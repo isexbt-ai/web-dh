@@ -1,0 +1,186 @@
+<?php
+/**
+ * 数据库连接配置文件
+ * 使用PDO连接SQLite数据库
+ */
+
+// 数据库文件路径
+$dbPath = __DIR__ . '/../data/nav.db';
+
+// 创建数据库目录（如果不存在）
+$dbDir = dirname($dbPath);
+if (!is_dir($dbDir)) {
+    mkdir($dbDir, 0755, true);
+}
+
+try {
+    $pdo = new PDO('sqlite:' . $dbPath);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+    // 设置时区
+    $pdo->exec("PRAGMA timezone = '+00:00'");
+
+} catch (PDOException $e) {
+    error_log('Database connection failed: ' . $e->getMessage());
+    die('系统维护中，请稍后访问');
+}
+
+/**
+ * 初始化数据库表结构
+ */
+function initDatabase($pdo) {
+    // 站点配置表
+    $pdo->exec("CREATE TABLE IF NOT EXISTS site_config (
+        id INTEGER PRIMARY KEY,
+        key TEXT UNIQUE NOT NULL,
+        value TEXT,
+        type TEXT DEFAULT 'text',
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+
+    // 广告位表
+    $pdo->exec("CREATE TABLE IF NOT EXISTS ads (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT,
+        image TEXT,
+        link TEXT,
+        sort_order INTEGER DEFAULT 0,
+        is_active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+
+    // 公告表
+    $pdo->exec("CREATE TABLE IF NOT EXISTS notices (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        content TEXT,
+        sort_order INTEGER DEFAULT 0,
+        is_active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+
+    // 分类目录表
+    $pdo->exec("CREATE TABLE IF NOT EXISTS categories (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        sort_order INTEGER DEFAULT 0,
+        is_active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+
+    // 导航卡片表
+    $pdo->exec("CREATE TABLE IF NOT EXISTS cards (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        category_id INTEGER,
+        title TEXT NOT NULL,
+        image TEXT,
+        link TEXT,
+        detail TEXT DEFAULT '',
+        card_type TEXT DEFAULT 'link',
+        image_width INTEGER DEFAULT 0,
+        image_height INTEGER DEFAULT 0,
+        sort_order INTEGER DEFAULT 0,
+        click_count INTEGER DEFAULT 0,
+        is_active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (category_id) REFERENCES categories(id)
+    )");
+
+    // 迁移：为已存在的cards表添加detail字段
+    try {
+        $pdo->exec("ALTER TABLE cards ADD COLUMN detail TEXT DEFAULT ''");
+    } catch (PDOException $e) {
+        // 字段已存在，忽略错误
+    }
+
+    // 迁移：为已存在的cards表添加card_type字段
+    try {
+        $pdo->exec("ALTER TABLE cards ADD COLUMN card_type TEXT DEFAULT 'link'");
+    } catch (PDOException $e) {
+        // 字段已存在，忽略错误
+    }
+
+    // 迁移：为已存在的cards表添加image_width和image_height字段
+    try {
+        $pdo->exec("ALTER TABLE cards ADD COLUMN image_width INTEGER DEFAULT 0");
+    } catch (PDOException $e) {
+        // 字段已存在，忽略错误
+    }
+    try {
+        $pdo->exec("ALTER TABLE cards ADD COLUMN image_height INTEGER DEFAULT 0");
+    } catch (PDOException $e) {
+        // 字段已存在，忽略错误
+    }
+
+    // 迁移：为已存在的cards表添加badge_text字段（自定义角标文字）
+    try {
+        $pdo->exec("ALTER TABLE cards ADD COLUMN badge_text TEXT DEFAULT ''");
+    } catch (PDOException $e) {
+        // 字段已存在，忽略错误
+    }
+
+    // 访问统计表
+    $pdo->exec("CREATE TABLE IF NOT EXISTS visit_stats (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        page TEXT,
+        ip TEXT,
+        user_agent TEXT,
+        visit_date DATE,
+        visit_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+
+    // 管理员表
+    $pdo->exec("CREATE TABLE IF NOT EXISTS admin_users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+
+    // 链接管理表（前台功能菜单）
+    $pdo->exec("CREATE TABLE IF NOT EXISTS links (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        url TEXT NOT NULL,
+        icon TEXT DEFAULT '',
+        sort_order INTEGER DEFAULT 0,
+        is_active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+
+    // 插入默认管理员账号 (admin/admin)
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM admin_users WHERE username = ?");
+    $stmt->execute(['admin']);
+    if ($stmt->fetchColumn() == 0) {
+        $hash = password_hash('admin', PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("INSERT INTO admin_users (username, password) VALUES (?, ?)");
+        $stmt->execute(['admin', $hash]);
+    }
+
+    // 插入默认站点配置
+    $defaultConfigs = [
+        ['site_title', '美女导航', 'text'],
+        ['avatar', '', 'image'],
+        ['contact_info', '微信：xxx', 'text'],
+        ['site_description', '精选美女导航网站', 'text'],
+    ];
+
+    foreach ($defaultConfigs as $config) {
+        $stmt = $pdo->prepare("INSERT OR IGNORE INTO site_config (key, value, type) VALUES (?, ?, ?)");
+        $stmt->execute($config);
+    }
+
+    // 插入默认分类
+    $stmt = $pdo->query("SELECT COUNT(*) FROM categories");
+    if ($stmt->fetchColumn() == 0) {
+        $categories = ['目录一', '目录二', '目录三'];
+        foreach ($categories as $index => $name) {
+            $stmt = $pdo->prepare("INSERT INTO categories (name, sort_order) VALUES (?, ?)");
+            $stmt->execute([$name, $index]);
+        }
+    }
+}
+
+// 初始化数据库
+initDatabase($pdo);
