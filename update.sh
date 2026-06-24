@@ -25,6 +25,16 @@ cd "$SCRIPT_DIR"
 echo -e "${YELLOW}📍 项目目录: $(pwd)${NC}"
 echo ""
 
+# 修复 git safe.directory 权限问题（root运行时需要）
+GIT_OWNER=$(stat -c '%U' "$SCRIPT_DIR/.git" 2>/dev/null || echo "")
+if [ "$(whoami)" != "$GIT_OWNER" ] && [ -n "$GIT_OWNER" ]; then
+    echo -e "${YELLOW}⚠️  当前用户($(whoami))与仓库所有者($GIT_OWNER)不一致${NC}"
+    echo -e "${BLUE}🔧 正在添加 safe.directory 例外...${NC}"
+    git config --global --add safe.directory "$SCRIPT_DIR" 2>/dev/null || true
+    echo -e "${GREEN}✅ 权限配置完成${NC}"
+    echo ""
+fi
+
 # 检查是否是git仓库
 if [ ! -d ".git" ]; then
     echo -e "${YELLOW}⚠️  未检测到git仓库，正在初始化...${NC}"
