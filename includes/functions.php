@@ -138,6 +138,24 @@ function getTotalVisits() {
 }
 
 /**
+ * 获取24小时内独立访问IP数
+ */
+function get24hVisits() {
+    global $pdo;
+    $stmt = $pdo->query("SELECT COUNT(DISTINCT ip) as count FROM visit_stats WHERE visit_date >= date('now', '-1 day')");
+    return $stmt->fetch()['count'];
+}
+
+/**
+ * 获取总点击量（所有卡片点击数之和）
+ */
+function getTotalClicks() {
+    global $pdo;
+    $stmt = $pdo->query("SELECT SUM(click_count) as total FROM cards");
+    return $stmt->fetch()['total'] ?? 0;
+}
+
+/**
  * 获取本周访问量数据（用于趋势图）
  */
 function getWeekVisits() {

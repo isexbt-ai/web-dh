@@ -1,6 +1,7 @@
 #!/bin/bash
-# 美女导航项目 - 自动更新脚本
+# 美女导航项目 - 服务器自动更新脚本
 # 用法: ./update.sh
+# 功能: 从GitHub拉取最新代码，自动应用数据库迁移，设置权限
 
 set -e
 
@@ -9,41 +10,42 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_NAME="美女导航"
 
 echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}  美女导航项目 - 自动更新脚本${NC}"
+echo -e "${BLUE}  $PROJECT_NAME - 服务器自动更新${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 
-# 获取脚本所在目录
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# 切换到项目目录
 cd "$SCRIPT_DIR"
-
-echo -e "${YELLOW}📍 当前目录: $(pwd)${NC}"
+echo -e "${YELLOW}📍 项目目录: $(pwd)${NC}"
 echo ""
 
 # 检查是否是git仓库
 if [ ! -d ".git" ]; then
-    echo -e "${RED}❌ 错误: 当前目录不是git仓库${NC}"
-    echo -e "${YELLOW}💡 提示: 请确保在正确的项目目录中运行此脚本${NC}"
-    exit 1
+    echo -e "${YELLOW}⚠️  未检测到git仓库，正在初始化...${NC}"
+    git init
+    git remote add origin https://github.com/isexbt-ai/web-dh.git
+    echo -e "${GREEN}✅ Git仓库初始化完成${NC}"
+    echo ""
 fi
 
-# 检查远程仓库
-echo -e "${BLUE}🔍 检查远程仓库...${NC}"
-if ! git remote -v > /dev/null 2>&1; then
-    echo -e "${RED}❌ 错误: 未配置远程仓库${NC}"
-    echo -e "${YELLOW}💡 提示: 请先运行: git remote add origin <仓库地址>${NC}"
-    exit 1
-fi
-
+# 检查远程仓库配置
 REMOTE_URL=$(git remote get-url origin 2>/dev/null || echo "")
+if [ -z "$REMOTE_URL" ]; then
+    echo -e "${BLUE}🔗 配置远程仓库...${NC}"
+    git remote add origin https://github.com/isbt-ai/web-dh.git
+    REMOTE_URL=$(git remote get-url origin)
+fi
 echo -e "${GREEN}✅ 远程仓库: $REMOTE_URL${NC}"
 echo ""
 
 # 获取当前分支
-BRANCH=$(git rev-parse --abbrev-ref HEAD)
+BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
 echo -e "${BLUE}🌿 当前分支: $BRANCH${NC}"
 
 # 检查是否有未提交的更改
@@ -61,7 +63,7 @@ if [ -n "$(git status --porcelain)" ]; then
     case $choice in
         1)
             echo -e "${BLUE}📦 暂存本地更改...${NC}"
-            git stash push -m "update-$(date +%Y%m%d-%H%M%S)"
+            git stash push -m "auto-stash-$(date +%Y%m%d-%H%M%S)"
             STASHED=1
             ;;
         2)
@@ -76,18 +78,14 @@ if [ -n "$(git status --porcelain)" ]; then
 fi
 echo ""
 
-# 拉取最新代码
-echo -e "${BLUE}⬇️  正在拉取最新代码...${NC}"
+# 从GitHub拉取最新代码
+echo -e "${BLUE}⬇️  正在从GitHub拉取最新代码...${NC}"
 if ! git pull origin "$BRANCH"; then
     echo -e "${RED}❌ 拉取代码失败${NC}"
-    echo -e "${YELLOW}💡 提示: 可能是网络问题或合并冲突${NC}"
-
-    # 如果之前有暂存，尝试恢复
-    if [ -n "$STASHED" ]; then
-        echo -e "${BLUE}📦 恢复暂存的更改...${NC}"
-        git stash pop
-    fi
-    exit 1
+    echo -e "${YELLOW}💡 尝试强制重置到远程分支...${NC}"
+    git fetch origin
+    git reset --hard "origin/$BRANCH"
+    echo -e "${GREEN}✅ 已强制同步到远程最新版本${NC}"
 fi
 echo -e "${GREEN}✅ 代码拉取成功${NC}"
 echo ""
@@ -97,11 +95,8 @@ echo -e "${BLUE}🗄️  检查数据库迁移...${NC}"
 php -r "
 require_once 'includes/db.php';
 echo \"数据库连接成功\n\";
-// initDatabase 会在 db.php 加载时自动执行
 echo \"数据库迁移完成\n\";
-" 2>/dev/null || {
-    echo -e "${YELLOW}⚠️  数据库迁移检查失败，请手动检查${NC}"
-}
+" 2>/dev/null && echo -e "${GREEN}✅ 数据库迁移完成${NC}" || echo -e "${YELLOW}⚠️  数据库迁移检查失败，请手动检查${NC}"
 echo ""
 
 # 设置文件权限
@@ -118,12 +113,12 @@ echo -e "  提交时间: ${GREEN}$(git log -1 --format=%cd --date=iso)${NC}"
 echo -e "  提交信息: ${GREEN}$(git log -1 --format=%s)${NC}"
 echo ""
 
-# 如果之前有暂存，提示用户
-git stash list | grep -q "update-" && {
+# 如果有暂存的更改，提示恢复
+if [ -n "$STASHED" ]; then
     echo -e "${YELLOW}⚠️  注意: 之前有本地更改被暂存${NC}"
     echo -e "${YELLOW}   运行 'git stash pop' 恢复更改${NC}"
     echo ""
-}
+fi
 
 echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}  🎉 更新完成！${NC}"

@@ -490,9 +490,21 @@ img {
 }
 
 .site-footer .visitor-count {
-    margin-top: 6px;
-    font-size: 12px;
-    color: #bbbbbb;
+    margin-top: 8px;
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #e94560, #ff6b6b, #f9a825, #4ecca3, #7c4dff);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 4s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 /* ==================== 响应式设计 - PC端优化 ==================== */
