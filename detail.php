@@ -138,6 +138,15 @@ $config = [
             margin-bottom: 0;
         }
 
+        .detail-body .detail-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            margin: 16px 0;
+            display: block;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
         .detail-actions {
             display: flex;
             gap: 12px;
@@ -276,7 +285,7 @@ $config = [
 
                 <div class="detail-body">
                     <?php if (!empty($card['detail'])): ?>
-                        <?php echo nl2br(e($card['detail'])); ?>
+                        <?php echo parseDetail($card['detail']); ?>
                     <?php else: ?>
                         <div class="detail-empty">暂无详细介绍</div>
                     <?php endif; ?>

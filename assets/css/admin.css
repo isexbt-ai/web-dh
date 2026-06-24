@@ -554,3 +554,50 @@ body {
         flex-direction: column;
     }
 }
+
+/* ==================== 详情编辑工具栏 ==================== */
+.detail-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px 8px 0 0;
+    border-bottom: none;
+}
+
+.toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toolbar-btn:hover {
+    background: rgba(233,69,96,0.2);
+    border-color: rgba(233,69,96,0.4);
+}
+
+.toolbar-hint {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    margin-left: auto;
+}
+
+/* 详情文本框样式 */
+#cardDetail {
+    border-radius: 0 0 8px 8px;
+    min-height: 200px;
+    font-family: monospace;
+    line-height: 1.8;
+    resize: vertical;
+}

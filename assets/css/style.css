@@ -489,6 +489,12 @@ img {
     margin-top: 4px;
 }
 
+.site-footer .visitor-count {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #bbbbbb;
+}
+
 /* ==================== 响应式设计 - PC端优化 ==================== */
 @media (min-width: 1024px) {
     .page-wrapper {

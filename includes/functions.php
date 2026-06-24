@@ -101,16 +101,22 @@ function getCards($categoryId = null, $activeOnly = true) {
 }
 
 /**
- * 记录访问统计
+ * 记录访问统计（24小时内同一IP只记录一次）
  */
 function recordVisit($page = '') {
     global $pdo;
-    $stmt = $pdo->prepare("INSERT INTO visit_stats (page, ip, user_agent, visit_date) VALUES (?, ?, ?, date('now'))");
-    $stmt->execute([
-        $page,
-        $_SERVER['REMOTE_ADDR'] ?? '',
-        $_SERVER['HTTP_USER_AGENT'] ?? ''
-    ]);
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+
+    // 检查该IP在最近24小时内是否已有记录
+    $stmt = $pdo->prepare("SELECT id FROM visit_stats WHERE ip = ? AND visit_date >= date('now', '-1 day') LIMIT 1");
+    $stmt->execute([$ip]);
+    $existing = $stmt->fetch();
+
+    if (!$existing) {
+        $stmt = $pdo->prepare("INSERT INTO visit_stats (page, ip, user_agent, visit_date) VALUES (?, ?, ?, date('now'))");
+        $stmt->execute([$page, $ip, $userAgent]);
+    }
 }
 
 /**
@@ -123,11 +129,11 @@ function getTodayVisits() {
 }
 
 /**
- * 获取总访问量
+ * 获取总访问量（独立IP数）
  */
 function getTotalVisits() {
     global $pdo;
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM visit_stats");
+    $stmt = $pdo->query("SELECT COUNT(DISTINCT ip) as count FROM visit_stats");
     return $stmt->fetch()['count'];
 }
 
@@ -193,8 +199,23 @@ function jsonError($message) {
 }
 
 /**
- * 上传图片
+ * 解析详情内容中的图片标记
+ * 支持 ![alt](url) Markdown图片语法
  */
+function parseDetail($text) {
+    if (empty($text)) return '';
+
+    // 先转义HTML特殊字符
+    $text = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+
+    // 解析图片标记 ![alt](url) -> <img src="url" alt="alt" class="detail-img">
+    $text = preg_replace('/!\[([^\]]*)\]\(([^\)]+)\)/', '<img src="$2" alt="$1" class="detail-img" loading="lazy">', $text);
+
+    // 保留换行
+    $text = nl2br($text);
+
+    return $text;
+}
 function uploadImage($file, $directory = 'cards') {
     $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     $maxSize = 10 * 1024 * 1024; // 10MB

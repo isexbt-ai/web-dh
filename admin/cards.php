@@ -201,7 +201,17 @@ if ($categoryFilter) {
                 </div>
                 <div class="form-group">
                     <label>详细介绍</label>
-                    <textarea id="cardDetail" name="detail" placeholder="请输入产品的详细介绍内容..."></textarea>
+                    <div class="detail-toolbar">
+                        <button type="button" class="toolbar-btn" onclick="insertImageFromFile()" title="上传图片">
+                            📷 上传图片
+                        </button>
+                        <button type="button" class="toolbar-btn" onclick="insertImageFromURL()" title="插入URL图片">
+                            🔗 URL图片
+                        </button>
+                        <span class="toolbar-hint">提示：也可以直接粘贴图片</span>
+                    </div>
+                    <textarea id="cardDetail" name="detail" placeholder="请输入产品的详细介绍内容..." rows="8"></textarea>
+                    <input type="file" id="detailImageFile" accept="image/*" style="display:none" onchange="handleDetailImageUpload(this)">
                 </div>
                 <div class="form-group">
                     <label>自定义角标</label>
@@ -272,6 +282,67 @@ if ($categoryFilter) {
                 location.reload();
             });
             return false;
+        }
+
+        // ==================== 详情图片插入功能 ====================
+
+        // 监听粘贴事件
+        document.getElementById('cardDetail').addEventListener('paste', async function(e) {
+            const items = e.clipboardData.items;
+            for (let item of items) {
+                if (item.type.startsWith('image/')) {
+                    e.preventDefault();
+                    const file = item.getAsFile();
+                    showToast('正在上传粘贴的图片...', 'warning');
+                    const result = await uploadImage(file, 'cards');
+                    if (result.success) {
+                        insertImageTag(result.data.path, '粘贴的图片');
+                        showToast('图片上传成功', 'success');
+                    } else {
+                        showToast(result.message || '上传失败', 'error');
+                    }
+                }
+            }
+        });
+
+        // 从文件上传图片
+        function insertImageFromFile() {
+            document.getElementById('detailImageFile').click();
+        }
+
+        async function handleDetailImageUpload(input) {
+            if (input.files && input.files[0]) {
+                showToast('正在上传图片...', 'warning');
+                const result = await uploadImage(input.files[0], 'cards');
+                if (result.success) {
+                    insertImageTag(result.data.path, '');
+                    showToast('图片上传成功', 'success');
+                } else {
+                    showToast(result.message || '上传失败', 'error');
+                }
+                input.value = '';
+            }
+        }
+
+        // 从URL插入图片
+        function insertImageFromURL() {
+            const url = prompt('请输入图片URL地址：', 'https://');
+            if (url && url.trim()) {
+                insertImageTag(url.trim(), '');
+            }
+        }
+
+        // 在详情文本框中插入图片标记
+        function insertImageTag(url, alt) {
+            const textarea = document.getElementById('cardDetail');
+            const tag = '![' + (alt || '图片') + '](' + url + ')';
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const before = textarea.value.substring(0, start);
+            const after = textarea.value.substring(end);
+            textarea.value = before + tag + '\n' + after;
+            textarea.selectionStart = textarea.selectionEnd = start + tag.length + 1;
+            textarea.focus();
         }
 
         function editCard(btn) {
