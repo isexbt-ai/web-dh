@@ -30,6 +30,18 @@ try {
  * 初始化数据库表结构
  */
 function initDatabase($pdo) {
+    // 快速检查：如果所有核心表都已存在，跳过初始化
+    $requiredTables = ['site_config', 'ads', 'notices', 'categories', 'cards', 'visit_stats', 'admin_users', 'links'];
+    try {
+        $existing = $pdo->query("SELECT name FROM sqlite_master WHERE type='table'")
+                        ->fetchAll(PDO::FETCH_COLUMN);
+        if (count(array_intersect($requiredTables, $existing)) === count($requiredTables)) {
+            return; // 所有表已存在，跳过初始化
+        }
+    } catch (PDOException $e) {
+        // 如果查询失败（数据库未初始化），继续执行初始化
+    }
+
     // 站点配置表
     $pdo->exec("CREATE TABLE IF NOT EXISTS site_config (
         id INTEGER PRIMARY KEY,

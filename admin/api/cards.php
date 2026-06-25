@@ -3,12 +3,25 @@
  * 获取卡片列表 API
  */
 header('Content-Type: application/json; charset=utf-8');
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
 require_once __DIR__ . '/../../includes/functions.php';
 
 $categoryId = isset($_GET['category_id']) ? intval($_GET['category_id']) : null;
 
 try {
     $cards = getCards($categoryId);
+
+    // 为每张卡片添加缩略图URL
+    foreach ($cards as &$card) {
+        if (!empty($card['image'])) {
+            $card['thumb_image'] = getThumbnailUrl($card['image']);
+        } else {
+            $card['thumb_image'] = '';
+        }
+    }
+
     jsonResponse($cards);
 } catch (Exception $e) {
     error_log('Cards API Error: ' . $e->getMessage());

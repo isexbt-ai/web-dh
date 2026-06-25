@@ -13,14 +13,26 @@ function e($string) {
 }
 
 /**
- * 获取站点配置
+ * 获取站点配置（带内存缓存）
  */
 function getConfig($key, $default = '') {
     global $pdo;
-    $stmt = $pdo->prepare("SELECT value FROM site_config WHERE key = ?");
-    $stmt->execute([$key]);
-    $result = $stmt->fetch();
-    return $result ? $result['value'] : $default;
+    static $configCache = null;
+
+    // 首次调用时批量加载所有配置到内存
+    if ($configCache === null) {
+        $configCache = [];
+        try {
+            $stmt = $pdo->query("SELECT key, value FROM site_config");
+            while ($row = $stmt->fetch()) {
+                $configCache[$row['key']] = $row['value'];
+            }
+        } catch (PDOException $e) {
+            // 表可能不存在，返回默认值
+        }
+    }
+
+    return $configCache[$key] ?? $default;
 }
 
 /**
@@ -101,21 +113,77 @@ function getCards($categoryId = null, $activeOnly = true) {
 }
 
 /**
- * 记录访问统计（24小时内同一IP只记录一次）
+ * 记录访问统计（异步队列模式）
+ * 写入文件队列，由 processVisitQueue() 批量处理
  */
 function recordVisit($page = '') {
-    global $pdo;
     $ip = $_SERVER['REMOTE_ADDR'] ?? '';
     $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
-    // 检查该IP在最近24小时内是否已有记录
-    $stmt = $pdo->prepare("SELECT id FROM visit_stats WHERE ip = ? AND visit_date >= date('now', '-1 day') LIMIT 1");
-    $stmt->execute([$ip]);
-    $existing = $stmt->fetch();
+    $data = json_encode([
+        'page' => $page,
+        'ip' => $ip,
+        'user_agent' => $userAgent,
+        'time' => time()
+    ]);
 
-    if (!$existing) {
-        $stmt = $pdo->prepare("INSERT INTO visit_stats (page, ip, user_agent, visit_date) VALUES (?, ?, ?, date('now'))");
-        $stmt->execute([$page, $ip, $userAgent]);
+    $queueFile = __DIR__ . '/../data/visit_queue.log';
+    file_put_contents($queueFile, $data . "\n", FILE_APPEND | LOCK_EX);
+}
+
+/**
+ * 处理访问统计队列（批量写入数据库）
+ * 应在页面输出完成后调用
+ */
+function processVisitQueue() {
+    global $pdo;
+
+    $queueFile = __DIR__ . '/../data/visit_queue.log';
+    if (!file_exists($queueFile) || filesize($queueFile) === 0) {
+        return;
+    }
+
+    // 读取并清空队列
+    $content = file_get_contents($queueFile);
+    file_put_contents($queueFile, '');
+
+    if (empty(trim($content))) {
+        return;
+    }
+
+    $lines = array_filter(explode("\n", trim($content)));
+    if (empty($lines)) {
+        return;
+    }
+
+    // 批量处理：按 IP 去重，只保留每个 IP 的最新记录
+    $uniqueVisits = [];
+    foreach ($lines as $line) {
+        $data = json_decode($line, true);
+        if (!$data) continue;
+        $key = $data['ip'] . '_' . $data['page'];
+        $uniqueVisits[$key] = $data;
+    }
+
+    foreach ($uniqueVisits as $data) {
+        $ip = $data['ip'];
+        $page = $data['page'];
+        $userAgent = $data['user_agent'];
+
+        // 检查该IP在当天是否已有记录
+        try {
+            $stmt = $pdo->prepare("SELECT id FROM visit_stats WHERE ip = ? AND visit_date = date('now') LIMIT 1");
+            $stmt->execute([$ip]);
+            $existing = $stmt->fetch();
+
+            if (!$existing) {
+                $stmt = $pdo->prepare("INSERT INTO visit_stats (page, ip, user_agent, visit_date) VALUES (?, ?, ?, date('now'))");
+                $stmt->execute([$page, $ip, $userAgent]);
+            }
+        } catch (PDOException $e) {
+            // 忽略写入错误，避免影响页面
+            error_log('Visit queue processing error: ' . $e->getMessage());
+        }
     }
 }
 
@@ -217,9 +285,86 @@ function jsonError($message) {
 }
 
 /**
- * 解析详情内容中的图片标记
- * 支持 ![alt](url) Markdown图片语法
+ * 获取缩略图URL（优先WebP，其次JPG，回退原图）
  */
+function getThumbnailUrl($imagePath) {
+    if (empty($imagePath)) return '';
+
+    $baseDir = __DIR__ . '/../';
+    $thumbPath = $imagePath . '_thumb.jpg';
+    $webpThumbPath = $thumbPath . '.webp';
+
+    // 优先返回 WebP 缩略图
+    if (file_exists($baseDir . $webpThumbPath)) {
+        return $webpThumbPath;
+    }
+
+    // 其次返回 JPG 缩略图
+    if (file_exists($baseDir . $thumbPath)) {
+        return $thumbPath;
+    }
+
+    // 回退原图
+    return $imagePath;
+}
+
+/**
+ * 渲染卡片HTML（用于PHP端SSR）
+ * 输出与JS端 renderCards() 完全一致的HTML结构
+ */
+function renderCardsHtml($cards) {
+    if (empty($cards)) {
+        echo '<div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="9" cy="9" r="2"/>
+                <path d="M21 15l-5-5L5 21"/>
+            </svg>
+            <p>暂无内容</p>
+        </div>';
+        return;
+    }
+
+    foreach ($cards as $card) {
+        $cardType = $card['card_type'] ?? 'link';
+
+        // 角标文字
+        $badgeText = $card['badge_text'] ?? '';
+        $badgeClass = '';
+        if ($badgeText) {
+            $badgeClass = 'custom';
+        } else {
+            $badgeClass = $cardType === 'detail' ? 'detail' : 'link';
+            $badgeText = $cardType === 'detail' ? '详情' : '外链';
+        }
+
+        // 点击事件
+        $onclickAttr = $cardType === 'detail'
+            ? 'onclick="goToDetail(' . intval($card['id']) . ')"'
+            : 'onclick="goToLink(' . intval($card['id']) . ', \'' . rawurlencode($card['link'] ?? '#') . '\')"';
+
+        // 图片处理 - 使用缩略图
+        $imageHtml = '';
+        if (!empty($card['image'])) {
+            $thumbUrl = getThumbnailUrl($card['image']);
+            $imageHtml = '<img src="' . e($thumbUrl) . '" alt="' . e($card['title']) . '" loading="lazy">';
+        } else {
+            $imageHtml = '<div class="card-placeholder">图片</div>';
+        }
+
+        // 图片尺寸
+        $imageContainerStyle = '';
+        if (!empty($card['image_height']) && $card['image_height'] > 0) {
+            $imageContainerStyle = 'style="height: ' . intval($card['image_height']) . 'px; aspect-ratio: auto;"';
+        }
+
+        echo '<div class="card-item" ' . $onclickAttr . '>';
+        echo '<span class="card-type-badge ' . $badgeClass . '">' . e($badgeText) . '</span>';
+        echo '<div class="card-image" ' . $imageContainerStyle . '>' . $imageHtml . '</div>';
+        echo '<div class="card-title">' . e($card['title']) . '</div>';
+        echo '</div>';
+    }
+}
 function parseDetail($text) {
     if (empty($text)) return '';
 

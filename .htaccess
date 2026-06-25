@@ -46,7 +46,20 @@ php_value post_max_size 20M
     </FilesMatch>
 </IfModule>
 
+# HTML 页面缓存 - 首页缓存 5 分钟，其他页面不缓存
+<IfModule mod_headers.c>
+    <FilesMatch "^index\.php$">
+        Header set Cache-Control "public, max-age=300"
+    </FilesMatch>
+    <FilesMatch "detail\.php$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+</IfModule>
+
 # Gzip 压缩
 <IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/html text/plain text/css application/javascript text/javascript application/json application/xml
+    AddOutputFilterByType DEFLATE text/html text/plain text/css application/javascript text/javascript application/json application/xml text/xml application/rss+xml application/atom+xml image/svg+xml
+
+    # 排除已压缩的内容
+    SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png|webp|zip|gz|bz2)$ no-gzip
 </IfModule>

@@ -1,6 +1,5 @@
 <?php
 require_once 'includes/functions.php';
-recordVisit('index');
 
 $ads = getAds();
 $notices = getNotices();
@@ -11,6 +10,12 @@ $config = [
     'site_title' => getConfig('site_title', '美女导航')
 ];
 $links = getLinks();
+
+// 获取第一个分类的卡片用于首屏SSR
+$firstCategoryCards = [];
+if (!empty($categories)) {
+    $firstCategoryCards = getCards($categories[0]['id']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -63,11 +68,11 @@ $links = getLinks();
         <section class="slide-section">
             <div class="section-card" style="padding: 10px;">
                 <div class="slide-carousel" id="slideCarousel">
-                    <?php foreach ($ads as $ad): ?>
-                    <div class="slide-item <?php echo $ad === $ads[0] ? 'active' : ''; ?>">
+                    <?php foreach ($ads as $index => $ad): ?>
+                    <div class="slide-item <?php echo $index === 0 ? 'active' : ''; ?>">
                         <a href="<?php echo e($ad['link'] ?? '#'); ?>" target="_blank" rel="noopener">
                             <?php if ($ad['image']): ?>
-                                <img src="<?php echo e($ad['image']); ?>" alt="<?php echo e($ad['title']); ?>" loading="lazy">
+                                <img src="<?php echo e($ad['image']); ?>" alt="<?php echo e($ad['title']); ?>" <?php echo $index === 0 ? '' : 'loading="lazy"'; ?>>
                             <?php else: ?>
                                 <div class="slide-placeholder">
                                     <span><?php echo e($ad['title'] ?: '推荐位'); ?></span>
@@ -124,10 +129,7 @@ $links = getLinks();
         <section class="card-section">
             <div class="section-card" style="padding: 14px;">
                 <div class="card-grid" id="cardGrid">
-                    <div class="loading-spinner">
-                        <div class="spinner"></div>
-                        <p>加载中...</p>
-                    </div>
+                    <?php renderCardsHtml($firstCategoryCards); ?>
                 </div>
             </div>
         </section>
@@ -141,11 +143,22 @@ $links = getLinks();
 
     <script src="assets/js/main.js"></script>
     <script>
+        // 标记首屏已加载的分类，避免JS重复请求
+        window.__firstCategoryLoaded = <?php echo !empty($categories) ? $categories[0]['id'] : 'null'; ?>;
+
         document.addEventListener('DOMContentLoaded', function() {
             <?php if (!empty($categories)): ?>
-            switchCategory(<?php echo $categories[0]['id']; ?>);
+            // 更新Tab状态但不触发AJAX（首屏已由PHP渲染）
+            const tabs = document.querySelectorAll('.category-tab');
+            tabs.forEach(tab => {
+                tab.classList.toggle('active', parseInt(tab.dataset.id) === <?php echo $categories[0]['id']; ?>);
+            });
             <?php endif; ?>
         });
     </script>
+    <?php
+    // 页面输出完成后处理访问统计队列
+    processVisitQueue();
+    ?>
 </body>
 </html>

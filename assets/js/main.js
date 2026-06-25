@@ -164,6 +164,12 @@ function switchCategory(categoryId) {
         tab.classList.toggle('active', parseInt(tab.dataset.id) === categoryId);
     });
 
+    // 如果首屏已加载且是同一分类，跳过AJAX
+    if (window.__firstCategoryLoaded === categoryId) {
+        window.__firstCategoryLoaded = null;
+        return;
+    }
+
     // 加载卡片
     loadCards(categoryId);
 }
@@ -228,8 +234,8 @@ function renderCards(cards) {
         <div class="card-item" ${onclickAttr}>
             <span class="card-type-badge ${badgeClass}">${badgeText}</span>
             <div class="card-image" ${imageContainerStyle}>
-                ${card.image
-                    ? `<img src="${card.image}" alt="${escapeHtml(card.title)}" loading="lazy" ${imageStyle}>`
+                ${card.thumb_image
+                    ? `<img src="${card.thumb_image}" alt="${escapeHtml(card.title)}" loading="lazy" ${imageStyle}>`
                     : `<div class="card-placeholder">图片</div>`
                 }
             </div>
