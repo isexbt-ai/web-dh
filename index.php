@@ -27,7 +27,7 @@ $links = getLinks();
         <div class="header-left">
             <div class="avatar-section">
                 <?php if ($config['avatar']): ?>
-                    <img src="<?php echo e($config['avatar']); ?>" alt="头像" class="avatar-img">
+                    <img src="<?php echo e($config['avatar']); ?>" alt="头像" class="avatar-img" loading="eager">
                 <?php else: ?>
                     <div class="avatar-placeholder">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
