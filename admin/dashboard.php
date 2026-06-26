@@ -5,8 +5,8 @@ requireLogin();
 
 // 获取统计数据
 $todayVisits = getTodayVisits();
+$todayIpCount = getTodayIpCount();
 $totalVisits = getTotalVisits();
-$visits24h = get24hVisits();
 $totalClicks = getTotalClicks();
 $weekData = getWeekVisits();
 $hotCards = getHotCards(5);
@@ -120,21 +120,8 @@ $cardsCount = $pdo->query("SELECT COUNT(*) FROM cards")->fetchColumn();
                         </svg>
                     </div>
                     <div class="stat-info">
-                        <h3><?php echo $todayVisits; ?></h3>
-                        <p>今日访问</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: linear-gradient(135deg, #ff6b6b, #ffa07a);">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2"/>
-                            <path d="M3 9h18"/>
-                            <path d="M9 21V9"/>
-                        </svg>
-                    </div>
-                    <div class="stat-info">
-                        <h3><?php echo $visits24h; ?></h3>
-                        <p>24小时独立IP</p>
+                        <h3><?php echo $todayIpCount; ?></h3>
+                        <p>今日IP数量</p>
                     </div>
                 </div>
                 <div class="stat-card">

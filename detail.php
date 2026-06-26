@@ -20,7 +20,6 @@ if (!$card) {
 
 // 记录访问
 recordVisit('detail');
-incrementCardClick($cardId);
 
 $config = [
     'site_title' => getConfig('site_title', '美女导航')

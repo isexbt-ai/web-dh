@@ -197,8 +197,22 @@ function getTodayVisits() {
 }
 
 /**
- * 获取总访问量（独立IP数）
+ * 获取总访问量（所有记录数，不去重）
  */
+function getTotalVisitsAll() {
+    global $pdo;
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM visit_stats");
+    return $stmt->fetch()['count'];
+}
+
+/**
+ * 获取今日访问IP数量（独立IP数）
+ */
+function getTodayIpCount() {
+    global $pdo;
+    $stmt = $pdo->query("SELECT COUNT(DISTINCT ip) as count FROM visit_stats WHERE visit_date = date('now')");
+    return $stmt->fetch()['count'];
+}
 function getTotalVisits() {
     global $pdo;
     $stmt = $pdo->query("SELECT COUNT(DISTINCT ip) as count FROM visit_stats");
