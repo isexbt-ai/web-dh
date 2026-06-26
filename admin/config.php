@@ -29,21 +29,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cardsPerRowTablet = isset($_POST['cards_per_row_tablet']) ? trim($_POST['cards_per_row_tablet']) : 'repeat(4, 1fr)';
         $cardsPerRowMobile = isset($_POST['cards_per_row_mobile']) ? trim($_POST['cards_per_row_mobile']) : 'repeat(3, 1fr)';
         $guestbookEnabled = isset($_POST['guestbook_enabled']) ? '1' : '0';
-        $guestbookTitle = isset($_POST['guestbook_title']) ? trim($_POST['guestbook_title']) : '留言板';
-        $guestbookSubtitle = isset($_POST['guestbook_subtitle']) ? trim($_POST['guestbook_subtitle']) : '欢迎留下你的想法';
-
-        // 处理留言板图片上传
-        $guestbookImage = getConfig('guestbook_image', '');
-        if (isset($_FILES['guestbook_image_file']) && $_FILES['guestbook_image_file']['tmp_name']) {
-            $result = uploadImage($_FILES['guestbook_image_file'], 'guestbook');
-            if ($result['success']) {
-                $guestbookImage = $result['path'];
-            }
-        }
-        // 如果填入了URL，优先使用URL
-        if (isset($_POST['guestbook_image']) && trim($_POST['guestbook_image'])) {
-            $guestbookImage = trim($_POST['guestbook_image']);
-        }
 
         // 保存配置
         setConfig('site_title', $siteTitle);
@@ -54,9 +39,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         setConfig('cards_per_row_tablet', $cardsPerRowTablet);
         setConfig('cards_per_row_mobile', $cardsPerRowMobile);
         setConfig('guestbook_enabled', $guestbookEnabled);
-        setConfig('guestbook_title', $guestbookTitle);
-        setConfig('guestbook_subtitle', $guestbookSubtitle);
-        setConfig('guestbook_image', $guestbookImage);
 
         $success = '配置保存成功';
     }
@@ -70,10 +52,7 @@ $config = [
     'cards_per_row_desktop' => getConfig('cards_per_row_desktop', 'repeat(auto-fill, 120px)'),
     'cards_per_row_tablet' => getConfig('cards_per_row_tablet', 'repeat(4, 1fr)'),
     'cards_per_row_mobile' => getConfig('cards_per_row_mobile', 'repeat(3, 1fr)'),
-    'guestbook_enabled' => getConfig('guestbook_enabled', '1'),
-    'guestbook_title' => getConfig('guestbook_title', '留言板'),
-    'guestbook_subtitle' => getConfig('guestbook_subtitle', '欢迎留下你的想法'),
-    'guestbook_image' => getConfig('guestbook_image', '')
+    'guestbook_enabled' => getConfig('guestbook_enabled', '1')
 ];
 ?>
 <!DOCTYPE html>
@@ -210,48 +189,7 @@ $config = [
                             </label>
                             <span class="toggle-text"><?php echo $config['guestbook_enabled'] === '1' ? '已开启' : '已关闭'; ?></span>
                         </div>
-                        <p class="form-hint">关闭后前台悬浮按钮和留言板页面将不可访问</p>
-                    </div>
-
-                    <!-- 留言板自定义设置 -->
-                    <div class="form-group">
-                        <label style="font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: block;">💬 留言板设置</label>
-
-                        <div class="form-group">
-                            <label>留言板标题</label>
-                            <input type="text" name="guestbook_title" value="<?php echo e($config['guestbook_title']); ?>" placeholder="请输入留言板标题">
-                        </div>
-
-                        <div class="form-group">
-                            <label>留言板副标题</label>
-                            <input type="text" name="guestbook_subtitle" value="<?php echo e($config['guestbook_subtitle']); ?>" placeholder="支持 {count} 占位符，显示留言数量">
-                            <p class="form-hint">支持 {count} 占位符，显示留言数量</p>
-                        </div>
-
-                        <div class="form-group">
-                            <label>留言板顶部图片</label>
-                            <div style="display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap;">
-                                <!-- 方式1：本地上传 -->
-                                <div style="flex: 1; min-width: 200px;">
-                                    <label style="font-size: 13px; color: #666; margin-bottom: 8px; display: block;">方式1：本地上传</label>
-                                    <div class="image-upload" style="max-width: 200px;">
-                                        <input type="file" name="guestbook_image_file" accept="image/*" onchange="previewImage(this, 'guestbookImagePreview')">
-                                        <div class="upload-icon">📷</div>
-                                        <div class="upload-text">点击上传图片</div>
-                                    </div>
-                                </div>
-                                <!-- 方式2：填入URL -->
-                                <div style="flex: 1; min-width: 200px;">
-                                    <label style="font-size: 13px; color: #666; margin-bottom: 8px; display: block;">方式2：图片URL</label>
-                                    <input type="text" name="guestbook_image" value="<?php echo e($config['guestbook_image']); ?>" placeholder="https://example.com/image.jpg" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff;">
-                                </div>
-                            </div>
-                            <div id="guestbookImagePreview" style="margin-top: 12px;">
-                                <?php if ($config['guestbook_image']): ?>
-                                    <img src="<?php echo e($config['guestbook_image']); ?>" style="max-width: 200px; border-radius: 8px;">
-                                <?php endif; ?>
-                            </div>
-                        </div>
+                        <p class="form-hint">关闭后前台悬浮按钮和留言板页面将不可访问。标题、图片等配置请前往<a href="messages.php" style="color: #e94560;">留言管理</a>页面设置。</p>
                     </div>
 
                     <div class="form-group">

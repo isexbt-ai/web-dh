@@ -3,6 +3,48 @@ require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
 
+$error = '';
+$success = '';
+
+// 处理配置保存
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_guestbook_config'])) {
+    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+        $error = '安全验证失败，请刷新页面重试';
+    } else {
+        $guestbookEnabled = isset($_POST['guestbook_enabled']) ? '1' : '0';
+        $guestbookTitle = isset($_POST['guestbook_title']) ? trim($_POST['guestbook_title']) : '留言板';
+        $guestbookSubtitle = isset($_POST['guestbook_subtitle']) ? trim($_POST['guestbook_subtitle']) : '欢迎留下你的想法';
+
+        // 处理留言板图片上传
+        $guestbookImage = getConfig('guestbook_image', '');
+        if (isset($_FILES['guestbook_image_file']) && $_FILES['guestbook_image_file']['tmp_name']) {
+            $result = uploadImage($_FILES['guestbook_image_file'], 'guestbook');
+            if ($result['success']) {
+                $guestbookImage = $result['path'];
+            }
+        }
+        // 如果填入了URL，优先使用URL
+        if (isset($_POST['guestbook_image']) && trim($_POST['guestbook_image'])) {
+            $guestbookImage = trim($_POST['guestbook_image']);
+        }
+
+        setConfig('guestbook_enabled', $guestbookEnabled);
+        setConfig('guestbook_title', $guestbookTitle);
+        setConfig('guestbook_subtitle', $guestbookSubtitle);
+        setConfig('guestbook_image', $guestbookImage);
+
+        $success = '留言板配置保存成功';
+    }
+}
+
+// 获取配置
+$gbConfig = [
+    'guestbook_enabled' => getConfig('guestbook_enabled', '1'),
+    'guestbook_title' => getConfig('guestbook_title', '留言板'),
+    'guestbook_subtitle' => getConfig('guestbook_subtitle', '欢迎留下你的想法'),
+    'guestbook_image' => getConfig('guestbook_image', '')
+];
+
 // 获取所有留言（包括已删除的，用于管理）
 $stmt = $pdo->query("SELECT * FROM messages ORDER BY created_at DESC");
 $messages = $stmt->fetchAll();
@@ -73,8 +115,79 @@ $activeCount = $pdo->query("SELECT COUNT(*) FROM messages WHERE is_active = 1")-
         <main class="main-content">
             <header class="page-header">
                 <h1>留言管理</h1>
-                <p>管理网站留言信息</p>
+                <p>管理留言板配置和留言内容</p>
             </header>
+
+            <?php if ($success): ?>
+            <div style="background: rgba(78, 204, 163, 0.2); border: 1px solid rgba(78, 204, 163, 0.3); color: #4ecca3; padding: 12px; border-radius: 8px; margin-bottom: 24px; font-size: 14px;">
+                <?php echo e($success); ?>
+            </div>
+            <?php endif; ?>
+            <?php if ($error): ?>
+            <div style="background: rgba(244, 67, 54, 0.2); border: 1px solid rgba(244, 67, 54, 0.3); color: #f44336; padding: 12px; border-radius: 8px; margin-bottom: 24px; font-size: 14px;">
+                <?php echo e($error); ?>
+            </div>
+            <?php endif; ?>
+
+            <!-- 留言板配置区域 -->
+            <div class="table-section" style="margin-bottom: 32px;">
+                <h2 class="section-title" style="margin-bottom: 20px;">💬 留言板设置</h2>
+                <form method="POST" action="" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
+                    <input type="hidden" name="save_guestbook_config" value="1">
+
+                    <div class="form-group">
+                        <label>留言板开关</label>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="guestbookEnabled" name="guestbook_enabled"
+                                   value="1" <?php echo $gbConfig['guestbook_enabled'] === '1' ? 'checked' : ''; ?>>
+                            <label for="guestbookEnabled" class="toggle-label">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-text"><?php echo $gbConfig['guestbook_enabled'] === '1' ? '已开启' : '已关闭'; ?></span>
+                        </div>
+                        <p class="form-hint">关闭后前台悬浮按钮和留言板页面将不可访问</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>留言板标题</label>
+                        <input type="text" name="guestbook_title" value="<?php echo e($gbConfig['guestbook_title']); ?>" placeholder="请输入留言板标题">
+                    </div>
+
+                    <div class="form-group">
+                        <label>留言板副标题</label>
+                        <input type="text" name="guestbook_subtitle" value="<?php echo e($gbConfig['guestbook_subtitle']); ?>" placeholder="支持 {count} 占位符，显示留言数量">
+                        <p class="form-hint">支持 {count} 占位符，显示留言数量</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>留言板顶部图片</label>
+                        <div style="display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap;">
+                            <!-- 方式1：本地上传 -->
+                            <div style="flex: 1; min-width: 200px;">
+                                <label style="font-size: 13px; color: #666; margin-bottom: 8px; display: block;">方式1：本地上传</label>
+                                <div class="image-upload" style="max-width: 200px;">
+                                    <input type="file" name="guestbook_image_file" accept="image/*" onchange="previewImage(this, 'guestbookImagePreview')">
+                                    <div class="upload-icon">📷</div>
+                                    <div class="upload-text">点击上传图片</div>
+                                </div>
+                            </div>
+                            <!-- 方式2：填入URL -->
+                            <div style="flex: 1; min-width: 200px;">
+                                <label style="font-size: 13px; color: #666; margin-bottom: 8px; display: block;">方式2：图片URL</label>
+                                <input type="text" name="guestbook_image" value="<?php echo e($gbConfig['guestbook_image']); ?>" placeholder="https://example.com/image.jpg" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff;">
+                            </div>
+                        </div>
+                        <div id="guestbookImagePreview" style="margin-top: 12px;">
+                            <?php if ($gbConfig['guestbook_image']): ?>
+                                <img src="<?php echo e($gbConfig['guestbook_image']); ?>" style="max-width: 200px; border-radius: 8px;">
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">保存配置</button>
+                </form>
+            </div>
 
             <!-- 统计卡片 -->
             <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
@@ -168,6 +281,17 @@ $activeCount = $pdo->query("SELECT COUNT(*) FROM messages WHERE is_active = 1")-
         function restoreMessage(id) {
             if (!confirm('确定要恢复这条留言吗？')) return;
             saveData('message', { id: id, is_active: 1 }, () => location.reload());
+        }
+
+        function previewImage(input, previewId) {
+            const preview = document.getElementById(previewId);
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = '<img src="' + e.target.result + '" style="max-width: 200px; border-radius: 8px;">';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
         }
     </script>
 </body>
