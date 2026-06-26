@@ -63,7 +63,6 @@ if (!empty($categories)) {
                     <a href="<?php echo e($link['url']); ?>"<?php echo (strpos($link['url'], 'admin/') === false) ? ' target="_blank" rel="noopener"' : ''; ?>><?php echo e($link['title']); ?></a>
                     <?php endforeach; ?>
                 <?php endif; ?>
-                <a href="admin/" target="_blank">后台编辑</a>
             </div>
         </div>
     </header>
