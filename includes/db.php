@@ -180,6 +180,9 @@ function initDatabase($pdo) {
         ['avatar', '', 'image'],
         ['contact_info', '微信：xxx', 'text'],
         ['site_description', '精选美女导航网站', 'text'],
+        ['cards_per_row_desktop', 'repeat(auto-fill, 120px)', 'text'],
+        ['cards_per_row_tablet', 'repeat(4, 1fr)', 'text'],
+        ['cards_per_row_mobile', 'repeat(3, 1fr)', 'text'],
     ];
 
     foreach ($defaultConfigs as $config) {

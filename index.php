@@ -25,6 +25,13 @@ if (!empty($categories)) {
     <title><?php echo e(getConfig('site_title', '美女导航')); ?></title>
     <meta name="description" content="<?php echo e(getConfig('site_description', '精选美女导航网站')); ?>">
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        :root {
+            --cards-per-row-desktop: <?php echo e(getConfig('cards_per_row_desktop', 'repeat(auto-fill, 120px)')); ?>;
+            --cards-per-row-tablet: <?php echo e(getConfig('cards_per_row_tablet', 'repeat(4, 1fr)')); ?>;
+            --cards-per-row-mobile: <?php echo e(getConfig('cards_per_row_mobile', 'repeat(3, 1fr)')); ?>;
+        }
+    </style>
 </head>
 <body>
     <!-- 顶部栏 -->

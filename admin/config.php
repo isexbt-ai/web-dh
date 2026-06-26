@@ -24,11 +24,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        // 保存卡片布局配置
+        $cardsPerRowDesktop = isset($_POST['cards_per_row_desktop']) ? trim($_POST['cards_per_row_desktop']) : 'repeat(auto-fill, 120px)';
+        $cardsPerRowTablet = isset($_POST['cards_per_row_tablet']) ? trim($_POST['cards_per_row_tablet']) : 'repeat(4, 1fr)';
+        $cardsPerRowMobile = isset($_POST['cards_per_row_mobile']) ? trim($_POST['cards_per_row_mobile']) : 'repeat(3, 1fr)';
+
         // 保存配置
         setConfig('site_title', $siteTitle);
         setConfig('contact_info', $contactInfo);
         setConfig('site_description', $siteDescription);
         setConfig('avatar', $avatar);
+        setConfig('cards_per_row_desktop', $cardsPerRowDesktop);
+        setConfig('cards_per_row_tablet', $cardsPerRowTablet);
+        setConfig('cards_per_row_mobile', $cardsPerRowMobile);
 
         $success = '配置保存成功';
     }
@@ -38,7 +46,10 @@ $config = [
     'site_title' => getConfig('site_title', '美女导航'),
     'contact_info' => getConfig('contact_info', '微信：xxx'),
     'site_description' => getConfig('site_description', '精选美女导航网站'),
-    'avatar' => getConfig('avatar', '')
+    'avatar' => getConfig('avatar', ''),
+    'cards_per_row_desktop' => getConfig('cards_per_row_desktop', 'repeat(auto-fill, 120px)'),
+    'cards_per_row_tablet' => getConfig('cards_per_row_tablet', 'repeat(4, 1fr)'),
+    'cards_per_row_mobile' => getConfig('cards_per_row_mobile', 'repeat(3, 1fr)')
 ];
 ?>
 <!DOCTYPE html>
@@ -124,6 +135,45 @@ $config = [
                     <div class="form-group">
                         <label>联系方式</label>
                         <input type="text" name="contact_info" value="<?php echo e($config['contact_info']); ?>" placeholder="请输入联系方式">
+                    </div>
+
+                    <!-- 卡片布局配置 -->
+                    <div class="form-group">
+                        <label style="font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: block;">📱 卡片布局设置</label>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                            <div>
+                                <label style="font-size: 13px; color: #666; margin-bottom: 6px; display: block;">桌面端（>768px）</label>
+                                <select name="cards_per_row_desktop" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff;">
+                                    <option value="repeat(auto-fill, 120px)" <?php echo $config['cards_per_row_desktop'] === 'repeat(auto-fill, 120px)' ? 'selected' : ''; ?>>自动填充（120px）</option>
+                                    <option value="repeat(2, 1fr)" <?php echo $config['cards_per_row_desktop'] === 'repeat(2, 1fr)' ? 'selected' : ''; ?>>每行 2 个</option>
+                                    <option value="repeat(3, 1fr)" <?php echo $config['cards_per_row_desktop'] === 'repeat(3, 1fr)' ? 'selected' : ''; ?>>每行 3 个</option>
+                                    <option value="repeat(4, 1fr)" <?php echo $config['cards_per_row_desktop'] === 'repeat(4, 1fr)' ? 'selected' : ''; ?>>每行 4 个</option>
+                                    <option value="repeat(5, 1fr)" <?php echo $config['cards_per_row_desktop'] === 'repeat(5, 1fr)' ? 'selected' : ''; ?>>每行 5 个</option>
+                                    <option value="repeat(6, 1fr)" <?php echo $config['cards_per_row_desktop'] === 'repeat(6, 1fr)' ? 'selected' : ''; ?>>每行 6 个</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label style="font-size: 13px; color: #666; margin-bottom: 6px; display: block;">平板端（481-768px）</label>
+                                <select name="cards_per_row_tablet" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff;">
+                                    <option value="repeat(2, 1fr)" <?php echo $config['cards_per_row_tablet'] === 'repeat(2, 1fr)' ? 'selected' : ''; ?>>每行 2 个</option>
+                                    <option value="repeat(3, 1fr)" <?php echo $config['cards_per_row_tablet'] === 'repeat(3, 1fr)' ? 'selected' : ''; ?>>每行 3 个</option>
+                                    <option value="repeat(4, 1fr)" <?php echo $config['cards_per_row_tablet'] === 'repeat(4, 1fr)' ? 'selected' : ''; ?>>每行 4 个</option>
+                                    <option value="repeat(5, 1fr)" <?php echo $config['cards_per_row_tablet'] === 'repeat(5, 1fr)' ? 'selected' : ''; ?>>每行 5 个</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label style="font-size: 13px; color: #666; margin-bottom: 6px; display: block;">手机端（≤480px）</label>
+                                <select name="cards_per_row_mobile" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff;">
+                                    <option value="repeat(2, 1fr)" <?php echo $config['cards_per_row_mobile'] === 'repeat(2, 1fr)' ? 'selected' : ''; ?>>每行 2 个</option>
+                                    <option value="repeat(3, 1fr)" <?php echo $config['cards_per_row_mobile'] === 'repeat(3, 1fr)' ? 'selected' : ''; ?>>每行 3 个</option>
+                                    <option value="repeat(4, 1fr)" <?php echo $config['cards_per_row_mobile'] === 'repeat(4, 1fr)' ? 'selected' : ''; ?>>每行 4 个</option>
+                                </select>
+                            </div>
+                        </div>
+                        <p style="font-size: 12px; color: #999; margin-top: 8px;">修改后刷新首页即可看到效果</p>
                     </div>
 
                     <div class="form-group">

@@ -338,14 +338,14 @@ img {
     box-shadow: 0 2px 8px rgba(233, 69, 96, 0.3);
 }
 
-/* ==================== 卡片网格 ==================== */
+/* ==================== 卡片网格（CSS 变量控制） ==================== */
 .card-section {
     padding: 6px 0 10px;
 }
 
 .card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 120px);
+    grid-template-columns: var(--cards-per-row-desktop, repeat(auto-fill, 120px));
     gap: 16px;
     min-height: 200px;
     align-items: start;
@@ -533,7 +533,7 @@ img {
 /* ==================== 响应式设计 - 平板端 ==================== */
 @media (max-width: 768px) {
     .card-grid {
-        grid-template-columns: repeat(auto-fill, 120px);
+        grid-template-columns: var(--cards-per-row-tablet, repeat(4, 1fr));
         gap: 14px;
     }
 
@@ -564,7 +564,7 @@ img {
 /* ==================== 响应式设计 - 手机端 ==================== */
 @media (max-width: 480px) {
     .card-grid {
-        grid-template-columns: repeat(auto-fill, 120px);
+        grid-template-columns: var(--cards-per-row-mobile, repeat(3, 1fr));
         gap: 12px;
     }
 
