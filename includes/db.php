@@ -195,6 +195,9 @@ function initDatabase($pdo) {
         ['cards_per_row_tablet', 'repeat(4, 1fr)', 'text'],
         ['cards_per_row_mobile', 'repeat(3, 1fr)', 'text'],
         ['guestbook_enabled', '1', 'toggle'],
+        ['guestbook_title', '留言板', 'text'],
+        ['guestbook_subtitle', '欢迎留下你的想法', 'text'],
+        ['guestbook_image', '', 'image'],
     ];
 
     foreach ($defaultConfigs as $config) {

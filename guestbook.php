@@ -13,18 +13,17 @@ $config = [
     'contact_info' => getConfig('contact_info', '微信：xxx')
 ];
 
-// 获取留言总数
-$totalMessages = getMessageCount();
-
-// 获取最新留言（首屏SSR，避免白屏）
-$messages = getMessages(0, 10);
+// 获取留言板配置
+$guestbookTitle = getConfig('guestbook_title', '留言板');
+$guestbookSubtitle = getConfig('guestbook_subtitle', '欢迎留下你的想法');
+$guestbookImage = getConfig('guestbook_image', '');
 ?>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>留言板 - <?php echo e($config['site_title']); ?></title>
+    <title><?php echo e($guestbookTitle); ?> - <?php echo e($config['site_title']); ?></title>
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
         :root {
@@ -66,10 +65,13 @@ $messages = getMessages(0, 10);
         <!-- 留言板标题区 -->
         <section style="padding: 10px 0;">
             <div class="section-card" style="padding: 30px 20px; text-align: center;">
+                <?php if ($guestbookImage): ?>
+                <img src="<?php echo e($guestbookImage); ?>" alt="留言板顶部图片" class="guestbook-header-image" loading="eager">
+                <?php endif; ?>
                 <div style="font-size: 48px; margin-bottom: 12px;">💬</div>
-                <h1 style="font-size: 24px; font-weight: 700; color: #1a1a2e; margin-bottom: 8px;">留言板</h1>
+                <h1 style="font-size: 24px; font-weight: 700; color: #1a1a2e; margin-bottom: 8px;"><?php echo e($guestbookTitle); ?></h1>
                 <p style="font-size: 14px; color: #999;">
-                    共 <?php echo $totalMessages; ?> 条留言 · 欢迎留下你的想法
+                    <?php echo e(str_replace('{count}', $totalMessages, $guestbookSubtitle)); ?>
                 </p>
             </div>
         </section>

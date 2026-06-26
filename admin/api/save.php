@@ -33,7 +33,7 @@ try {
     switch ($action) {
         // 保存站点配置
         case 'config':
-            $allowedConfigKeys = ['site_title', 'avatar', 'contact_info', 'site_description', 'cards_per_row_desktop', 'cards_per_row_tablet', 'cards_per_row_mobile', 'guestbook_enabled'];
+            $allowedConfigKeys = ['site_title', 'avatar', 'contact_info', 'site_description', 'cards_per_row_desktop', 'cards_per_row_tablet', 'cards_per_row_mobile', 'guestbook_enabled', 'guestbook_title', 'guestbook_subtitle', 'guestbook_image'];
             foreach ($data as $key => $value) {
                 if (!in_array($key, $allowedConfigKeys, true)) {
                     continue; // 跳过不在白名单中的键

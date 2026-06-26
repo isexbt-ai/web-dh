@@ -839,3 +839,13 @@ img {
         font-size: 9px;
     }
 }
+
+/* ==================== 留言板头部图片 ==================== */
+.guestbook-header-image {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    display: block;
+}
