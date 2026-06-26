@@ -56,15 +56,14 @@ if (!empty($categories)) {
                 <span>功能</span>
             </button>
             <div class="func-menu" id="funcMenu">
+                <a href="javascript:void(0)" onclick="copyLink()">复制链接</a>
+                <a href="javascript:void(0)" onclick="sharePage()">分享页面</a>
                 <?php if (!empty($links)): ?>
                     <?php foreach ($links as $link): ?>
                     <a href="<?php echo e($link['url']); ?>"<?php echo (strpos($link['url'], 'admin/') === false) ? ' target="_blank" rel="noopener"' : ''; ?>><?php echo e($link['title']); ?></a>
                     <?php endforeach; ?>
-                <?php else: ?>
-                    <a href="javascript:void(0)" onclick="copyLink()">复制链接</a>
-                    <a href="javascript:void(0)" onclick="sharePage()">分享页面</a>
-                    <a href="admin/" target="_blank">后台编辑</a>
                 <?php endif; ?>
+                <a href="admin/" target="_blank">后台编辑</a>
             </div>
         </div>
     </header>

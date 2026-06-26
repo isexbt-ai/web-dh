@@ -49,15 +49,40 @@ function fallbackCopy(text) {
 
 // ==================== 分享页面 ====================
 function sharePage() {
+    const shareData = {
+        title: document.title,
+        text: '发现了一个不错的网站，推荐给你！',
+        url: window.location.href
+    };
+
     if (navigator.share) {
-        navigator.share({
-            title: document.title,
-            url: window.location.href
+        navigator.share(shareData)
+            .then(() => {
+                showToast('分享成功');
+            })
+            .catch((err) => {
+                if (err.name !== 'AbortError') {
+                    // 不是用户取消，尝试降级
+                    fallbackShare(shareData);
+                }
+            });
+    } else {
+        fallbackShare(shareData);
+    }
+}
+
+function fallbackShare(shareData) {
+    const url = shareData.url;
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(() => {
+            showToast('当前浏览器不支持原生分享，链接已复制到剪贴板');
         }).catch(() => {
-            // 用户取消分享
+            fallbackCopy(url);
+            showToast('当前浏览器不支持原生分享，链接已复制到剪贴板');
         });
     } else {
-        copyLink();
+        fallbackCopy(url);
+        showToast('当前浏览器不支持原生分享，链接已复制到剪贴板');
     }
 }
 
@@ -106,10 +131,7 @@ function initSlideCarousel() {
     if (slides.length <= 1) {
         // 只有一个轮播项时，确保显示
         slides.forEach(slide => {
-            slide.style.display = 'block';
-            slide.style.position = 'relative';
-            slide.style.opacity = '1';
-            slide.style.visibility = 'visible';
+            slide.classList.add('active');
         });
         return;
     }
@@ -118,16 +140,8 @@ function initSlideCarousel() {
         slides.forEach((slide, i) => {
             if (i === index) {
                 slide.classList.add('active');
-                slide.style.display = 'block';
-                slide.style.position = 'relative';
-                slide.style.opacity = '1';
-                slide.style.visibility = 'visible';
             } else {
                 slide.classList.remove('active');
-                slide.style.display = 'none';
-                slide.style.position = 'absolute';
-                slide.style.opacity = '0';
-                slide.style.visibility = 'hidden';
             }
         });
         dots.forEach((dot, i) => {
