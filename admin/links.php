@@ -12,7 +12,7 @@ $links = getLinks(false);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?php echo generateCsrfToken(); ?>">
     <title>链接管理 - 后台管理</title>
-    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/admin.css?v=2">
 </head>
 <body>
     <div class="admin-layout">
@@ -101,8 +101,8 @@ $links = getLinks(false);
                             </td>
                             <td>
                                 <div class="table-actions">
-                                    <button class="btn btn-secondary btn-sm" onclick="editLink(this)" data-title="<?php echo e($link['title']); ?>" data-url="<?php echo e($link['url']); ?>" data-sort_order="<?php echo e($link['sort_order']); ?>" data-is_active="<?php echo e($link['is_active']); ?>" style="padding: 6px 12px; font-size: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 8px; cursor: pointer; transition: all 0.3s;">编辑</button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteItem('link', <?php echo $link['id']; ?>, () => location.reload())" style="padding: 6px 12px; font-size: 12px; background: rgba(244,67,54,0.2); border: 1px solid rgba(244,67,54,0.3); color: #f44336; border-radius: 8px; cursor: pointer; transition: all 0.3s;">删除</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="editLink(this)" data-title="<?php echo e($link['title']); ?>" data-url="<?php echo e($link['url']); ?>" data-sort_order="<?php echo e($link['sort_order']); ?>" data-is_active="<?php echo e($link['is_active']); ?>" style="padding: 6px 12px; font-size: 12px; background: #f8f9fa; border: 1px solid #e0e0e0; color: #333333; border-radius: 8px; cursor: pointer; transition: all 0.3s;">编辑</button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteItem('link', <?php echo $link['id']; ?>, () => location.reload())" style="padding: 6px 12px; font-size: 12px; background: rgba(244,67,54,0.1); border: 1px solid rgba(244,67,54,0.2); color: #f44336; border-radius: 8px; cursor: pointer; transition: all 0.3s;">删除</button>
                                 </div>
                             </td>
                         </tr>
@@ -130,7 +130,7 @@ $links = getLinks(false);
                 <div class="form-group">
                     <label>链接地址</label>
                     <input type="text" id="linkUrl" name="url" placeholder="如：https://example.com" required>
-                    <small style="color: rgba(255,255,255,0.4); font-size: 12px; display: block; margin-top: 4px;">请输入有效的URL地址</small>
+                    <small style="color: #999999; font-size: 12px; display: block; margin-top: 4px;">请输入有效的URL地址</small>
                 </div>
                 <div class="form-group">
                     <label>排序</label>

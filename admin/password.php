@@ -10,7 +10,7 @@ requireLogin();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?php echo generateCsrfToken(); ?>">
     <title>修改密码 - 后台管理</title>
-    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/admin.css?v=2">
     <style>
         .password-form {
             max-width: 500px;
@@ -22,28 +22,28 @@ requireLogin();
             display: block;
             margin-bottom: 8px;
             font-size: 14px;
-            color: rgba(255, 255, 255, 0.8);
+            color: #333333;
         }
         .password-form .form-group input {
             width: 100%;
             padding: 12px 16px;
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
+            border: 1px solid #e0e0e0;
+            background: #ffffff;
+            color: #1a1a2e;
             font-size: 15px;
             outline: none;
             transition: all 0.3s ease;
         }
         .password-form .form-group input:focus {
             border-color: #e94560;
-            box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.2);
+            box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.15);
         }
         .password-form .form-group input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
+            color: #999999;
         }
         .password-form .form-group small {
-            color: rgba(255, 255, 255, 0.4);
+            color: #999999;
             font-size: 12px;
             display: block;
             margin-top: 4px;
@@ -52,7 +52,7 @@ requireLogin();
             margin-top: 8px;
             height: 4px;
             border-radius: 2px;
-            background: rgba(255, 255, 255, 0.1);
+            background: #e0e0e0;
             overflow: hidden;
         }
         .password-strength-bar {

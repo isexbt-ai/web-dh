@@ -24,7 +24,7 @@ $cardsCount = $pdo->query("SELECT COUNT(*) FROM cards")->fetchColumn();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?php echo generateCsrfToken(); ?>">
     <title>仪表盘 - 后台管理</title>
-    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/admin.css?v=2">
 </head>
 <body>
     <div class="admin-layout">
@@ -263,7 +263,7 @@ $cardsCount = $pdo->query("SELECT COUNT(*) FROM cards")->fetchColumn();
         const maxCount = Math.max(...chartData.map(d => d.count), 10);
 
         // 绘制网格线
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.strokeStyle = '#e8e8e8';
         ctx.lineWidth = 1;
         for (let i = 0; i <= 5; i++) {
             const y = padding.top + (chartHeight / 5) * i;
@@ -300,20 +300,20 @@ $cardsCount = $pdo->query("SELECT COUNT(*) FROM cards")->fetchColumn();
             ctx.arc(x, y, 6, 0, Math.PI * 2);
             ctx.fill();
 
-            ctx.fillStyle = '#fff';
+            ctx.fillStyle = '#ffffff';
             ctx.beginPath();
             ctx.arc(x, y, 3, 0, Math.PI * 2);
             ctx.fill();
 
             // 数值标签
-            ctx.fillStyle = '#fff';
+            ctx.fillStyle = '#1a1a2e';
             ctx.font = '12px sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(item.count.toString(), x, y - 12);
         });
 
         // 绘制X轴标签
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.fillStyle = '#666666';
         ctx.font = '12px sans-serif';
         ctx.textAlign = 'center';
         chartData.forEach((item, index) => {

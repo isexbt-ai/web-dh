@@ -25,7 +25,7 @@ if ($categoryFilter) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?php echo generateCsrfToken(); ?>">
     <title>卡片管理 - 后台管理</title>
-    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/admin.css?v=2">
 </head>
 <body>
     <div class="admin-layout">
@@ -83,7 +83,7 @@ if ($categoryFilter) {
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <h2 class="section-title" style="margin-bottom: 0;">卡片列表</h2>
-                        <select onchange="location.href='cards.php?category_id=' + this.value" style="padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; font-size: 14px;">
+                        <select onchange="location.href='cards.php?category_id=' + this.value" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #e0e0e0; background: #ffffff; color: #1a1a2e; font-size: 14px;">
                             <option value="">全部分类</option>
                             <?php foreach ($categories as $cat): ?>
                             <option value="<?php echo $cat['id']; ?>" <?php echo $categoryFilter == $cat['id'] ? 'selected' : ''; ?>>
@@ -91,7 +91,7 @@ if ($categoryFilter) {
                             </option>
                             <?php endforeach; ?>
                         </select>
-                        <span style="color: rgba(255,255,255,0.5); font-size: 14px;">共 <?php echo count($cards); ?> 条</span>
+                        <span style="color: #999999; font-size: 14px;">共 <?php echo count($cards); ?> 条</span>
                     </div>
                     <button class="btn btn-primary" onclick="openModal('cardModal')">添加卡片</button>
                 </div>
@@ -128,9 +128,9 @@ if ($categoryFilter) {
                             <td><?php echo e($card['category_name'] ?? '未分类'); ?></td>
                             <td>
                                 <?php if (($card['card_type'] ?? 'link') === 'detail'): ?>
-                                    <span style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; background: rgba(233, 69, 96, 0.2); color: #e94560;">详情页</span>
+                                    <span style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; background: rgba(233, 69, 96, 0.1); color: #e94560;">详情页</span>
                                 <?php else: ?>
-                                    <span style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; background: rgba(78, 204, 163, 0.2); color: #4ecca3;">外链</span>
+                                    <span style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; background: rgba(78, 204, 163, 0.1); color: #4ecca3;">外链</span>
                                 <?php endif; ?>
                             </td>
                             <td><?php echo $card['click_count']; ?></td>
@@ -143,8 +143,8 @@ if ($categoryFilter) {
                             </td>
                             <td>
                                 <div class="table-actions">
-                                    <button class="btn btn-secondary btn-sm" onclick="editCard(this)" data-category_id="<?php echo e($card['category_id']); ?>" data-title="<?php echo e($card['title']); ?>" data-image="<?php echo e($card['image']); ?>" data-link="<?php echo e($card['link']); ?>" data-detail="<?php echo e($card['detail']); ?>" data-sort_order="<?php echo e($card['sort_order']); ?>" data-is_active="<?php echo e($card['is_active']); ?>" data-card_type="<?php echo e($card['card_type']); ?>" data-badge_text="<?php echo e($card['badge_text']); ?>" style="padding: 6px 12px; font-size: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 8px; cursor: pointer; transition: all 0.3s;">编辑</button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteItem('card', <?php echo $card['id']; ?>, () => location.reload())" style="padding: 6px 12px; font-size: 12px; background: rgba(244,67,54,0.2); border: 1px solid rgba(244,67,54,0.3); color: #f44336; border-radius: 8px; cursor: pointer; transition: all 0.3s;">删除</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="editCard(this)" data-category_id="<?php echo e($card['category_id']); ?>" data-title="<?php echo e($card['title']); ?>" data-image="<?php echo e($card['image']); ?>" data-link="<?php echo e($card['link']); ?>" data-detail="<?php echo e($card['detail']); ?>" data-sort_order="<?php echo e($card['sort_order']); ?>" data-is_active="<?php echo e($card['is_active']); ?>" data-card_type="<?php echo e($card['card_type']); ?>" data-badge_text="<?php echo e($card['badge_text']); ?>" style="padding: 6px 12px; font-size: 12px; background: #f8f9fa; border: 1px solid #e0e0e0; color: #333333; border-radius: 8px; cursor: pointer; transition: all 0.3s;">编辑</button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteItem('card', <?php echo $card['id']; ?>, () => location.reload())" style="padding: 6px 12px; font-size: 12px; background: rgba(244,67,54,0.1); border: 1px solid rgba(244,67,54,0.2); color: #f44336; border-radius: 8px; cursor: pointer; transition: all 0.3s;">删除</button>
                                 </div>
                             </td>
                         </tr>
@@ -216,7 +216,7 @@ if ($categoryFilter) {
                 <div class="form-group">
                     <label>自定义角标</label>
                     <input type="text" id="cardBadgeText" name="badge_text" placeholder="如：热门、推荐、NEW" maxlength="10">
-                    <small style="color: rgba(255,255,255,0.4); font-size: 12px; display: block; margin-top: 4px;">留空则显示默认角标（外链/详情）</small>
+                    <small style="color: #999999; font-size: 12px; display: block; margin-top: 4px;">留空则显示默认角标（外链/详情）</small>
                 </div>
                 <div class="form-group">
                     <label>排序</label>

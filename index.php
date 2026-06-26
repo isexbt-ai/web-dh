@@ -145,7 +145,7 @@ if (!empty($categories)) {
     <!-- 页脚 -->
     <footer class="site-footer">
         <p><?php echo e(getConfig('site_title', '美女导航')); ?> - 精选优质网站导航</p>
-        <p class="visitor-count">总访问量 <?php echo getTotalVisitsAll(); ?></p>
+        <p class="visitor-count">您是本站的第 <?php echo getTotalVisitsAll(); ?> 位访客，欢迎光临本站。</p>
     </footer>
 
     <script src="assets/js/main.js"></script>

@@ -1,4 +1,4 @@
-/* ==================== 后台管理样式 ==================== */
+/* ==================== 后台管理样式（浅色主题） ==================== */
 
 /* 基础重置 */
 *, *::before, *::after {
@@ -9,8 +9,8 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #0f0f1a;
-    color: #fff;
+    background: #f5f7fa;
+    color: #1a1a2e;
     line-height: 1.6;
     min-height: 100vh;
 }
@@ -24,8 +24,8 @@ body {
 /* ==================== 侧边栏 ==================== */
 .sidebar {
     width: 260px;
-    background: #16162a;
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    background: #ffffff;
+    border-right: 1px solid #f0f0f0;
     display: flex;
     flex-direction: column;
     position: fixed;
@@ -38,13 +38,13 @@ body {
 
 .sidebar-header {
     padding: 24px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid #f0f0f0;
 }
 
 .sidebar-header h2 {
     font-size: 18px;
     font-weight: 600;
-    color: #fff;
+    color: #1a1a2e;
 }
 
 .sidebar-nav {
@@ -57,7 +57,7 @@ body {
     align-items: center;
     gap: 12px;
     padding: 12px 20px;
-    color: rgba(255, 255, 255, 0.6);
+    color: #666666;
     text-decoration: none;
     font-size: 14px;
     transition: all 0.3s ease;
@@ -65,12 +65,12 @@ body {
 }
 
 .nav-item:hover {
-    background: rgba(255, 255, 255, 0.03);
-    color: #fff;
+    background: #f8f9fa;
+    color: #1a1a2e;
 }
 
 .nav-item.active {
-    background: rgba(233, 69, 96, 0.1);
+    background: rgba(233, 69, 96, 0.08);
     color: #e94560;
     border-left-color: #e94560;
 }
@@ -83,7 +83,7 @@ body {
 
 .sidebar-footer {
     padding: 16px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid #f0f0f0;
 }
 
 /* ==================== 主内容区 ==================== */
@@ -102,10 +102,11 @@ body {
     font-size: 28px;
     font-weight: 600;
     margin-bottom: 8px;
+    color: #1a1a2e;
 }
 
 .page-header p {
-    color: rgba(255, 255, 255, 0.5);
+    color: #999999;
     font-size: 14px;
 }
 
@@ -118,13 +119,14 @@ body {
 }
 
 .stat-card {
-    background: #1a1a2e;
+    background: #ffffff;
     border-radius: 16px;
     padding: 24px;
     display: flex;
     align-items: center;
     gap: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
 }
 
 .stat-icon {
@@ -147,26 +149,29 @@ body {
     font-size: 28px;
     font-weight: 700;
     margin-bottom: 4px;
+    color: #1a1a2e;
 }
 
 .stat-info p {
-    color: rgba(255, 255, 255, 0.5);
+    color: #999999;
     font-size: 14px;
 }
 
 /* ==================== 图表区域 ==================== */
 .chart-section {
-    background: #1a1a2e;
+    background: #ffffff;
     border-radius: 16px;
     padding: 24px;
     margin-bottom: 32px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
 }
 
 .section-title {
     font-size: 18px;
     font-weight: 600;
     margin-bottom: 20px;
+    color: #1a1a2e;
 }
 
 .chart-container {
@@ -181,10 +186,11 @@ body {
 
 /* ==================== 表格区域 ==================== */
 .table-section {
-    background: #1a1a2e;
+    background: #ffffff;
     border-radius: 16px;
     padding: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
 }
 
 .data-table {
@@ -200,14 +206,14 @@ body {
 }
 
 .data-table th {
-    color: rgba(255, 255, 255, 0.5);
+    color: #999999;
     font-weight: 500;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid #f0f0f0;
 }
 
 .data-table td {
-    color: rgba(255, 255, 255, 0.8);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    color: #333333;
+    border-bottom: 1px solid #f5f5f5;
 }
 
 .data-table tr:last-child td {
@@ -223,8 +229,8 @@ body {
     border-radius: 50%;
     font-size: 12px;
     font-weight: 600;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
+    background: #f0f0f0;
+    color: #666666;
 }
 
 .rank-badge.top1 {
@@ -269,23 +275,23 @@ body {
 }
 
 .btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #f8f9fa;
+    color: #333333;
+    border: 1px solid #e0e0e0;
 }
 
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: #f0f0f0;
 }
 
 .btn-danger {
-    background: rgba(244, 67, 54, 0.2);
+    background: rgba(244, 67, 54, 0.1);
     color: #f44336;
-    border: 1px solid rgba(244, 67, 54, 0.3);
+    border: 1px solid rgba(244, 67, 54, 0.2);
 }
 
 .btn-danger:hover {
-    background: rgba(244, 67, 54, 0.3);
+    background: rgba(244, 67, 54, 0.2);
 }
 
 .btn-sm {
@@ -307,7 +313,7 @@ body {
     display: block;
     margin-bottom: 8px;
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.8);
+    color: #333333;
 }
 
 .form-group input,
@@ -316,9 +322,9 @@ body {
     width: 100%;
     padding: 12px 16px;
     border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
+    border: 1px solid #e0e0e0;
+    background: #ffffff;
+    color: #1a1a2e;
     font-size: 14px;
     outline: none;
     transition: all 0.3s ease;
@@ -328,17 +334,17 @@ body {
 .form-group select:focus,
 .form-group textarea:focus {
     border-color: #e94560;
-    box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.2);
+    box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.15);
 }
 
 .form-group input::placeholder,
 .form-group textarea::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: #999999;
 }
 
 .form-group select option {
-    background: #1a1a2e;
-    color: #fff;
+    background: #ffffff;
+    color: #1a1a2e;
 }
 
 .form-group textarea {
@@ -348,7 +354,7 @@ body {
 
 /* 图片上传 */
 .image-upload {
-    border: 2px dashed rgba(255, 255, 255, 0.1);
+    border: 2px dashed #e0e0e0;
     border-radius: 12px;
     padding: 30px;
     text-align: center;
@@ -360,7 +366,7 @@ body {
 
 .image-upload:hover {
     border-color: #e94560;
-    background: rgba(233, 69, 96, 0.05);
+    background: rgba(233, 69, 96, 0.03);
 }
 
 .image-upload input[type="file"] {
@@ -376,12 +382,12 @@ body {
 .image-upload .upload-icon {
     font-size: 40px;
     margin-bottom: 8px;
-    color: rgba(255, 255, 255, 0.3);
+    color: #cccccc;
 }
 
 .image-upload .upload-text {
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.5);
+    color: #999999;
 }
 
 .image-preview {
@@ -423,7 +429,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.1);
+    background: #e0e0e0;
     border-radius: 24px;
     transition: all 0.3s ease;
 }
@@ -435,7 +441,7 @@ body {
     width: 18px;
     left: 3px;
     bottom: 3px;
-    background: #fff;
+    background: #ffffff;
     border-radius: 50%;
     transition: all 0.3s ease;
 }
@@ -455,7 +461,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -471,7 +477,7 @@ body {
 }
 
 .modal-content {
-    background: #1a1a2e;
+    background: #ffffff;
     border-radius: 20px;
     padding: 32px;
     width: 90%;
@@ -480,7 +486,8 @@ body {
     overflow-y: auto;
     transform: translateY(20px);
     transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
 }
 
 .modal-overlay.show .modal-content {
@@ -497,26 +504,27 @@ body {
 .modal-header h2 {
     font-size: 20px;
     font-weight: 600;
+    color: #1a1a2e;
 }
 
 .modal-close {
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.5);
+    color: #999999;
     font-size: 24px;
     cursor: pointer;
     transition: color 0.3s ease;
 }
 
 .modal-close:hover {
-    color: #fff;
+    color: #1a1a2e;
 }
 
 /* ==================== 空状态 ==================== */
 .empty-state {
     text-align: center;
     padding: 60px 20px;
-    color: rgba(255, 255, 255, 0.4);
+    color: #999999;
     font-size: 15px;
 }
 
@@ -562,8 +570,8 @@ body {
     gap: 8px;
     margin-bottom: 8px;
     padding: 8px 12px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
     border-radius: 8px 8px 0 0;
     border-bottom: none;
 }
@@ -573,23 +581,24 @@ body {
     align-items: center;
     gap: 4px;
     padding: 6px 12px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.12);
+    background: #f0f0f0;
+    border: 1px solid #e0e0e0;
     border-radius: 6px;
-    color: #fff;
+    color: #333333;
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .toolbar-btn:hover {
-    background: rgba(233,69,96,0.2);
-    border-color: rgba(233,69,96,0.4);
+    background: rgba(233,69,96,0.1);
+    border-color: rgba(233,69,96,0.3);
+    color: #e94560;
 }
 
 .toolbar-hint {
     font-size: 12px;
-    color: rgba(255,255,255,0.4);
+    color: #999999;
     margin-left: auto;
 }
 
