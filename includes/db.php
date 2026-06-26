@@ -31,7 +31,7 @@ try {
  */
 function initDatabase($pdo) {
     // 快速检查：如果所有核心表都已存在，跳过初始化
-    $requiredTables = ['site_config', 'ads', 'notices', 'categories', 'cards', 'visit_stats', 'admin_users', 'links'];
+    $requiredTables = ['site_config', 'ads', 'notices', 'categories', 'cards', 'visit_stats', 'admin_users', 'links', 'messages'];
     try {
         $existing = $pdo->query("SELECT name FROM sqlite_master WHERE type='table'")
                         ->fetchAll(PDO::FETCH_COLUMN);
@@ -161,6 +161,17 @@ function initDatabase($pdo) {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
 
+    // 留言板表
+    $pdo->exec("CREATE TABLE IF NOT EXISTS messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nickname TEXT DEFAULT '',
+        content TEXT NOT NULL,
+        ip TEXT,
+        user_agent TEXT,
+        is_active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+
     // 插入默认管理员账号 (admin / 随机强密码)
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM admin_users WHERE username = ?");
     $stmt->execute(['admin']);
@@ -183,6 +194,7 @@ function initDatabase($pdo) {
         ['cards_per_row_desktop', 'repeat(auto-fill, 120px)', 'text'],
         ['cards_per_row_tablet', 'repeat(4, 1fr)', 'text'],
         ['cards_per_row_mobile', 'repeat(3, 1fr)', 'text'],
+        ['guestbook_enabled', '1', 'toggle'],
     ];
 
     foreach ($defaultConfigs as $config) {

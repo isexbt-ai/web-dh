@@ -146,6 +146,16 @@ if (!empty($categories)) {
         <p class="visitor-count">您是本站的第 <?php echo getTotalVisitsAll(); ?> 位访客，欢迎光临本站。</p>
     </footer>
 
+    <!-- 留言板悬浮入口 -->
+    <?php if (getConfig('guestbook_enabled', '1') === '1'): ?>
+    <a href="guestbook.php" class="guestbook-float-btn" title="留言板">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        <span>留言</span>
+    </a>
+    <?php endif; ?>
+
     <script src="assets/js/main.js"></script>
     <script>
         // 标记首屏已加载的分类，避免JS重复请求

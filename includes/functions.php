@@ -393,6 +393,68 @@ function parseDetail($text) {
 
     return $text;
 }
+
+/**
+ * 获取留言列表
+ */
+function getMessages($offset = 0, $limit = 10, $includeDeleted = false) {
+    global $pdo;
+    $sql = "SELECT * FROM messages";
+    if (!$includeDeleted) {
+        $sql .= " WHERE is_active = 1";
+    }
+    $sql .= " ORDER BY created_at DESC LIMIT ? OFFSET ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$limit, $offset]);
+    return $stmt->fetchAll();
+}
+
+/**
+ * 获取留言总数
+ */
+function getMessageCount($includeDeleted = false) {
+    global $pdo;
+    $sql = "SELECT COUNT(*) FROM messages";
+    if (!$includeDeleted) {
+        $sql .= " WHERE is_active = 1";
+    }
+    return $pdo->query($sql)->fetchColumn();
+}
+
+/**
+ * 渲染留言列表HTML（PHP端SSR）
+ */
+function renderGuestbookMessages($messages) {
+    if (empty($messages)) {
+        echo '<div class="guestbook-empty">暂无留言，快来抢沙发吧~</div>';
+        return;
+    }
+    foreach ($messages as $msg) {
+        echo '<div class="guestbook-item">';
+        echo '<div class="guestbook-item-header">';
+        echo '<span class="guestbook-item-nickname">' . e($msg['nickname'] ?: '匿名用户') . '</span>';
+        echo '<span class="guestbook-item-time">' . formatMessageTime($msg['created_at']) . '</span>';
+        echo '</div>';
+        echo '<div class="guestbook-item-content">' . e($msg['content']) . '</div>';
+        echo '</div>';
+    }
+}
+
+/**
+ * 格式化留言时间（刚刚/几分钟前/几小时前/日期）
+ */
+function formatMessageTime($timestamp) {
+    $time = strtotime($timestamp);
+    $now = time();
+    $diff = $now - $time;
+
+    if ($diff < 60) return '刚刚';
+    if ($diff < 3600) return floor($diff / 60) . '分钟前';
+    if ($diff < 86400) return floor($diff / 3600) . '小时前';
+    if ($diff < 604800) return floor($diff / 86400) . '天前';
+
+    return date('n月j日 H:i', $time);
+}
 function uploadImage($file, $directory = 'cards') {
     $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     $maxSize = 10 * 1024 * 1024; // 10MB

@@ -640,3 +640,202 @@ img {
     transition: opacity 0.3s ease;
     pointer-events: none;
 }
+
+/* ==================== 留言板悬浮按钮 ==================== */
+.guestbook-float-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e94560, #ff6b6b);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    box-shadow: 0 4px 16px rgba(233, 69, 96, 0.4);
+    z-index: 90;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.guestbook-float-btn:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 8px 24px rgba(233, 69, 96, 0.5);
+}
+
+.guestbook-float-btn:active {
+    transform: translateY(-2px) scale(0.98);
+}
+
+.guestbook-float-btn svg {
+    width: 22px;
+    height: 22px;
+}
+
+.guestbook-float-btn span {
+    font-size: 10px;
+    font-weight: 600;
+}
+
+/* ==================== 留言板页面样式 ==================== */
+
+/* 留言列表 */
+.guestbook-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* 单条留言 */
+.guestbook-item {
+    padding: 16px 0;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s ease;
+}
+
+.guestbook-item:hover {
+    background: #fafafa;
+    margin: 0 -20px;
+    padding: 16px 20px;
+}
+
+.guestbook-item:last-child {
+    border-bottom: none;
+}
+
+/* 留言头部 */
+.guestbook-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.guestbook-item-nickname {
+    font-weight: 600;
+    color: #e94560;
+    font-size: 14px;
+}
+
+.guestbook-item-time {
+    font-size: 12px;
+    color: #999;
+}
+
+/* 留言内容 */
+.guestbook-item-content {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.7;
+    word-break: break-all;
+    white-space: pre-wrap;
+}
+
+/* 留言表单 */
+.guestbook-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.guestbook-form input,
+.guestbook-form textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    background: #fafafa;
+}
+
+.guestbook-form input:focus,
+.guestbook-form textarea:focus {
+    outline: none;
+    border-color: #e94560;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.1);
+}
+
+.guestbook-form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.guestbook-form button {
+    background: linear-gradient(135deg, #e94560, #ff6b6b);
+    color: #fff;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    align-self: flex-end;
+}
+
+.guestbook-form button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(233, 69, 96, 0.3);
+}
+
+.guestbook-form button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 分页按钮 */
+.pagination-btn {
+    background: #f8f9fa;
+    border: 1px solid #e8e8e8;
+    color: #666;
+    padding: 10px 32px;
+    border-radius: 25px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pagination-btn:hover {
+    background: #fff5f5;
+    border-color: #e94560;
+    color: #e94560;
+}
+
+/* 空状态 */
+.guestbook-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    font-size: 14px;
+}
+
+/* 新消息高亮动画 */
+@keyframes highlightNew {
+    0% { background: rgba(233, 69, 96, 0.1); }
+    100% { background: transparent; }
+}
+
+/* 响应式 - 手机端悬浮按钮 */
+@media (max-width: 480px) {
+    .guestbook-float-btn {
+        bottom: 16px;
+        right: 16px;
+        width: 48px;
+        height: 48px;
+    }
+    .guestbook-float-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+    .guestbook-float-btn span {
+        font-size: 9px;
+    }
+}

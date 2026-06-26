@@ -33,7 +33,7 @@ try {
     switch ($action) {
         // 保存站点配置
         case 'config':
-            $allowedConfigKeys = ['site_title', 'avatar', 'contact_info', 'site_description', 'cards_per_row_desktop', 'cards_per_row_tablet', 'cards_per_row_mobile'];
+            $allowedConfigKeys = ['site_title', 'avatar', 'contact_info', 'site_description', 'cards_per_row_desktop', 'cards_per_row_tablet', 'cards_per_row_mobile', 'guestbook_enabled'];
             foreach ($data as $key => $value) {
                 if (!in_array($key, $allowedConfigKeys, true)) {
                     continue; // 跳过不在白名单中的键
@@ -259,6 +259,20 @@ try {
             $stmt->execute([$new_hash, $username]);
 
             jsonResponse(['changed' => true]);
+            break;
+
+        // 管理留言（删除/恢复）
+        case 'message':
+            $id = isset($data['id']) ? intval($data['id']) : 0;
+            $is_active = isset($data['is_active']) ? intval($data['is_active']) : 1;
+
+            if ($id <= 0) {
+                jsonError('无效的留言ID');
+            }
+
+            $stmt = $pdo->prepare("UPDATE messages SET is_active = ? WHERE id = ?");
+            $stmt->execute([$is_active, $id]);
+            jsonResponse(['id' => $id, 'saved' => true]);
             break;
 
         default:

@@ -28,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cardsPerRowDesktop = isset($_POST['cards_per_row_desktop']) ? trim($_POST['cards_per_row_desktop']) : 'repeat(auto-fill, 120px)';
         $cardsPerRowTablet = isset($_POST['cards_per_row_tablet']) ? trim($_POST['cards_per_row_tablet']) : 'repeat(4, 1fr)';
         $cardsPerRowMobile = isset($_POST['cards_per_row_mobile']) ? trim($_POST['cards_per_row_mobile']) : 'repeat(3, 1fr)';
+        $guestbookEnabled = isset($_POST['guestbook_enabled']) ? '1' : '0';
 
         // 保存配置
         setConfig('site_title', $siteTitle);
@@ -37,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         setConfig('cards_per_row_desktop', $cardsPerRowDesktop);
         setConfig('cards_per_row_tablet', $cardsPerRowTablet);
         setConfig('cards_per_row_mobile', $cardsPerRowMobile);
+        setConfig('guestbook_enabled', $guestbookEnabled);
 
         $success = '配置保存成功';
     }
@@ -49,7 +51,8 @@ $config = [
     'avatar' => getConfig('avatar', ''),
     'cards_per_row_desktop' => getConfig('cards_per_row_desktop', 'repeat(auto-fill, 120px)'),
     'cards_per_row_tablet' => getConfig('cards_per_row_tablet', 'repeat(4, 1fr)'),
-    'cards_per_row_mobile' => getConfig('cards_per_row_mobile', 'repeat(3, 1fr)')
+    'cards_per_row_mobile' => getConfig('cards_per_row_mobile', 'repeat(3, 1fr)'),
+    'guestbook_enabled' => getConfig('guestbook_enabled', '1')
 ];
 ?>
 <!DOCTYPE html>
@@ -174,6 +177,19 @@ $config = [
                             </div>
                         </div>
                         <p style="font-size: 12px; color: #999; margin-top: 8px;">修改后刷新首页即可看到效果</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>留言板开关</label>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="guestbookEnabled" name="guestbook_enabled"
+                                   value="1" <?php echo $config['guestbook_enabled'] === '1' ? 'checked' : ''; ?>>
+                            <label for="guestbookEnabled" class="toggle-label">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-text"><?php echo $config['guestbook_enabled'] === '1' ? '已开启' : '已关闭'; ?></span>
+                        </div>
+                        <p class="form-hint">关闭后前台悬浮按钮和留言板页面将不可访问</p>
                     </div>
 
                     <div class="form-group">
