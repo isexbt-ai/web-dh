@@ -156,7 +156,7 @@ function initSlideCarousel() {
     // 自动轮播
     slideInterval = setInterval(() => {
         showSlide((slideIndex + 1) % slides.length);
-    }, 4000);
+    }, 6000);
 
     // 点击切换
     dots.forEach((dot, i) => {
