@@ -1,6 +1,7 @@
 <?php
 /**
  * 获取卡片列表 API
+ * 公开接口：前台切换分类时使用，无需认证
  */
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-cache, no-store, must-revalidate');

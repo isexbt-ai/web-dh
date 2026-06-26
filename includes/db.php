@@ -161,13 +161,17 @@ function initDatabase($pdo) {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
 
-    // 插入默认管理员账号 (admin/admin)
+    // 插入默认管理员账号 (admin / 随机强密码)
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM admin_users WHERE username = ?");
     $stmt->execute(['admin']);
     if ($stmt->fetchColumn() == 0) {
-        $hash = password_hash('admin', PASSWORD_DEFAULT);
+        // 生成随机强密码
+        $defaultPassword = bin2hex(random_bytes(8)); // 16位随机密码
+        $hash = password_hash($defaultPassword, PASSWORD_DEFAULT);
         $stmt = $pdo->prepare("INSERT INTO admin_users (username, password) VALUES (?, ?)");
         $stmt->execute(['admin', $hash]);
+        // 记录到日志，提醒用户修改
+        error_log("[SECURITY] 默认管理员账号已创建。用户名: admin, 初始密码: {$defaultPassword} - 请登录后立即修改密码！");
     }
 
     // 插入默认站点配置

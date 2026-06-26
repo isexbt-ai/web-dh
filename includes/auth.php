@@ -11,10 +11,25 @@ ini_set('session.cookie_samesite', 'Strict');
 session_start();
 
 /**
- * 检查是否已登录
+ * 检查是否已登录（包含 session 超时检查）
+ * 默认超时时间：30分钟无操作自动登出
  */
 function isLoggedIn() {
-    return isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true;
+    if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+        return false;
+    }
+
+    // 检查 session 是否超时（30分钟 = 1800秒）
+    $lastActivity = $_SESSION['last_activity'] ?? 0;
+    if ((time() - $lastActivity) > 1800) {
+        // Session 已超时，执行登出
+        doLogout();
+        return false;
+    }
+
+    // 更新最后活动时间
+    $_SESSION['last_activity'] = time();
+    return true;
 }
 
 /**
@@ -52,6 +67,7 @@ function doLogin($username) {
     $_SESSION['admin_logged_in'] = true;
     $_SESSION['admin_username'] = $username;
     $_SESSION['login_time'] = time();
+    $_SESSION['last_activity'] = time();
 }
 
 /**
@@ -84,11 +100,26 @@ function verifyCsrfToken($token) {
 }
 
 /**
- * 检查是否被锁定（5次失败后锁定15分钟）
+ * 获取客户端 IP 地址
+ */
+function getClientIp() {
+    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    // 处理 X-Forwarded-For 可能包含多个 IP 的情况
+    if (strpos($ip, ',') !== false) {
+        $ips = explode(',', $ip);
+        $ip = trim($ips[0]);
+    }
+    return filter_var($ip, FILTER_VALIDATE_IP) ?: '0.0.0.0';
+}
+
+/**
+ * 检查是否被锁定（5次失败后锁定15分钟）- 基于 IP
  */
 function isLoginLocked() {
-    $attempts = $_SESSION['login_attempts'] ?? 0;
-    $lockTime = $_SESSION['login_lock_time'] ?? 0;
+    $ip = getClientIp();
+    $key = 'login_lock_' . md5($ip);
+    $attempts = $_SESSION[$key . '_attempts'] ?? 0;
+    $lockTime = $_SESSION[$key . '_lock_time'] ?? 0;
 
     if ($attempts >= 5 && (time() - $lockTime) < 900) {
         return true;
@@ -103,19 +134,23 @@ function isLoginLocked() {
 }
 
 /**
- * 记录登录失败
+ * 记录登录失败 - 基于 IP
  */
 function recordLoginFailure() {
-    $_SESSION['login_attempts'] = ($_SESSION['login_attempts'] ?? 0) + 1;
-    if ($_SESSION['login_attempts'] >= 5) {
-        $_SESSION['login_lock_time'] = time();
+    $ip = getClientIp();
+    $key = 'login_lock_' . md5($ip);
+    $_SESSION[$key . '_attempts'] = ($_SESSION[$key . '_attempts'] ?? 0) + 1;
+    if ($_SESSION[$key . '_attempts'] >= 5) {
+        $_SESSION[$key . '_lock_time'] = time();
     }
 }
 
 /**
- * 重置登录尝试计数
+ * 重置登录尝试计数 - 基于 IP
  */
 function resetLoginAttempts() {
-    unset($_SESSION['login_attempts']);
-    unset($_SESSION['login_lock_time']);
+    $ip = getClientIp();
+    $key = 'login_lock_' . md5($ip);
+    unset($_SESSION[$key . '_attempts']);
+    unset($_SESSION[$key . '_lock_time']);
 }

@@ -37,19 +37,30 @@ try {
             jsonResponse(['saved' => true]);
             break;
 
-        // 保存广告
-        case 'ad':
-            $id = isset($data['id']) ? intval($data['id']) : 0;
-            $title = isset($data['title']) ? $data['title'] : '';
-            $image = isset($data['image']) ? $data['image'] : '';
-            $link = isset($data['link']) ? $data['link'] : '';
-            $sort_order = isset($data['sort_order']) ? intval($data['sort_order']) : 0;
-            $is_active = isset($data['is_active']) ? intval($data['is_active']) : 1;
+    // 定义字段长度限制
+const MAX_TITLE_LENGTH = 255;
+const MAX_CONTENT_LENGTH = 65535;
+const MAX_URL_LENGTH = 2048;
+const MAX_DETAIL_LENGTH = 65535;
 
-            // 禁止javascript:协议
-            if (!empty($link) && preg_match('/^\s*javascript\s*:/i', $link)) {
-                jsonError('链接地址不允许使用javascript:协议');
-            }
+switch ($action) {
+    // 保存广告
+    case 'ad':
+        $id = isset($data['id']) ? intval($data['id']) : 0;
+        $title = isset($data['title']) ? substr(trim($data['title']), 0, MAX_TITLE_LENGTH) : '';
+        $image = isset($data['image']) ? substr($data['image'], 0, MAX_URL_LENGTH) : '';
+        $link = isset($data['link']) ? substr(trim($data['link']), 0, MAX_URL_LENGTH) : '';
+        $sort_order = isset($data['sort_order']) ? intval($data['sort_order']) : 0;
+        $is_active = isset($data['is_active']) ? intval($data['is_active']) : 1;
+
+        if (empty($title)) {
+            jsonError('广告标题不能为空');
+        }
+
+        // 禁止危险协议
+        if (!empty($link) && preg_match('/^\s*(javascript|data|vbscript):/i', $link)) {
+            jsonError('链接地址包含不允许的协议');
+        }
 
             if ($id > 0) {
                 $stmt = $pdo->prepare("UPDATE ads SET title = ?, image = ?, link = ?, sort_order = ?, is_active = ? WHERE id = ?");
@@ -65,9 +76,9 @@ try {
         // 保存链接
         case 'link':
             $id = isset($data['id']) ? intval($data['id']) : 0;
-            $title = isset($data['title']) ? $data['title'] : '';
-            $url = isset($data['url']) ? $data['url'] : '';
-            $icon = isset($data['icon']) ? $data['icon'] : '';
+            $title = isset($data['title']) ? substr(trim($data['title']), 0, MAX_TITLE_LENGTH) : '';
+            $url = isset($data['url']) ? substr(trim($data['url']), 0, MAX_URL_LENGTH) : '';
+            $icon = isset($data['icon']) ? substr($data['icon'], 0, MAX_URL_LENGTH) : '';
             $sort_order = isset($data['sort_order']) ? intval($data['sort_order']) : 0;
             $is_active = isset($data['is_active']) ? intval($data['is_active']) : 1;
 
@@ -78,9 +89,9 @@ try {
                 jsonError('链接地址不能为空');
             }
 
-            // 禁止javascript:协议
-            if (preg_match('/^\s*javascript\s*:/i', $url)) {
-                jsonError('链接地址不允许使用javascript:协议');
+            // 禁止危险协议
+            if (preg_match('/^\s*(javascript|data|vbscript):/i', $url)) {
+                jsonError('链接地址包含不允许的协议');
             }
 
             if ($id > 0) {
@@ -97,10 +108,14 @@ try {
         // 保存公告
         case 'notice':
             $id = isset($data['id']) ? intval($data['id']) : 0;
-            $title = isset($data['title']) ? $data['title'] : '';
-            $content = isset($data['content']) ? $data['content'] : '';
+            $title = isset($data['title']) ? substr(trim($data['title']), 0, MAX_TITLE_LENGTH) : '';
+            $content = isset($data['content']) ? substr($data['content'], 0, MAX_CONTENT_LENGTH) : '';
             $sort_order = isset($data['sort_order']) ? intval($data['sort_order']) : 0;
             $is_active = isset($data['is_active']) ? intval($data['is_active']) : 1;
+
+            if (empty($title)) {
+                jsonError('公告标题不能为空');
+            }
 
             if ($id > 0) {
                 $stmt = $pdo->prepare("UPDATE notices SET title = ?, content = ?, sort_order = ?, is_active = ? WHERE id = ?");
@@ -116,7 +131,7 @@ try {
         // 保存分类
         case 'category':
             $id = isset($data['id']) ? intval($data['id']) : 0;
-            $name = isset($data['name']) ? $data['name'] : '';
+            $name = isset($data['name']) ? substr(trim($data['name']), 0, MAX_TITLE_LENGTH) : '';
             $sort_order = isset($data['sort_order']) ? intval($data['sort_order']) : 0;
             $is_active = isset($data['is_active']) ? intval($data['is_active']) : 1;
 
@@ -139,24 +154,30 @@ try {
         case 'card':
             $id = isset($data['id']) ? intval($data['id']) : 0;
             $category_id = isset($data['category_id']) ? intval($data['category_id']) : 0;
-            $title = isset($data['title']) ? $data['title'] : '';
-            $image = isset($data['image']) ? $data['image'] : '';
-            $link = isset($data['link']) ? $data['link'] : '';
-            $detail = isset($data['detail']) ? $data['detail'] : '';
+            $title = isset($data['title']) ? substr(trim($data['title']), 0, MAX_TITLE_LENGTH) : '';
+            $image = isset($data['image']) ? substr($data['image'], 0, MAX_URL_LENGTH) : '';
+            $link = isset($data['link']) ? substr(trim($data['link']), 0, MAX_URL_LENGTH) : '';
+            $detail = isset($data['detail']) ? substr($data['detail'], 0, MAX_DETAIL_LENGTH) : '';
             $card_type = isset($data['card_type']) ? $data['card_type'] : 'link';
-            $badge_text = isset($data['badge_text']) ? $data['badge_text'] : '';
+            $badge_text = isset($data['badge_text']) ? substr($data['badge_text'], 0, 50) : '';
             $image_width = isset($data['image_width']) ? intval($data['image_width']) : 0;
             $image_height = isset($data['image_height']) ? intval($data['image_height']) : 0;
             $sort_order = isset($data['sort_order']) ? intval($data['sort_order']) : 0;
             $is_active = isset($data['is_active']) ? intval($data['is_active']) : 1;
 
+            // card_type 白名单验证
+            $allowedCardTypes = ['link', 'image', 'video', 'text'];
+            if (!in_array($card_type, $allowedCardTypes, true)) {
+                $card_type = 'link'; // 默认回退到 link
+            }
+
             if (empty($title)) {
                 jsonError('卡片标题不能为空');
             }
 
-            // 禁止javascript:协议
-            if (!empty($link) && preg_match('/^\s*javascript\s*:/i', $link)) {
-                jsonError('链接地址不允许使用javascript:协议');
+            // 禁止危险协议
+            if (!empty($link) && preg_match('/^\s*(javascript|data|vbscript):/i', $link)) {
+                jsonError('链接地址包含不允许的协议');
             }
 
             if ($id > 0) {
@@ -176,13 +197,26 @@ try {
             $items = isset($data['items']) ? $data['items'] : [];
 
             $allowedTables = ['ads', 'notices', 'categories', 'cards', 'links'];
-            if (!in_array($table, $allowedTables)) {
+            if (!in_array($table, $allowedTables, true)) {
                 jsonError('无效的表名');
             }
 
+            // 验证 items 数组结构
+            if (!is_array($items) || empty($items)) {
+                jsonError('排序数据不能为空');
+            }
+
             foreach ($items as $item) {
+                if (!is_array($item) || !isset($item['id']) || !isset($item['sort_order'])) {
+                    jsonError('排序数据格式错误');
+                }
+                $sortId = intval($item['id']);
+                $sortOrder = intval($item['sort_order']);
+                if ($sortId <= 0) {
+                    jsonError('无效的排序ID');
+                }
                 $stmt = $pdo->prepare("UPDATE {$table} SET sort_order = ? WHERE id = ?");
-                $stmt->execute([$item['sort_order'], $item['id']]);
+                $stmt->execute([$sortOrder, $sortId]);
             }
             jsonResponse(['sorted' => true]);
             break;
