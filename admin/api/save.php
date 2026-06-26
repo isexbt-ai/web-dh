@@ -23,11 +23,17 @@ if (!verifyCsrfToken($csrf_token)) {
     jsonError('安全验证失败，请刷新页面重试');
 }
 
+// 定义字段长度限制
+const MAX_TITLE_LENGTH = 255;
+const MAX_CONTENT_LENGTH = 65535;
+const MAX_URL_LENGTH = 2048;
+const MAX_DETAIL_LENGTH = 65535;
+
 try {
     switch ($action) {
         // 保存站点配置
         case 'config':
-            $allowedConfigKeys = ['site_title', 'avatar', 'contact_info', 'site_description'];
+            $allowedConfigKeys = ['site_title', 'avatar', 'contact_info', 'site_description', 'cards_per_row_desktop', 'cards_per_row_tablet', 'cards_per_row_mobile'];
             foreach ($data as $key => $value) {
                 if (!in_array($key, $allowedConfigKeys, true)) {
                     continue; // 跳过不在白名单中的键
@@ -37,30 +43,23 @@ try {
             jsonResponse(['saved' => true]);
             break;
 
-    // 定义字段长度限制
-const MAX_TITLE_LENGTH = 255;
-const MAX_CONTENT_LENGTH = 65535;
-const MAX_URL_LENGTH = 2048;
-const MAX_DETAIL_LENGTH = 65535;
+        // 保存广告
+        case 'ad':
+            $id = isset($data['id']) ? intval($data['id']) : 0;
+            $title = isset($data['title']) ? substr(trim($data['title']), 0, MAX_TITLE_LENGTH) : '';
+            $image = isset($data['image']) ? substr($data['image'], 0, MAX_URL_LENGTH) : '';
+            $link = isset($data['link']) ? substr(trim($data['link']), 0, MAX_URL_LENGTH) : '';
+            $sort_order = isset($data['sort_order']) ? intval($data['sort_order']) : 0;
+            $is_active = isset($data['is_active']) ? intval($data['is_active']) : 1;
 
-switch ($action) {
-    // 保存广告
-    case 'ad':
-        $id = isset($data['id']) ? intval($data['id']) : 0;
-        $title = isset($data['title']) ? substr(trim($data['title']), 0, MAX_TITLE_LENGTH) : '';
-        $image = isset($data['image']) ? substr($data['image'], 0, MAX_URL_LENGTH) : '';
-        $link = isset($data['link']) ? substr(trim($data['link']), 0, MAX_URL_LENGTH) : '';
-        $sort_order = isset($data['sort_order']) ? intval($data['sort_order']) : 0;
-        $is_active = isset($data['is_active']) ? intval($data['is_active']) : 1;
+            if (empty($title)) {
+                jsonError('广告标题不能为空');
+            }
 
-        if (empty($title)) {
-            jsonError('广告标题不能为空');
-        }
-
-        // 禁止危险协议
-        if (!empty($link) && preg_match('/^\s*(javascript|data|vbscript):/i', $link)) {
-            jsonError('链接地址包含不允许的协议');
-        }
+            // 禁止危险协议
+            if (!empty($link) && preg_match('/^\s*(javascript|data|vbscript):/i', $link)) {
+                jsonError('链接地址包含不允许的协议');
+            }
 
             if ($id > 0) {
                 $stmt = $pdo->prepare("UPDATE ads SET title = ?, image = ?, link = ?, sort_order = ?, is_active = ? WHERE id = ?");
@@ -160,8 +159,6 @@ switch ($action) {
             $detail = isset($data['detail']) ? substr($data['detail'], 0, MAX_DETAIL_LENGTH) : '';
             $card_type = isset($data['card_type']) ? $data['card_type'] : 'link';
             $badge_text = isset($data['badge_text']) ? substr($data['badge_text'], 0, 50) : '';
-            $image_width = isset($data['image_width']) ? intval($data['image_width']) : 0;
-            $image_height = isset($data['image_height']) ? intval($data['image_height']) : 0;
             $sort_order = isset($data['sort_order']) ? intval($data['sort_order']) : 0;
             $is_active = isset($data['is_active']) ? intval($data['is_active']) : 1;
 
@@ -181,11 +178,11 @@ switch ($action) {
             }
 
             if ($id > 0) {
-                $stmt = $pdo->prepare("UPDATE cards SET category_id = ?, title = ?, image = ?, link = ?, detail = ?, card_type = ?, badge_text = ?, image_width = ?, image_height = ?, sort_order = ?, is_active = ? WHERE id = ?");
-                $stmt->execute([$category_id, $title, $image, $link, $detail, $card_type, $badge_text, $image_width, $image_height, $sort_order, $is_active, $id]);
+                $stmt = $pdo->prepare("UPDATE cards SET category_id = ?, title = ?, image = ?, link = ?, detail = ?, card_type = ?, badge_text = ?, sort_order = ?, is_active = ? WHERE id = ?");
+                $stmt->execute([$category_id, $title, $image, $link, $detail, $card_type, $badge_text, $sort_order, $is_active, $id]);
             } else {
-                $stmt = $pdo->prepare("INSERT INTO cards (category_id, title, image, link, detail, card_type, badge_text, image_width, image_height, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$category_id, $title, $image, $link, $detail, $card_type, $badge_text, $image_width, $image_height, $sort_order, $is_active]);
+                $stmt = $pdo->prepare("INSERT INTO cards (category_id, title, image, link, detail, card_type, badge_text, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$category_id, $title, $image, $link, $detail, $card_type, $badge_text, $sort_order, $is_active]);
                 $id = $pdo->lastInsertId();
             }
             jsonResponse(['id' => $id, 'saved' => true]);

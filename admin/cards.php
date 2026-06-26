@@ -143,7 +143,7 @@ if ($categoryFilter) {
                             </td>
                             <td>
                                 <div class="table-actions">
-                                    <button class="btn btn-secondary btn-sm" onclick="editCard(this)" data-category_id="<?php echo e($card['category_id']); ?>" data-title="<?php echo e($card['title']); ?>" data-image="<?php echo e($card['image']); ?>" data-link="<?php echo e($card['link']); ?>" data-detail="<?php echo e($card['detail']); ?>" data-sort_order="<?php echo e($card['sort_order']); ?>" data-is_active="<?php echo e($card['is_active']); ?>" data-card_type="<?php echo e($card['card_type']); ?>" data-badge_text="<?php echo e($card['badge_text']); ?>" data-image_width="<?php echo e($card['image_width']); ?>" data-image_height="<?php echo e($card['image_height']); ?>" style="padding: 6px 12px; font-size: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 8px; cursor: pointer; transition: all 0.3s;">编辑</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="editCard(this)" data-category_id="<?php echo e($card['category_id']); ?>" data-title="<?php echo e($card['title']); ?>" data-image="<?php echo e($card['image']); ?>" data-link="<?php echo e($card['link']); ?>" data-detail="<?php echo e($card['detail']); ?>" data-sort_order="<?php echo e($card['sort_order']); ?>" data-is_active="<?php echo e($card['is_active']); ?>" data-card_type="<?php echo e($card['card_type']); ?>" data-badge_text="<?php echo e($card['badge_text']); ?>" style="padding: 6px 12px; font-size: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 8px; cursor: pointer; transition: all 0.3s;">编辑</button>
                                     <button class="btn btn-danger btn-sm" onclick="deleteItem('card', <?php echo $card['id']; ?>, () => location.reload())" style="padding: 6px 12px; font-size: 12px; background: rgba(244,67,54,0.2); border: 1px solid rgba(244,67,54,0.3); color: #f44336; border-radius: 8px; cursor: pointer; transition: all 0.3s;">删除</button>
                                 </div>
                             </td>
@@ -217,20 +217,6 @@ if ($categoryFilter) {
                     <label>自定义角标</label>
                     <input type="text" id="cardBadgeText" name="badge_text" placeholder="如：热门、推荐、NEW" maxlength="10">
                     <small style="color: rgba(255,255,255,0.4); font-size: 12px; display: block; margin-top: 4px;">留空则显示默认角标（外链/详情）</small>
-                </div>
-                <div class="form-group">
-                    <label>图片尺寸</label>
-                    <div style="display: flex; gap: 12px; align-items: center;">
-                        <div style="flex: 1;">
-                            <label style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 4px; display: block;">宽度 (px)</label>
-                            <input type="number" id="cardImageWidth" name="image_width" value="0" min="0" placeholder="自动" style="width: 100%;">
-                        </div>
-                        <div style="flex: 1;">
-                            <label style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 4px; display: block;">高度 (px)</label>
-                            <input type="number" id="cardImageHeight" name="image_height" value="0" min="0" placeholder="自动" style="width: 100%;">
-                        </div>
-                    </div>
-                    <small style="color: rgba(255,255,255,0.4); font-size: 12px; display: block; margin-top: 4px;">留空或填0表示自适应</small>
                 </div>
                 <div class="form-group">
                     <label>排序</label>
@@ -356,8 +342,6 @@ if ($categoryFilter) {
             const isActive = parseInt(btn.getAttribute('data-is_active')) || 0;
             const cardType = btn.getAttribute('data-card_type') || '';
             const badgeText = btn.getAttribute('data-badge_text') || '';
-            const imageWidth = parseInt(btn.getAttribute('data-image_width')) || 0;
-            const imageHeight = parseInt(btn.getAttribute('data-image_height')) || 0;
 
             document.getElementById('cardId').value = id;
             document.getElementById('cardCategory').value = categoryId || '';
@@ -369,8 +353,6 @@ if ($categoryFilter) {
             document.getElementById('cardImage').value = image;
             document.getElementById('cardType').value = cardType || 'link';
             document.getElementById('cardBadgeText').value = badgeText || '';
-            document.getElementById('cardImageWidth').value = imageWidth || 0;
-            document.getElementById('cardImageHeight').value = imageHeight || 0;
 
             const preview = document.getElementById('cardImagePreview');
             if (image) {
