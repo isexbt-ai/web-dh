@@ -17,6 +17,12 @@ $config = [
 $guestbookTitle = getConfig('guestbook_title', '留言板');
 $guestbookSubtitle = getConfig('guestbook_subtitle', '欢迎留下你的想法');
 $guestbookImage = getConfig('guestbook_image', '');
+
+// 获取留言总数
+$totalMessages = getMessageCount();
+
+// 获取最新留言（首屏SSR，避免白屏）
+$messages = getMessages(0, 10);
 ?>
 <!DOCTYPE html>
 <html lang="zh-CN">
