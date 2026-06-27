@@ -259,6 +259,7 @@ $activeCount = $pdo->query("SELECT COUNT(*) FROM messages WHERE is_active = 1")-
                                     <button class="btn btn-danger btn-sm" onclick="deleteMessage(<?php echo $msg['id']; ?>)" style="padding: 6px 12px; font-size: 12px; background: rgba(244,67,54,0.1); border: 1px solid rgba(244,67,54,0.2); color: #f44336; border-radius: 8px; cursor: pointer; transition: all 0.3s;">删除</button>
                                     <?php else: ?>
                                     <button class="btn btn-secondary btn-sm" onclick="restoreMessage(<?php echo $msg['id']; ?>)" style="padding: 6px 12px; font-size: 12px; background: #f8f9fa; border: 1px solid #e0e0e0; color: #333333; border-radius: 8px; cursor: pointer; transition: all 0.3s;">恢复</button>
+                                    <button class="btn btn-danger btn-sm" onclick="purgeMessage(<?php echo $msg['id']; ?>)" style="padding: 6px 12px; font-size: 12px; background: rgba(244,67,54,0.1); border: 1px solid rgba(244,67,54,0.2); color: #f44336; border-radius: 8px; cursor: pointer; transition: all 0.3s;">彻底删除</button>
                                     <?php endif; ?>
                                     <button class="btn btn-primary btn-sm" onclick="replyMessage(<?php echo $msg['id']; ?>, '<?php echo e(addslashes($msg['reply'] ?? '')); ?>')" style="padding: 6px 12px; font-size: 12px; background: rgba(78,204,163,0.1); border: 1px solid rgba(78,204,163,0.2); color: #4ecca3; border-radius: 8px; cursor: pointer; transition: all 0.3s;">回复</button>
                                 </div>
@@ -315,6 +316,11 @@ $activeCount = $pdo->query("SELECT COUNT(*) FROM messages WHERE is_active = 1")-
         function restoreMessage(id) {
             if (!confirm('确定要恢复这条留言吗？')) return;
             saveData('message', { id: id, is_active: 1 }, () => location.reload());
+        }
+
+        function purgeMessage(id) {
+            if (!confirm('确定要彻底删除这条留言吗？此操作不可恢复。')) return;
+            deleteItem('message', id, () => location.reload());
         }
 
         function previewImage(input, previewId) {

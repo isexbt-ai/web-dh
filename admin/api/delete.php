@@ -81,6 +81,12 @@ try {
             jsonResponse(['deleted' => true]);
             break;
 
+        case 'message':
+            $stmt = $pdo->prepare("DELETE FROM messages WHERE id = ?");
+            $stmt->execute([$id]);
+            jsonResponse(['deleted' => true]);
+            break;
+
         default:
             jsonError('未知的操作');
     }
