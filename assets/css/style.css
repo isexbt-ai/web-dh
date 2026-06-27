@@ -849,3 +849,27 @@ img {
     margin-bottom: 16px;
     display: block;
 }
+
+/* ==================== 管理员回复 ==================== */
+.guestbook-reply {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #fff5f5, #fff0f0);
+    border-radius: 10px;
+    border-left: 3px solid #e94560;
+}
+
+.guestbook-reply-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #e94560;
+    margin-bottom: 6px;
+}
+
+.guestbook-reply-content {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.7;
+    word-break: break-all;
+    white-space: pre-wrap;
+}

@@ -275,6 +275,20 @@ try {
             jsonResponse(['id' => $id, 'saved' => true]);
             break;
 
+        // 回复留言
+        case 'messageReply':
+            $id = isset($data['id']) ? intval($data['id']) : 0;
+            $reply = isset($data['reply']) ? trim($data['reply']) : '';
+
+            if ($id <= 0) {
+                jsonError('无效的留言ID');
+            }
+
+            $stmt = $pdo->prepare("UPDATE messages SET reply = ?, replied_at = CASE WHEN ? = '' THEN NULL ELSE CURRENT_TIMESTAMP END WHERE id = ?");
+            $stmt->execute([$reply, $reply, $id]);
+            jsonResponse(['id' => $id, 'saved' => true]);
+            break;
+
         default:
             jsonError('未知的操作');
     }

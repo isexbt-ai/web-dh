@@ -260,6 +260,7 @@ $activeCount = $pdo->query("SELECT COUNT(*) FROM messages WHERE is_active = 1")-
                                     <?php else: ?>
                                     <button class="btn btn-secondary btn-sm" onclick="restoreMessage(<?php echo $msg['id']; ?>)" style="padding: 6px 12px; font-size: 12px; background: #f8f9fa; border: 1px solid #e0e0e0; color: #333333; border-radius: 8px; cursor: pointer; transition: all 0.3s;">恢复</button>
                                     <?php endif; ?>
+                                    <button class="btn btn-primary btn-sm" onclick="replyMessage(<?php echo $msg['id']; ?>, '<?php echo e(addslashes($msg['reply'] ?? '')); ?>')" style="padding: 6px 12px; font-size: 12px; background: rgba(78,204,163,0.1); border: 1px solid rgba(78,204,163,0.2); color: #4ecca3; border-radius: 8px; cursor: pointer; transition: all 0.3s;">回复</button>
                                 </div>
                             </td>
                         </tr>
@@ -271,8 +272,41 @@ $activeCount = $pdo->query("SELECT COUNT(*) FROM messages WHERE is_active = 1")-
         </main>
     </div>
 
+    <!-- 回复模态框 -->
+    <div class="modal-overlay" id="replyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>回复留言</h2>
+                <button class="modal-close" onclick="closeModal('replyModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>回复内容</label>
+                <textarea id="replyContent" rows="4" placeholder="请输入回复内容..."></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="submitReply()">保存回复</button>
+        </div>
+    </div>
+
     <script src="../assets/js/admin.js"></script>
     <script>
+        let currentReplyId = null;
+
+        function replyMessage(id, existingReply) {
+            currentReplyId = id;
+            document.getElementById('replyContent').value = existingReply || '';
+            openModal('replyModal');
+        }
+
+        function submitReply() {
+            const reply = document.getElementById('replyContent').value.trim();
+            if (!currentReplyId) return;
+
+            saveData('messageReply', { id: currentReplyId, reply: reply }, () => {
+                closeModal('replyModal');
+                location.reload();
+            });
+        }
+
         function deleteMessage(id) {
             if (!confirm('确定要删除这条留言吗？')) return;
             saveData('message', { id: id, is_active: 0 }, () => location.reload());

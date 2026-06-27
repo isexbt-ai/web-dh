@@ -436,6 +436,13 @@ function renderGuestbookMessages($messages) {
         echo '<span class="guestbook-item-time">' . formatMessageTime($msg['created_at']) . '</span>';
         echo '</div>';
         echo '<div class="guestbook-item-content">' . e($msg['content']) . '</div>';
+        // 如果有回复，显示回复
+        if (!empty($msg['reply'])) {
+            echo '<div class="guestbook-reply">';
+            echo '<div class="guestbook-reply-label">管理员回复</div>';
+            echo '<div class="guestbook-reply-content">' . e($msg['reply']) . '</div>';
+            echo '</div>';
+        }
         echo '</div>';
     }
 }

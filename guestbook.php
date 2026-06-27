@@ -221,13 +221,22 @@ $messages = getMessages(0, 10);
         function createMessageItem(msg) {
             const div = document.createElement('div');
             div.className = 'guestbook-item';
-            div.innerHTML = `
+            let html = `
                 <div class="guestbook-item-header">
                     <span class="guestbook-item-nickname">${escapeHtml(msg.nickname || '匿名用户')}</span>
                     <span class="guestbook-item-time">${formatTime(msg.created_at)}</span>
                 </div>
                 <div class="guestbook-item-content">${escapeHtml(msg.content)}</div>
             `;
+            if (msg.reply) {
+                html += `
+                    <div class="guestbook-reply">
+                        <div class="guestbook-reply-label">管理员回复</div>
+                        <div class="guestbook-reply-content">${escapeHtml(msg.reply)}</div>
+                    </div>
+                `;
+            }
+            div.innerHTML = html;
             return div;
         }
 

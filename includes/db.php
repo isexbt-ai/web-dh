@@ -172,6 +172,18 @@ function initDatabase($pdo) {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
 
+    // 迁移：为 messages 表添加 reply 和 replied_at 字段
+    try {
+        $pdo->exec("ALTER TABLE messages ADD COLUMN reply TEXT DEFAULT ''");
+    } catch (PDOException $e) {
+        // 字段已存在，忽略错误
+    }
+    try {
+        $pdo->exec("ALTER TABLE messages ADD COLUMN replied_at TIMESTAMP");
+    } catch (PDOException $e) {
+        // 字段已存在，忽略错误
+    }
+
     // 插入默认管理员账号 (admin / 随机强密码)
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM admin_users WHERE username = ?");
     $stmt->execute(['admin']);
