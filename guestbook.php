@@ -117,7 +117,7 @@ $messages = getMessages(0, 10);
     <!-- 页脚 -->
     <footer class="site-footer">
         <p><?php echo e($config['site_title']); ?> - 精选优质网站导航</p>
-        <p class="visitor-count">您是本站的第 <?php echo getTotalVisitsAll(); ?> 位访客，欢迎光临本站。</p>
+        <p class="visitor-count">您是本站的第 <?php echo number_format(getDisplayVisitorCount()); ?> 位访客，欢迎光临本站。</p>
     </footer>
 
     <script src="assets/js/main.js"></script>
@@ -252,6 +252,10 @@ $messages = getMessages(0, 10);
             return date.toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         }
     </script>
-    <?php processVisitQueue(); ?>
+    <?php
+    // 记录留言板访问
+    recordVisit('guestbook');
+    processVisitQueue();
+    ?>
 </body>
 </html>

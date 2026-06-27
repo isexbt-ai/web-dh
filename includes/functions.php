@@ -206,6 +206,30 @@ function getTotalVisitsAll() {
 }
 
 /**
+ * 获取显示用的热度访客数（前台页脚使用）
+ * 公式：真实UV + (点击量/click_divisor) + (今日UV × today_multiplier)
+ * 倍数可通过后台配置调整
+ */
+function getDisplayVisitorCount() {
+    $realUv = getTotalVisits();           // 真实总独立IP
+    $totalClicks = getTotalClicks();      // 总点击量
+    $todayUv = getTodayIpCount();         // 今日独立IP
+
+    // 从配置读取倍数，默认：点击除数100，今日加成倍数2
+    $clickDivisor = max(1, intval(getConfig('visitor_click_divisor', '100')));
+    $todayMultiplier = max(0, intval(getConfig('visitor_today_multiplier', '2')));
+
+    // 热度公式
+    $clickBonus = floor($totalClicks / $clickDivisor);
+    $todayBonus = $todayUv * $todayMultiplier;
+
+    $displayCount = $realUv + $clickBonus + $todayBonus;
+
+    // 保底显示，新站也不尴尬
+    return max($displayCount, 88);
+}
+
+/**
  * 获取今日访问IP数量（独立IP数）
  */
 function getTodayIpCount() {
@@ -235,6 +259,15 @@ function getTotalClicks() {
     global $pdo;
     $stmt = $pdo->query("SELECT SUM(click_count) as total FROM cards");
     return $stmt->fetch()['total'] ?? 0;
+}
+
+/**
+ * 获取总PV（visit_stats表总记录数）
+ */
+function getTotalPv() {
+    global $pdo;
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM visit_stats");
+    return $stmt->fetch()['count'] ?? 0;
 }
 
 /**

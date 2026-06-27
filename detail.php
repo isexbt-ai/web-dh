@@ -316,5 +316,9 @@ $config = [
     <footer class="site-footer">
         <p><?php echo e($config['site_title']); ?> - 精选优质网站导航</p>
     </footer>
+    <?php
+    // 页面输出完成后处理访问统计队列
+    processVisitQueue();
+    ?>
 </body>
 </html>

@@ -8,6 +8,7 @@ $todayVisits = getTodayVisits();
 $todayIpCount = getTodayIpCount();
 $totalVisits = getTotalVisits();
 $totalClicks = getTotalClicks();
+$totalPv = getTotalPv();
 $weekData = getWeekVisits();
 $hotCards = getHotCards(5);
 
@@ -129,6 +130,17 @@ $cardsCount = $pdo->query("SELECT COUNT(*) FROM cards")->fetchColumn();
                     </div>
                 </div>
                 <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #ff6b6b, #ff8e8e);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <h3><?php echo $todayVisits; ?></h3>
+                        <p>今日PV</p>
+                    </div>
+                </div>
+                <div class="stat-card">
                     <div class="stat-icon" style="background: linear-gradient(135deg, #4ecca3, #6bcb77);">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -140,6 +152,19 @@ $cardsCount = $pdo->query("SELECT COUNT(*) FROM cards")->fetchColumn();
                     <div class="stat-info">
                         <h3><?php echo $totalVisits; ?></h3>
                         <p>总独立IP</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #00bcd4, #4dd0e1);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="3" y1="9" x2="21" y2="9"/>
+                            <line x1="9" y1="21" x2="9" y2="9"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <h3><?php echo $totalPv; ?></h3>
+                        <p>总访问量</p>
                     </div>
                 </div>
                 <div class="stat-card">

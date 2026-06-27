@@ -143,7 +143,7 @@ if (!empty($categories)) {
     <!-- 页脚 -->
     <footer class="site-footer">
         <p><?php echo e(getConfig('site_title', '美女导航')); ?> - 精选优质网站导航</p>
-        <p class="visitor-count">您是本站的第 <?php echo getTotalVisitsAll(); ?> 位访客，欢迎光临本站。</p>
+        <p class="visitor-count">您是本站的第 <?php echo number_format(getDisplayVisitorCount()); ?> 位访客，欢迎光临本站。</p>
     </footer>
 
     <!-- 留言板悬浮入口 -->
@@ -172,6 +172,8 @@ if (!empty($categories)) {
         });
     </script>
     <?php
+    // 记录首页访问
+    recordVisit('index');
     // 页面输出完成后处理访问统计队列
     processVisitQueue();
     ?>
