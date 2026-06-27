@@ -137,15 +137,16 @@ $activeCount = $pdo->query("SELECT COUNT(*) FROM messages WHERE is_active = 1")-
                     <input type="hidden" name="save_guestbook_config" value="1">
 
                     <div class="form-group">
-                        <label>留言板开关</label>
-                        <div class="toggle-switch">
-                            <input type="checkbox" id="guestbookEnabled" name="guestbook_enabled"
-                                   value="1" <?php echo $gbConfig['guestbook_enabled'] === '1' ? 'checked' : ''; ?>>
-                            <label for="guestbookEnabled" class="toggle-label">
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <span class="toggle-text"><?php echo $gbConfig['guestbook_enabled'] === '1' ? '已开启' : '已关闭'; ?></span>
-                        </div>
+                        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                            <div class="toggle-switch" style="margin: 0;">
+                                <input type="checkbox" id="guestbookEnabled" name="guestbook_enabled"
+                                       value="1" <?php echo $gbConfig['guestbook_enabled'] === '1' ? 'checked' : ''; ?>>
+                                <label for="guestbookEnabled" class="toggle-label">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <span style="font-size: 14px; font-weight: 500; color: #1a1a2e;">留言板<?php echo $gbConfig['guestbook_enabled'] === '1' ? '已开启' : '已关闭'; ?></span>
+                        </label>
                         <p class="form-hint">关闭后前台悬浮按钮和留言板页面将不可访问</p>
                     </div>
 
@@ -237,6 +238,7 @@ $activeCount = $pdo->query("SELECT COUNT(*) FROM messages WHERE is_active = 1")-
                             <th>IP</th>
                             <th>时间</th>
                             <th>状态</th>
+                            <th>回复</th>
                             <th>操作</th>
                         </tr>
                     </thead>
@@ -252,6 +254,13 @@ $activeCount = $pdo->query("SELECT COUNT(*) FROM messages WHERE is_active = 1")-
                                 <span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; <?php echo $msg['is_active'] ? 'background: rgba(78, 204, 163, 0.15); color: #4ecca3;' : 'background: rgba(244, 67, 54, 0.15); color: #f44336;'; ?>">
                                     <?php echo $msg['is_active'] ? '● 显示中' : '● 已删除'; ?>
                                 </span>
+                            </td>
+                            <td>
+                                <?php if (!empty($msg['reply'])): ?>
+                                <span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; background: rgba(233, 69, 96, 0.15); color: #e94560;">✓ 已回复</span>
+                                <?php else: ?>
+                                <span style="font-size: 12px; color: #999;">-</span>
+                                <?php endif; ?>
                             </td>
                             <td>
                                 <div class="table-actions">
