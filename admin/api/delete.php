@@ -41,6 +41,8 @@ try {
             }
             $stmt = $pdo->prepare("DELETE FROM ads WHERE id = ?");
             $stmt->execute([$id]);
+            // 清除缓存
+            clearCache();
             jsonResponse(['deleted' => true]);
             break;
 
@@ -53,6 +55,8 @@ try {
         case 'notice':
             $stmt = $pdo->prepare("DELETE FROM notices WHERE id = ?");
             $stmt->execute([$id]);
+            // 清除公告缓存
+            clearCache();
             jsonResponse(['deleted' => true]);
             break;
 
@@ -65,6 +69,8 @@ try {
             }
             $stmt = $pdo->prepare("DELETE FROM categories WHERE id = ?");
             $stmt->execute([$id]);
+            // 清除分类缓存
+            clearCache();
             jsonResponse(['deleted' => true]);
             break;
 

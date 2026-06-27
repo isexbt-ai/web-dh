@@ -59,29 +59,73 @@ function getAds($activeOnly = true) {
 }
 
 /**
- * 获取所有公告
+ * 获取文件缓存数据（带TTL）
  */
+function getCache($key, $ttl = 300) {
+    $cacheFile = __DIR__ . '/../data/cache_' . md5($key) . '.json';
+    if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $ttl) {
+        $data = json_decode(file_get_contents($cacheFile), true);
+        if ($data !== null) {
+            return $data;
+        }
+    }
+    return null;
+}
+
+/**
+ * 设置文件缓存
+ */
+function setCache($key, $data) {
+    $cacheFile = __DIR__ . '/../data/cache_' . md5($key) . '.json';
+    file_put_contents($cacheFile, json_encode($data), LOCK_EX);
+}
+
+/**
+ * 清除所有文件缓存
+ */
+function clearCache() {
+    $cacheDir = __DIR__ . '/../data/';
+    foreach (glob($cacheDir . 'cache_*.json') as $file) {
+        @unlink($file);
+    }
+}
 function getNotices($activeOnly = true) {
+    $cacheKey = 'notices_' . ($activeOnly ? '1' : '0');
+    $cached = getCache($cacheKey, 300);
+    if ($cached !== null) {
+        return $cached;
+    }
+
     global $pdo;
     $sql = "SELECT * FROM notices";
     if ($activeOnly) {
         $sql .= " WHERE is_active = 1";
     }
     $sql .= " ORDER BY sort_order ASC, id DESC";
-    return $pdo->query($sql)->fetchAll();
+    $data = $pdo->query($sql)->fetchAll();
+    setCache($cacheKey, $data);
+    return $data;
 }
 
 /**
  * 获取所有分类
  */
 function getCategories($activeOnly = true) {
+    $cacheKey = 'categories_' . ($activeOnly ? '1' : '0');
+    $cached = getCache($cacheKey, 300);
+    if ($cached !== null) {
+        return $cached;
+    }
+
     global $pdo;
     $sql = "SELECT * FROM categories";
     if ($activeOnly) {
         $sql .= " WHERE is_active = 1";
     }
     $sql .= " ORDER BY sort_order ASC, id ASC";
-    return $pdo->query($sql)->fetchAll();
+    $data = $pdo->query($sql)->fetchAll();
+    setCache($cacheKey, $data);
+    return $data;
 }
 
 /**
@@ -117,7 +161,7 @@ function getCards($categoryId = null, $activeOnly = true) {
  * 写入文件队列，由 processVisitQueue() 批量处理
  */
 function recordVisit($page = '') {
-    $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+    $ip = getClientIp(); // 使用已有的函数获取真实IP（支持反向代理）
     $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
     $data = json_encode([

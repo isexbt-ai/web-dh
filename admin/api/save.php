@@ -40,6 +40,8 @@ try {
                 }
                 setConfig($key, $value);
             }
+            // 清除数据缓存
+            clearCache();
             jsonResponse(['saved' => true]);
             break;
 
@@ -69,6 +71,8 @@ try {
                 $stmt->execute([$title, $image, $link, $sort_order, $is_active]);
                 $id = $pdo->lastInsertId();
             }
+            // 清除公告缓存
+            clearCache();
             jsonResponse(['id' => $id, 'saved' => true]);
             break;
 
@@ -124,6 +128,8 @@ try {
                 $stmt->execute([$title, $content, $sort_order, $is_active]);
                 $id = $pdo->lastInsertId();
             }
+            // 清除公告缓存
+            clearCache();
             jsonResponse(['id' => $id, 'saved' => true]);
             break;
 
@@ -146,6 +152,8 @@ try {
                 $stmt->execute([$name, $sort_order, $is_active]);
                 $id = $pdo->lastInsertId();
             }
+            // 清除分类缓存
+            clearCache();
             jsonResponse(['id' => $id, 'saved' => true]);
             break;
 

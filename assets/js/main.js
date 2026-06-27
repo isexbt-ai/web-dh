@@ -295,7 +295,41 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// ==================== 返回顶部按钮 ====================
+function initBackToTop() {
+    // 创建按钮
+    let btn = document.getElementById('backToTop');
+    if (!btn) {
+        btn = document.createElement('button');
+        btn.id = 'backToTop';
+        btn.className = 'back-to-top';
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>';
+        btn.title = '返回顶部';
+        btn.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        document.body.appendChild(btn);
+    }
+
+    // 滚动监听
+    let ticking = false;
+    window.addEventListener('scroll', function() {
+        if (!ticking) {
+            requestAnimationFrame(function() {
+                if (window.scrollY > 300) {
+                    btn.classList.add('visible');
+                } else {
+                    btn.classList.remove('visible');
+                }
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+}
+
 // ==================== 初始化 ====================
 document.addEventListener('DOMContentLoaded', function() {
     initSlideCarousel();
+    initBackToTop();
 });

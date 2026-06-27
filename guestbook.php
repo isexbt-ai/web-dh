@@ -30,6 +30,13 @@ $messages = getMessages(0, 10);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo e($guestbookTitle); ?> - <?php echo e($config['site_title']); ?></title>
+    <meta name="description" content="<?php echo e(getConfig('site_description', '精选美女导航网站')); ?>">
+    <!-- Open Graph / Twitter Card -->
+    <meta property="og:title" content="<?php echo e($guestbookTitle); ?>">
+    <meta property="og:description" content="<?php echo e(getConfig('site_description', '精选美女导航网站')); ?>">
+    <meta property="og:image" content="<?php echo e($config['avatar'] ?: 'assets/images/logo.png'); ?>">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
         :root {

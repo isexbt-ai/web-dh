@@ -31,6 +31,13 @@ $config = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo e($card['title']); ?> - <?php echo e($config['site_title']); ?></title>
+    <meta name="description" content="<?php echo e(mb_substr(strip_tags($card['detail'] ?? ''), 0, 150)); ?>">
+    <!-- Open Graph / Twitter Card -->
+    <meta property="og:title" content="<?php echo e($card['title']); ?>">
+    <meta property="og:description" content="<?php echo e(mb_substr(strip_tags($card['detail'] ?? ''), 0, 150)); ?>">
+    <meta property="og:image" content="<?php echo e($card['image'] ?: ($config['avatar'] ?: 'assets/images/logo.png')); ?>">
+    <meta property="og:type" content="article">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
         .detail-container {
