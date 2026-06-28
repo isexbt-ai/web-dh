@@ -100,43 +100,6 @@ function verifyCsrfToken($token) {
 }
 
 /**
- * 获取客户端真实 IP 地址（支持 Cloudflare CDN 等反向代理）
- *
- * 优先级：
- * 1. HTTP_CF_CONNECTING_IP - Cloudflare 提供的真实客户端IP（最可信）
- * 2. HTTP_X_FORWARDED_FOR - 通用反向代理头
- * 3. HTTP_CLIENT_IP - 部分代理服务器
- * 4. REMOTE_ADDR - 直接连接IP（无代理时）
- */
-function getClientIp() {
-    $ip = null;
-
-    // 1. Cloudflare 专用请求头（最优先，不可伪造）
-    if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
-        $ip = $_SERVER['HTTP_CF_CONNECTING_IP'];
-    }
-    // 2. 通用 X-Forwarded-For（可能包含多个IP，取第一个）
-    elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        // 处理可能包含多个 IP 的情况，取第一个（最原始客户端IP）
-        if (strpos($ip, ',') !== false) {
-            $ips = explode(',', $ip);
-            $ip = trim($ips[0]);
-        }
-    }
-    // 3. 其他代理头
-    elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-        $ip = $_SERVER['HTTP_CLIENT_IP'];
-    }
-    // 4. 直接连接的IP
-    else {
-        $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-    }
-
-    return filter_var($ip, FILTER_VALIDATE_IP) ?: '0.0.0.0';
-}
-
-/**
  * 检查是否被锁定（5次失败后锁定15分钟）- 基于 IP
  */
 function isLoginLocked() {
