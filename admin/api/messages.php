@@ -37,7 +37,7 @@ if ($method === 'GET') {
     }
 
     // IP防刷：同一IP 1分钟内只能提交一次
-    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    $ip = getClientIp();
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM messages
         WHERE ip = ? AND created_at > datetime('now', '-1 minute')");
     $stmt->execute([$ip]);

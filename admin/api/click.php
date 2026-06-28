@@ -16,7 +16,7 @@ if ($cardId <= 0) {
 session_start();
 
 // IP 速率限制：同一 IP 每 5 秒只能点击一次
-$ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+$ip = getClientIp();
 $rateLimitKey = 'click_limit_' . md5($ip . '_' . $cardId);
 $lastClick = $_SESSION[$rateLimitKey] ?? 0;
 $currentTime = time();
