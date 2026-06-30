@@ -172,6 +172,20 @@ function initDatabase($pdo) {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
 
+    // 效果展示表
+    $pdo->exec("CREATE TABLE IF NOT EXISTS showcase (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        image TEXT,
+        imgbed_url TEXT DEFAULT '',
+        imgbed_status INTEGER DEFAULT 0,
+        imgbed_filename TEXT DEFAULT '',
+        imgbed_uploaded_at TIMESTAMP,
+        sort_order INTEGER DEFAULT 0,
+        is_active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+
     // 插入默认管理员账号 (admin / 随机强密码)
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM admin_users WHERE username = ?");
     $stmt->execute(['admin']);

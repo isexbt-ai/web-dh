@@ -729,3 +729,230 @@ function deleteImage($path) {
         unlink($thumbPath);
     }
 }
+
+/**
+ * 获取效果展示列表
+ */
+function getShowcases($activeOnly = true) {
+    global $pdo;
+    $sql = "SELECT * FROM showcase";
+    if ($activeOnly) {
+        $sql .= " WHERE is_active = 1";
+    }
+    $sql .= " ORDER BY sort_order ASC, id DESC";
+    return $pdo->query($sql)->fetchAll();
+}
+
+/**
+ * 获取单条效果展示
+ */
+function getShowcase($id) {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM showcase WHERE id = ?");
+    $stmt->execute([$id]);
+    return $stmt->fetch();
+}
+
+/**
+ * 上传图片到图床 (img.scdn.io)
+ *
+ * @param string $localPath 本地图片路径（相对项目根目录）
+ * @param array $options 可选参数：outputFormat, cdn_domain, storage_destination
+ * @return array ['success' => bool, 'url' => string, 'filename' => string, 'message' => string]
+ */
+function uploadToImgbed($localPath, $options = []) {
+    $fullPath = realpath(__DIR__ . '/../' . $localPath);
+    if (!$fullPath || !file_exists($fullPath)) {
+        return ['success' => false, 'url' => '', 'filename' => '', 'message' => '本地文件不存在: ' . $localPath];
+    }
+
+    $apiUrl = 'https://img.scdn.io/api/v1.php';
+
+    // 构建 multipart 请求
+    $boundary = '----WebKitFormBoundary' . uniqid();
+    $body = '';
+
+    // 文件字段
+    $fileContent = file_get_contents($fullPath);
+    $mimeType = mime_content_type($fullPath) ?: 'image/webp';
+    $filename = basename($fullPath);
+
+    $body .= "--{$boundary}\r\n";
+    $body .= "Content-Disposition: form-data; name=\"image\"; filename=\"{$filename}\"\r\n";
+    $body .= "Content-Type: {$mimeType}\r\n\r\n";
+    $body .= $fileContent . "\r\n";
+
+    // 可选参数
+    if (!empty($options['outputFormat'])) {
+        $body .= "--{$boundary}\r\n";
+        $body .= "Content-Disposition: form-data; name=\"outputFormat\"\r\n\r\n";
+        $body .= $options['outputFormat'] . "\r\n";
+    }
+    if (!empty($options['cdn_domain'])) {
+        $body .= "--{$boundary}\r\n";
+        $body .= "Content-Disposition: form-data; name=\"cdn_domain\"\r\n\r\n";
+        $body .= $options['cdn_domain'] . "\r\n";
+    }
+    if (!empty($options['storage_destination'])) {
+        $body .= "--{$boundary}\r\n";
+        $body .= "Content-Disposition: form-data; name=\"storage_destination\"\r\n\r\n";
+        $body .= $options['storage_destination'] . "\r\n";
+    }
+
+    $body .= "--{$boundary}--\r\n";
+
+    $headers = [
+        'Content-Type: multipart/form-data; boundary=' . $boundary,
+        'Content-Length: ' . strlen($body),
+    ];
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $apiUrl);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+
+    if ($curlError) {
+        return ['success' => false, 'url' => '', 'filename' => '', 'message' => 'cURL错误: ' . $curlError];
+    }
+
+    if ($httpCode !== 200) {
+        return ['success' => false, 'url' => '', 'filename' => '', 'message' => 'HTTP错误码: ' . $httpCode];
+    }
+
+    $result = json_decode($response, true);
+    if (!$result || !isset($result['success'])) {
+        return ['success' => false, 'url' => '', 'filename' => '', 'message' => '图床API返回格式异常'];
+    }
+
+    if ($result['success']) {
+        return [
+            'success' => true,
+            'url' => $result['url'] ?? ($result['data']['url'] ?? ''),
+            'filename' => $result['data']['filename'] ?? '',
+            'message' => $result['message'] ?? '上传成功',
+            'data' => $result['data'] ?? []
+        ];
+    } else {
+        return [
+            'success' => false,
+            'url' => '',
+            'filename' => '',
+            'message' => $result['message'] ?? $result['error'] ?? '上传失败'
+        ];
+    }
+}
+
+/**
+ * 查询图床图片元数据
+ *
+ * @param string $query 图片ID或完整文件名
+ * @return array ['success' => bool, 'data' => array, 'message' => string]
+ */
+function queryImgbedMeta($query) {
+    $apiUrl = 'https://img.scdn.io/api/v1.php?q=' . urlencode($query);
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $apiUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+
+    if ($curlError) {
+        return ['success' => false, 'data' => [], 'message' => 'cURL错误: ' . $curlError];
+    }
+
+    $result = json_decode($response, true);
+    if (!$result) {
+        return ['success' => false, 'data' => [], 'message' => '图床API返回格式异常'];
+    }
+
+    return [
+        'success' => $result['success'] ?? false,
+        'data' => $result['data'] ?? [],
+        'message' => $result['message'] ?? $result['error'] ?? '查询失败'
+    ];
+}
+
+/**
+ * 获取图片展示URL（优先图床，失败回退本地）
+ *
+ * @param array $showcase 效果展示记录数组
+ * @return string 可用的图片URL
+ */
+function getShowcaseImageUrl($showcase) {
+    // 优先使用图床URL
+    if (!empty($showcase['imgbed_url'])) {
+        // 验证图床URL是否可用（简单检查）
+        return $showcase['imgbed_url'];
+    }
+
+    // 回退到本地图片
+    if (!empty($showcase['image'])) {
+        return $showcase['image'];
+    }
+
+    return '';
+}
+
+/**
+ * 批量上传本地图片到图床
+ *
+ * @param array $ids 要上传的showcase ID数组，空数组则上传所有未上传的
+ * @return array ['success' => int, 'failed' => int, 'details' => array]
+ */
+function batchUploadToImgbed($ids = []) {
+    global $pdo;
+
+    if (empty($ids)) {
+        // 获取所有未上传图床且本地有图片的记录
+        $stmt = $pdo->query("SELECT * FROM showcase WHERE imgbed_status = 0 AND image != '' AND is_active = 1 ORDER BY id ASC");
+        $items = $stmt->fetchAll();
+    } else {
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $pdo->prepare("SELECT * FROM showcase WHERE id IN ({$placeholders}) AND image != '' ORDER BY id ASC");
+        $stmt->execute($ids);
+        $items = $stmt->fetchAll();
+    }
+
+    $success = 0;
+    $failed = 0;
+    $details = [];
+
+    foreach ($items as $item) {
+        $result = uploadToImgbed($item['image'], [
+            'outputFormat' => 'auto',
+            'cdn_domain' => 'img.scdn.io'
+        ]);
+
+        if ($result['success']) {
+            // 更新数据库
+            $stmt = $pdo->prepare("UPDATE showcase SET imgbed_url = ?, imgbed_status = 1, imgbed_filename = ?, imgbed_uploaded_at = CURRENT_TIMESTAMP WHERE id = ?");
+            $stmt->execute([$result['url'], $result['filename'], $item['id']]);
+            $success++;
+            $details[] = ['id' => $item['id'], 'title' => $item['title'], 'status' => 'success', 'url' => $result['url']];
+        } else {
+            $failed++;
+            $details[] = ['id' => $item['id'], 'title' => $item['title'], 'status' => 'failed', 'message' => $result['message']];
+        }
+
+        // 避免触发限流：每次上传后休眠0.5秒
+        usleep(500000);
+    }
+
+    return ['success' => $success, 'failed' => $failed, 'details' => $details];
+}

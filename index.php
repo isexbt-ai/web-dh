@@ -152,15 +152,35 @@ if (!empty($categories)) {
         <p class="visitor-count">您是本站的第 <?php echo number_format(getDisplayVisitorCount()); ?> 位访客，欢迎光临本站。</p>
     </footer>
 
-    <!-- 留言板悬浮入口 -->
-    <?php if (getConfig('guestbook_enabled', '1') === '1'): ?>
-    <a href="guestbook.php" class="guestbook-float-btn" title="留言板">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        </svg>
-        <span>留言</span>
-    </a>
-    <?php endif; ?>
+    <!-- 多功能悬浮按钮组 -->
+    <div class="float-btn-group" id="floatBtnGroup">
+        <!-- 返回顶部按钮 -->
+        <button class="float-btn" id="backToTop" title="返回顶部">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M18 15l-6-6-6 6"/>
+            </svg>
+        </button>
+
+        <!-- 效果展示入口 -->
+        <a href="showcase.php" class="float-btn" title="效果展示">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <span>展示</span>
+        </a>
+
+        <!-- 留言板入口 -->
+        <?php if (getConfig('guestbook_enabled', '1') === '1'): ?>
+        <a href="guestbook.php" class="float-btn" title="留言板">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <span>留言</span>
+        </a>
+        <?php endif; ?>
+    </div>
 
     <script src="assets/js/main.js"></script>
     <script>

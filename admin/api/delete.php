@@ -93,8 +93,18 @@ try {
             jsonResponse(['deleted' => true]);
             break;
 
-        default:
-            jsonError('未知的操作');
+        case 'showcase':
+            // 删除关联图片
+            $stmt = $pdo->prepare("SELECT image FROM showcase WHERE id = ?");
+            $stmt->execute([$id]);
+            $showcase = $stmt->fetch();
+            if ($showcase && $showcase['image']) {
+                deleteImage($showcase['image']);
+            }
+            $stmt = $pdo->prepare("DELETE FROM showcase WHERE id = ?");
+            $stmt->execute([$id]);
+            jsonResponse(['deleted' => true]);
+            break;
     }
 } catch (Exception $e) {
     error_log('Delete API Error: ' . $e->getMessage());
