@@ -194,6 +194,7 @@ $showcases = getShowcases(false);
             <!-- 批量操作 -->
             <div class="batch-actions">
                 <button class="btn btn-primary" onclick="openModal('showcaseModal')">添加展示</button>
+                <button class="btn btn-primary" onclick="openModal('galleryModal')" style="background: linear-gradient(135deg, #00bcd4, #4dd0e1); border: none;">添加相册</button>
                 <button class="btn btn-upload-imgbed" id="btnUploadImgbed" onclick="batchUploadToImgbed()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -350,8 +351,54 @@ $showcases = getShowcases(false);
         </div>
     </div>
 
+    <!-- 添加/编辑相册模态框 -->
+    <div class="modal-overlay" id="galleryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="galleryModalTitle">添加相册</h2>
+                <button class="modal-close" onclick="closeModal('galleryModal')">&times;</button>
+            </div>
+            <form id="galleryForm" onsubmit="return saveGallery(event)">
+                <input type="hidden" id="galleryId" name="id" value="0">
+                <div class="form-group">
+                    <label>相册标题</label>
+                    <input type="text" id="galleryTitle" name="title" placeholder="请输入相册标题" required>
+                </div>
+                <div class="form-group">
+                    <label>相册描述</label>
+                    <textarea id="galleryDescription" name="description" placeholder="请输入相册描述（可选）" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>排序</label>
+                    <input type="number" id="gallerySort" name="sort_order" value="0" min="0">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="galleryActive" name="is_active" value="1" checked>
+                        启用
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">保存</button>
+            </form>
+        </div>
+    </div>
+
     <script src="../assets/js/admin.js"></script>
     <script>
+        async function saveGallery(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = {};
+            formData.forEach((value, key) => { data[key] = value; });
+            data.is_active = document.getElementById('galleryActive').checked ? 1 : 0;
+
+            saveData('gallery', data, () => {
+                closeModal('galleryModal');
+                location.reload();
+            });
+            return false;
+        }
+
         function previewShowcaseMedia(input) {
             const preview = document.getElementById('showcaseImagePreview');
             if (input.files && input.files[0]) {

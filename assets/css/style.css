@@ -731,13 +731,14 @@ img {
     opacity: 0;
     pointer-events: none;
     transform: scale(0.8);
-    display: flex;
+    display: none; /* 初始隐藏 */
 }
 
 .float-btn#backToTop.show {
     opacity: 1;
     pointer-events: auto;
     transform: scale(1);
+    display: flex; /* 显示时才用flex */
 }
 
 .float-btn#backToTop:hover {
