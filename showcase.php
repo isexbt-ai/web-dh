@@ -1,11 +1,17 @@
 <?php
 /**
- * 效果展示页面 - 展示 WebP 动态/静态图片
+ * 效果展示页面 - 展示 WebP 动态/静态图片和视频
  */
 require_once 'includes/functions.php';
 
+// 获取相册参数
+$galleryId = isset($_GET['gallery']) ? intval($_GET['gallery']) : null;
+
+// 获取相册列表
+$galleries = getGalleries(true);
+
 // 获取效果展示列表
-$showcases = getShowcases(true);
+$showcases = getShowcases(true, $galleryId);
 
 // 记录访问
 recordVisit('showcase');
@@ -320,6 +326,63 @@ recordVisit('showcase');
             to { transform: rotate(360deg); }
         }
 
+        /* 相册导航 */
+        .gallery-nav {
+            display: flex;
+            gap: 10px;
+            padding: 16px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .gallery-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: #ffffff;
+            border: 1px solid #e8e8e8;
+            color: #666666;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-tab:hover {
+            background: #fff5f5;
+            border-color: #e94560;
+            color: #e94560;
+        }
+
+        .gallery-tab.active {
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(233, 69, 96, 0.3);
+        }
+
+        .gallery-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.3);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .gallery-tab.active .gallery-count {
+            background: rgba(255,255,255,0.3);
+        }
+
         /* 响应式 */
         @media (max-width: 768px) {
             .showcase-grid {
@@ -376,6 +439,19 @@ recordVisit('showcase');
         <span class="showcase-count">共 <?php echo count($showcases); ?> 张</span>
     </header>
 
+    <!-- 相册导航 -->
+    <?php if (!empty($galleries)): ?>
+    <div class="gallery-nav">
+        <a href="showcase.php" class="gallery-tab <?php echo $galleryId === null ? 'active' : ''; ?>">全部</a>
+        <?php foreach ($galleries as $gallery): ?>
+        <a href="showcase.php?gallery=<?php echo $gallery['id']; ?>" class="gallery-tab <?php echo $galleryId == $gallery['id'] ? 'active' : ''; ?>">
+            <?php echo e($gallery['title']); ?>
+            <span class="gallery-count"><?php echo getGalleryShowcaseCount($gallery['id']); ?></span>
+        </a>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+
     <!-- 展示网格 -->
     <div class="showcase-grid" id="showcaseGrid">
         <?php if (empty($showcases)): ?>
@@ -390,14 +466,23 @@ recordVisit('showcase');
         <?php else: ?>
             <?php foreach ($showcases as $index => $item):
                 $imageUrl = getShowcaseImageUrl($item);
-                $isVideo = ($item['media_type'] ?? '') === 'video';
+                $mediaType = $item['media_type'] ?? 'image';
+                // 判断是否为动图/WebP：本地视频上传后图床会转为webp_animated
                 $isWebpAnimated = false;
-                if (!empty($imageUrl) && !$isVideo) {
-                    // 检测是否为动态WebP
-                    $isWebpAnimated = (strpos($imageUrl, '.webp') !== false);
+                $isVideo = false;
+                if (!empty($imageUrl)) {
+                    $ext = strtolower(pathinfo($imageUrl, PATHINFO_EXTENSION));
+                    // 如果原始是视频类型，或者URL包含.webp，都当作动图处理
+                    if ($mediaType === 'video' || $ext === 'webp' || strpos($imageUrl, '.webp') !== false) {
+                        $isWebpAnimated = true;
+                    }
+                    // 只有本地原始视频文件(mp4/webm/mov)才用video标签
+                    if ($mediaType === 'video' && in_array($ext, ['mp4', 'webm', 'mov'])) {
+                        $isVideo = true;
+                    }
                 }
             ?>
-            <div class="showcase-item" data-index="<?php echo $index; ?>" data-title="<?php echo e($item['title']); ?>" data-src="<?php echo e($imageUrl); ?>" data-media-type="<?php echo e($item['media_type'] ?? 'image'); ?>">
+            <div class="showcase-item" data-index="<?php echo $index; ?>" data-title="<?php echo e($item['title']); ?>" data-src="<?php echo e($imageUrl); ?>" data-media-type="<?php echo $isWebpAnimated ? 'animated' : 'image'; ?>">
                 <div class="showcase-image-wrapper">
                     <?php if ($isVideo): ?>
                         <span class="showcase-badge video">视频</span>
@@ -466,18 +551,29 @@ recordVisit('showcase');
 
             modalMediaContainer.innerHTML = '';
 
-            if (mediaType === 'video') {
+            if (mediaType === 'animated') {
+                // WebP动图：使用img标签（浏览器原生支持）
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = title;
+                img.style.maxWidth = '90vw';
+                img.style.maxHeight = '85vh';
+                img.style.objectFit = 'contain';
+                modalMediaContainer.appendChild(img);
+            } else if (mediaType === 'video') {
+                // 原始视频文件(mp4/webm/mov)
                 const video = document.createElement('video');
                 video.src = src;
                 video.autoplay = true;
                 video.loop = true;
-                video.muted = false; // 全屏播放时有声音
+                video.muted = false;
                 video.playsInline = true;
                 video.controls = true;
                 video.style.maxWidth = '90vw';
                 video.style.maxHeight = '85vh';
                 modalMediaContainer.appendChild(video);
             } else {
+                // 静态图片
                 const img = document.createElement('img');
                 img.src = src;
                 img.alt = title;

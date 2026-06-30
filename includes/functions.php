@@ -748,26 +748,63 @@ function deleteImage($path) {
 }
 
 /**
- * 获取效果展示列表
+ * 获取效果展示列表（可按相册筛选）
  */
-function getShowcases($activeOnly = true) {
+function getShowcases($activeOnly = true, $galleryId = null) {
     global $pdo;
     $sql = "SELECT * FROM showcase";
+    $where = [];
+    $params = [];
+
+    if ($activeOnly) {
+        $where[] = "is_active = 1";
+    }
+    if ($galleryId !== null) {
+        $where[] = "gallery_id = ?";
+        $params[] = $galleryId;
+    }
+
+    if (!empty($where)) {
+        $sql .= " WHERE " . implode(" AND ", $where);
+    }
+    $sql .= " ORDER BY sort_order ASC, id DESC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll();
+}
+
+/**
+ * 获取所有相册合集
+ */
+function getGalleries($activeOnly = true) {
+    global $pdo;
+    $sql = "SELECT * FROM galleries";
     if ($activeOnly) {
         $sql .= " WHERE is_active = 1";
     }
-    $sql .= " ORDER BY sort_order ASC, id DESC";
+    $sql .= " ORDER BY sort_order ASC, id ASC";
     return $pdo->query($sql)->fetchAll();
 }
 
 /**
- * 获取单条效果展示
+ * 获取单个相册
  */
-function getShowcase($id) {
+function getGallery($id) {
     global $pdo;
-    $stmt = $pdo->prepare("SELECT * FROM showcase WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM galleries WHERE id = ?");
     $stmt->execute([$id]);
     return $stmt->fetch();
+}
+
+/**
+ * 获取相册下的展示数量
+ */
+function getGalleryShowcaseCount($galleryId) {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM showcase WHERE gallery_id = ? AND is_active = 1");
+    $stmt->execute([$galleryId]);
+    return $stmt->fetchColumn();
 }
 
 /**

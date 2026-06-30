@@ -105,6 +105,18 @@ try {
             $stmt->execute([$id]);
             jsonResponse(['deleted' => true]);
             break;
+
+        case 'gallery':
+            // 检查相册下是否有展示内容
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM showcase WHERE gallery_id = ?");
+            $stmt->execute([$id]);
+            if ($stmt->fetchColumn() > 0) {
+                jsonError('该相册下还有展示内容，请先删除或转移');
+            }
+            $stmt = $pdo->prepare("DELETE FROM galleries WHERE id = ?");
+            $stmt->execute([$id]);
+            jsonResponse(['deleted' => true]);
+            break;
     }
 } catch (Exception $e) {
     error_log('Delete API Error: ' . $e->getMessage());

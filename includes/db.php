@@ -187,6 +187,27 @@ function initDatabase($pdo) {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
 
+    // 相册合集表
+    $pdo->exec("CREATE TABLE IF NOT EXISTS galleries (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        cover_image TEXT DEFAULT '',
+        sort_order INTEGER DEFAULT 0,
+        is_active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+
+    // 插入默认相册合集
+    $stmt = $pdo->query("SELECT COUNT(*) FROM galleries");
+    if ($stmt->fetchColumn() == 0) {
+        $galleries = ['默认相册', '精选推荐', '最新上传'];
+        foreach ($galleries as $index => $name) {
+            $stmt = $pdo->prepare("INSERT INTO galleries (title, sort_order) VALUES (?, ?)");
+            $stmt->execute([$name, $index]);
+        }
+    }
+
     // 插入默认管理员账号 (admin / 随机强密码)
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM admin_users WHERE username = ?");
     $stmt->execute(['admin']);
@@ -250,6 +271,13 @@ try {
 // 迁移：为已存在的 showcase 表添加 media_type 字段
 try {
     $pdo->exec("ALTER TABLE showcase ADD COLUMN media_type TEXT DEFAULT 'image'");
+} catch (PDOException $e) {
+    // 字段已存在，忽略错误
+}
+
+// 迁移：为已存在的 showcase 表添加 gallery_id 字段
+try {
+    $pdo->exec("ALTER TABLE showcase ADD COLUMN gallery_id INTEGER DEFAULT 1");
 } catch (PDOException $e) {
     // 字段已存在，忽略错误
 }

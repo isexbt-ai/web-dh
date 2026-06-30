@@ -297,12 +297,37 @@ try {
             jsonResponse(['id' => $id, 'saved' => true]);
             break;
 
+        // 保存相册合集
+        case 'gallery':
+            $id = isset($data['id']) ? intval($data['id']) : 0;
+            $title = isset($data['title']) ? substr(trim($data['title']), 0, MAX_TITLE_LENGTH) : '';
+            $description = isset($data['description']) ? substr(trim($data['description']), 0, MAX_CONTENT_LENGTH) : '';
+            $cover_image = isset($data['cover_image']) ? substr($data['cover_image'], 0, MAX_URL_LENGTH) : '';
+            $sort_order = isset($data['sort_order']) ? intval($data['sort_order']) : 0;
+            $is_active = isset($data['is_active']) ? intval($data['is_active']) : 1;
+
+            if (empty($title)) {
+                jsonError('相册标题不能为空');
+            }
+
+            if ($id > 0) {
+                $stmt = $pdo->prepare("UPDATE galleries SET title = ?, description = ?, cover_image = ?, sort_order = ?, is_active = ? WHERE id = ?");
+                $stmt->execute([$title, $description, $cover_image, $sort_order, $is_active, $id]);
+            } else {
+                $stmt = $pdo->prepare("INSERT INTO galleries (title, description, cover_image, sort_order, is_active) VALUES (?, ?, ?, ?, ?)");
+                $stmt->execute([$title, $description, $cover_image, $sort_order, $is_active]);
+                $id = $pdo->lastInsertId();
+            }
+            jsonResponse(['id' => $id, 'saved' => true]);
+            break;
+
         // 保存效果展示
         case 'showcase':
             $id = isset($data['id']) ? intval($data['id']) : 0;
             $title = isset($data['title']) ? substr(trim($data['title']), 0, MAX_TITLE_LENGTH) : '';
             $image = isset($data['image']) ? substr($data['image'], 0, MAX_URL_LENGTH) : '';
             $media_type = isset($data['media_type']) ? $data['media_type'] : 'image';
+            $gallery_id = isset($data['gallery_id']) ? intval($data['gallery_id']) : 1;
             $sort_order = isset($data['sort_order']) ? intval($data['sort_order']) : 0;
             $is_active = isset($data['is_active']) ? intval($data['is_active']) : 1;
 
@@ -311,11 +336,11 @@ try {
             }
 
             if ($id > 0) {
-                $stmt = $pdo->prepare("UPDATE showcase SET title = ?, image = ?, media_type = ?, sort_order = ?, is_active = ? WHERE id = ?");
-                $stmt->execute([$title, $image, $media_type, $sort_order, $is_active, $id]);
+                $stmt = $pdo->prepare("UPDATE showcase SET title = ?, image = ?, media_type = ?, gallery_id = ?, sort_order = ?, is_active = ? WHERE id = ?");
+                $stmt->execute([$title, $image, $media_type, $gallery_id, $sort_order, $is_active, $id]);
             } else {
-                $stmt = $pdo->prepare("INSERT INTO showcase (title, image, media_type, sort_order, is_active) VALUES (?, ?, ?, ?, ?)");
-                $stmt->execute([$title, $image, $media_type, $sort_order, $is_active]);
+                $stmt = $pdo->prepare("INSERT INTO showcase (title, image, media_type, gallery_id, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$title, $image, $media_type, $gallery_id, $sort_order, $is_active]);
                 $id = $pdo->lastInsertId();
             }
             jsonResponse(['id' => $id, 'saved' => true]);
