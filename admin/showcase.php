@@ -224,6 +224,7 @@ $showcases = getShowcases(false);
                             <th>ID</th>
                             <th>预览</th>
                             <th>标题</th>
+                            <th>所属相册</th>
                             <th>本地图片</th>
                             <th>图床状态</th>
                             <th>图床URL</th>
@@ -250,6 +251,18 @@ $showcases = getShowcases(false);
                                 <?php endif; ?>
                             </td>
                             <td><?php echo e($item['title']); ?></td>
+                            <td>
+                                <?php
+                                $galleryName = '默认相册';
+                                foreach ($galleries as $g) {
+                                    if ($g['id'] == ($item['gallery_id'] ?? 1)) {
+                                        $galleryName = $g['title'];
+                                        break;
+                                    }
+                                }
+                                echo e($galleryName);
+                                ?>
+                            </td>
                             <td>
                                 <?php if ($item['image']): ?>
                                     <span style="font-size: 12px; color: #666; word-break: break-all;"><?php echo e($item['image']); ?></span>
@@ -298,6 +311,7 @@ $showcases = getShowcases(false);
                                         data-title="<?php echo e($item['title']); ?>"
                                         data-image="<?php echo e($item['image']); ?>"
                                         data-media_type="<?php echo e($item['media_type'] ?? 'image'); ?>"
+                                        data-gallery_id="<?php echo e($item['gallery_id'] ?? 1); ?>"
                                         data-sort_order="<?php echo e($item['sort_order']); ?>"
                                         data-is_active="<?php echo e($item['is_active']); ?>">编辑</button>
                                     <button class="btn btn-danger btn-sm" onclick="deleteItem('showcase', <?php echo $item['id']; ?>, () => location.reload())">删除</button>
@@ -335,6 +349,15 @@ $showcases = getShowcases(false);
                     <div class="image-upload-preview" id="showcaseImagePreview"></div>
                     <input type="hidden" id="showcaseImage" name="image" value="">
                     <input type="hidden" id="showcaseMediaType" name="media_type" value="image">
+                </div>
+                <div class="form-group">
+                    <label>所属相册</label>
+                    <select id="showcaseGallery" name="gallery_id" required>
+                        <option value="">请选择相册</option>
+                        <?php foreach ($galleries as $g): ?>
+                        <option value="<?php echo $g['id']; ?>"><?php echo e($g['title']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>排序</label>
@@ -449,6 +472,7 @@ $showcases = getShowcases(false);
             const title = btn.getAttribute('data-title') || '';
             const image = btn.getAttribute('data-image') || '';
             const mediaType = btn.getAttribute('data-media_type') || 'image';
+            const galleryId = parseInt(btn.getAttribute('data-gallery_id')) || 1;
             const sortOrder = parseInt(btn.getAttribute('data-sort_order')) || 0;
             const isActive = parseInt(btn.getAttribute('data-is_active')) || 0;
 
@@ -456,6 +480,7 @@ $showcases = getShowcases(false);
             document.getElementById('showcaseTitle').value = title;
             document.getElementById('showcaseImage').value = image;
             document.getElementById('showcaseMediaType').value = mediaType;
+            document.getElementById('showcaseGallery').value = galleryId;
             document.getElementById('showcaseSort').value = sortOrder;
             document.getElementById('showcaseActive').checked = isActive === 1;
 
