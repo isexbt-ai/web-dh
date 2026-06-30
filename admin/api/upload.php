@@ -2,19 +2,22 @@
 /**
  * 文件上传 API（支持图片和视频）
  */
-header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../../includes/functions.php';
 require_once __DIR__ . '/../../includes/auth.php';
 
 // 需要登录
 if (!isLoggedIn()) {
-    jsonError('请先登录');
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['success' => false, 'message' => '请先登录']);
+    exit;
 }
 
 // CSRF验证
 $csrf_token = $_POST['csrf_token'] ?? '';
 if (!verifyCsrfToken($csrf_token)) {
-    jsonError('安全验证失败，请刷新页面重试');
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['success' => false, 'message' => '安全验证失败，请刷新页面重试']);
+    exit;
 }
 
 $type = isset($_GET['type']) ? $_GET['type'] : 'cards';
@@ -23,11 +26,6 @@ $allowedTypes = ['ads', 'cards', 'avatar', 'showcase'];
 if (!in_array($type, $allowedTypes)) {
     $type = 'cards';
 }
-
-// 调试信息
-error_log('Upload API called. Type: ' . $type);
-error_log('FILES: ' . print_r($_FILES, true));
-error_log('POST: ' . print_r($_POST, true));
 
 if (!isset($_FILES['image']) || empty($_FILES['image']['tmp_name'])) {
     $errorMsg = '请选择文件';
@@ -56,13 +54,17 @@ if (!isset($_FILES['image']) || empty($_FILES['image']['tmp_name'])) {
                 break;
         }
     }
-    jsonError($errorMsg);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['success' => false, 'message' => $errorMsg]);
+    exit;
 }
 
 $result = uploadImage($_FILES['image'], $type);
 
+header('Content-Type: application/json; charset=utf-8');
 if ($result['success']) {
-    jsonResponse(['path' => $result['path'], 'is_video' => $result['is_video'] ?? false]);
+    echo json_encode(['success' => true, 'data' => ['path' => $result['path'], 'is_video' => $result['is_video'] ?? false]]);
 } else {
-    jsonError($result['message']);
+    echo json_encode(['success' => false, 'message' => $result['message']]);
 }
+exit;

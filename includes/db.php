@@ -246,3 +246,10 @@ try {
 } catch (PDOException $e) {
     // 字段已存在，忽略错误
 }
+
+// 迁移：为已存在的 showcase 表添加 media_type 字段
+try {
+    $pdo->exec("ALTER TABLE showcase ADD COLUMN media_type TEXT DEFAULT 'image'");
+} catch (PDOException $e) {
+    // 字段已存在，忽略错误
+}
