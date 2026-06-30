@@ -31,7 +31,7 @@ try {
  */
 function initDatabase($pdo) {
     // 快速检查：如果所有核心表都已存在，跳过初始化
-    $requiredTables = ['site_config', 'ads', 'notices', 'categories', 'cards', 'visit_stats', 'admin_users', 'links', 'messages', 'showcase'];
+    $requiredTables = ['site_config', 'ads', 'notices', 'categories', 'cards', 'visit_stats', 'admin_users', 'links', 'messages', 'showcase', 'galleries'];
     try {
         $existing = $pdo->query("SELECT name FROM sqlite_master WHERE type='table'")
                         ->fetchAll(PDO::FETCH_COLUMN);
