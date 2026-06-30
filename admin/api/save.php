@@ -306,14 +306,42 @@ try {
             $sort_order = isset($data['sort_order']) ? intval($data['sort_order']) : 0;
             $is_active = isset($data['is_active']) ? intval($data['is_active']) : 1;
 
-            if (empty($title)) {
-                jsonError('相册标题不能为空');
-            }
-
             if ($id > 0) {
-                $stmt = $pdo->prepare("UPDATE galleries SET title = ?, description = ?, cover_image = ?, sort_order = ?, is_active = ? WHERE id = ?");
-                $stmt->execute([$title, $description, $cover_image, $sort_order, $is_active, $id]);
+                // 更新现有记录 - 只更新提供的字段（支持toggleStatus部分更新）
+                $updateFields = [];
+                $params = [];
+                if (isset($data['title'])) {
+                    if (empty($title)) {
+                        jsonError('相册标题不能为空');
+                    }
+                    $updateFields[] = "title = ?";
+                    $params[] = $title;
+                }
+                if (isset($data['description'])) {
+                    $updateFields[] = "description = ?";
+                    $params[] = $description;
+                }
+                if (isset($data['cover_image'])) {
+                    $updateFields[] = "cover_image = ?";
+                    $params[] = $cover_image;
+                }
+                if (isset($data['sort_order'])) {
+                    $updateFields[] = "sort_order = ?";
+                    $params[] = $sort_order;
+                }
+                if (isset($data['is_active'])) {
+                    $updateFields[] = "is_active = ?";
+                    $params[] = $is_active;
+                }
+                if (!empty($updateFields)) {
+                    $params[] = $id;
+                    $stmt = $pdo->prepare("UPDATE galleries SET " . implode(', ', $updateFields) . " WHERE id = ?");
+                    $stmt->execute($params);
+                }
             } else {
+                if (empty($title)) {
+                    jsonError('相册标题不能为空');
+                }
                 $stmt = $pdo->prepare("INSERT INTO galleries (title, description, cover_image, sort_order, is_active) VALUES (?, ?, ?, ?, ?)");
                 $stmt->execute([$title, $description, $cover_image, $sort_order, $is_active]);
                 $id = $pdo->lastInsertId();
@@ -331,14 +359,46 @@ try {
             $sort_order = isset($data['sort_order']) ? intval($data['sort_order']) : 0;
             $is_active = isset($data['is_active']) ? intval($data['is_active']) : 1;
 
-            if (empty($title)) {
-                jsonError('展示标题不能为空');
-            }
-
             if ($id > 0) {
-                $stmt = $pdo->prepare("UPDATE showcase SET title = ?, image = ?, media_type = ?, gallery_id = ?, sort_order = ?, is_active = ? WHERE id = ?");
-                $stmt->execute([$title, $image, $media_type, $gallery_id, $sort_order, $is_active, $id]);
+                // 更新现有记录 - 只更新提供的字段（支持toggleStatus部分更新）
+                $updateFields = [];
+                $params = [];
+                if (isset($data['title'])) {
+                    if (empty($title)) {
+                        jsonError('展示标题不能为空');
+                    }
+                    $updateFields[] = "title = ?";
+                    $params[] = $title;
+                }
+                if (isset($data['image'])) {
+                    $updateFields[] = "image = ?";
+                    $params[] = $image;
+                }
+                if (isset($data['media_type'])) {
+                    $updateFields[] = "media_type = ?";
+                    $params[] = $media_type;
+                }
+                if (isset($data['gallery_id'])) {
+                    $updateFields[] = "gallery_id = ?";
+                    $params[] = $gallery_id;
+                }
+                if (isset($data['sort_order'])) {
+                    $updateFields[] = "sort_order = ?";
+                    $params[] = $sort_order;
+                }
+                if (isset($data['is_active'])) {
+                    $updateFields[] = "is_active = ?";
+                    $params[] = $is_active;
+                }
+                if (!empty($updateFields)) {
+                    $params[] = $id;
+                    $stmt = $pdo->prepare("UPDATE showcase SET " . implode(', ', $updateFields) . " WHERE id = ?");
+                    $stmt->execute($params);
+                }
             } else {
+                if (empty($title)) {
+                    jsonError('展示标题不能为空');
+                }
                 $stmt = $pdo->prepare("INSERT INTO showcase (title, image, media_type, gallery_id, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$title, $image, $media_type, $gallery_id, $sort_order, $is_active]);
                 $id = $pdo->lastInsertId();

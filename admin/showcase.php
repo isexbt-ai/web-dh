@@ -7,6 +7,7 @@ require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
 
 $showcases = getShowcases(false);
+$galleries = getGalleries(false);
 ?>
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -191,6 +192,69 @@ $showcases = getShowcases(false);
                 <p>管理效果展示图片（支持WebP动图）</p>
             </header>
 
+            <!-- 相册列表 -->
+            <div class="table-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="section-title" style="margin-bottom: 0;">相册列表</h2>
+                    <button class="btn btn-primary" onclick="openModal('galleryModal')">添加相册</button>
+                </div>
+
+                <?php if (empty($galleries)): ?>
+                <div class="empty-state">暂无相册，点击上方按钮添加</div>
+                <?php else: ?>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>封面</th>
+                            <th>标题</th>
+                            <th>描述</th>
+                            <th>内容数</th>
+                            <th>排序</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($galleries as $gallery): ?>
+                        <tr>
+                            <td><?php echo $gallery['id']; ?></td>
+                            <td>
+                                <?php if ($gallery['cover_image']): ?>
+                                    <img src="../<?php echo e($gallery['cover_image']); ?>" class="showcase-preview" alt="<?php echo e($gallery['title']); ?>" onclick="window.open(this.src, '_blank')">
+                                <?php else: ?>
+                                    <div style="width: 80px; height: 60px; background: linear-gradient(135deg, #e94560, #ff6b6b); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff;">无封面</div>
+                                <?php endif; ?>
+                            </td>
+                            <td><?php echo e($gallery['title']); ?></td>
+                            <td><?php echo e($gallery['description'] ?: '-'); ?></td>
+                            <td><?php echo getGalleryShowcaseCount($gallery['id']); ?></td>
+                            <td><?php echo $gallery['sort_order']; ?></td>
+                            <td>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" <?php echo $gallery['is_active'] ? 'checked' : ''; ?> onchange="toggleStatus('gallery', <?php echo $gallery['id']; ?>, this.checked)">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn btn-secondary btn-sm" onclick="editGallery(this)"
+                                        data-id="<?php echo $gallery['id']; ?>"
+                                        data-title="<?php echo e($gallery['title']); ?>"
+                                        data-description="<?php echo e($gallery['description']); ?>"
+                                        data-cover_image="<?php echo e($gallery['cover_image']); ?>"
+                                        data-sort_order="<?php echo e($gallery['sort_order']); ?>"
+                                        data-is_active="<?php echo e($gallery['is_active']); ?>">编辑</button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteItem('gallery', <?php echo $gallery['id']; ?>, () => location.reload())">删除</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <?php endif; ?>
+            </div>
+
             <!-- 批量操作 -->
             <div class="batch-actions">
                 <button class="btn btn-primary" onclick="openModal('showcaseModal')">添加展示</button>
@@ -254,11 +318,17 @@ $showcases = getShowcases(false);
                             <td>
                                 <?php
                                 $galleryName = '默认相册';
+                                $foundGallery = false;
                                 foreach ($galleries as $g) {
                                     if ($g['id'] == ($item['gallery_id'] ?? 1)) {
                                         $galleryName = $g['title'];
+                                        $foundGallery = true;
                                         break;
                                     }
+                                }
+                                // 如果gallery_id存在但找不到对应相册，显示相册ID
+                                if (!$foundGallery && !empty($item['gallery_id']) && $item['gallery_id'] != 1) {
+                                    $galleryName = '相册ID:' . $item['gallery_id'];
                                 }
                                 echo e($galleryName);
                                 ?>
@@ -392,6 +462,16 @@ $showcases = getShowcases(false);
                     <textarea id="galleryDescription" name="description" placeholder="请输入相册描述（可选）" rows="3"></textarea>
                 </div>
                 <div class="form-group">
+                    <label>封面图片</label>
+                    <div class="image-upload">
+                        <input type="file" id="galleryCoverFile" accept="image/*" onchange="previewGalleryCover(this)">
+                        <div class="upload-icon">📷</div>
+                        <div class="upload-text">点击上传封面图片</div>
+                    </div>
+                    <div class="image-upload-preview" id="galleryCoverPreview"></div>
+                    <input type="hidden" id="galleryCoverImage" name="cover_image" value="">
+                </div>
+                <div class="form-group">
                     <label>排序</label>
                     <input type="number" id="gallerySort" name="sort_order" value="0" min="0">
                 </div>
@@ -413,6 +493,16 @@ $showcases = getShowcases(false);
             const formData = new FormData(e.target);
             const data = {};
             formData.forEach((value, key) => { data[key] = value; });
+
+            // 处理封面上传
+            const fileInput = document.getElementById('galleryCoverFile');
+            if (fileInput.files && fileInput.files[0]) {
+                const uploadResult = await uploadImage(fileInput.files[0], 'showcase');
+                if (uploadResult.success) {
+                    data.cover_image = uploadResult.data.path;
+                }
+            }
+
             data.is_active = document.getElementById('galleryActive').checked ? 1 : 0;
 
             saveData('gallery', data, () => {
@@ -420,6 +510,43 @@ $showcases = getShowcases(false);
                 location.reload();
             });
             return false;
+        }
+
+        function previewGalleryCover(input) {
+            const preview = document.getElementById('galleryCoverPreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = '<img src="' + e.target.result + '" alt="预览" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;">';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function editGallery(btn) {
+            const id = btn.getAttribute('data-id');
+            const title = btn.getAttribute('data-title') || '';
+            const description = btn.getAttribute('data-description') || '';
+            const coverImage = btn.getAttribute('data-cover_image') || '';
+            const sortOrder = parseInt(btn.getAttribute('data-sort_order')) || 0;
+            const isActive = parseInt(btn.getAttribute('data-is_active')) || 0;
+
+            document.getElementById('galleryId').value = id;
+            document.getElementById('galleryTitle').value = title;
+            document.getElementById('galleryDescription').value = description;
+            document.getElementById('galleryCoverImage').value = coverImage;
+            document.getElementById('gallerySort').value = sortOrder;
+            document.getElementById('galleryActive').checked = isActive === 1;
+
+            const preview = document.getElementById('galleryCoverPreview');
+            if (coverImage) {
+                preview.innerHTML = '<img src="../' + coverImage + '" alt="预览" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;">';
+            } else {
+                preview.innerHTML = '';
+            }
+
+            document.getElementById('galleryModalTitle').textContent = '编辑相册';
+            openModal('galleryModal');
         }
 
         function previewShowcaseMedia(input) {
@@ -437,6 +564,67 @@ $showcases = getShowcases(false);
                 };
                 reader.readAsDataURL(file);
             }
+        }
+
+        async function saveGallery(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = {};
+            formData.forEach((value, key) => { data[key] = value; });
+
+            // 处理封面上传
+            const fileInput = document.getElementById('galleryCoverFile');
+            if (fileInput.files && fileInput.files[0]) {
+                const uploadResult = await uploadImage(fileInput.files[0], 'showcase');
+                if (uploadResult.success) {
+                    data.cover_image = uploadResult.data.path;
+                }
+            }
+
+            data.is_active = document.getElementById('galleryActive').checked ? 1 : 0;
+
+            saveData('gallery', data, () => {
+                closeModal('galleryModal');
+                location.reload();
+            });
+            return false;
+        }
+
+        function previewGalleryCover(input) {
+            const preview = document.getElementById('galleryCoverPreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = '<img src="' + e.target.result + '" alt="预览" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;">';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function editGallery(btn) {
+            const id = btn.getAttribute('data-id');
+            const title = btn.getAttribute('data-title') || '';
+            const description = btn.getAttribute('data-description') || '';
+            const coverImage = btn.getAttribute('data-cover_image') || '';
+            const sortOrder = parseInt(btn.getAttribute('data-sort_order')) || 0;
+            const isActive = parseInt(btn.getAttribute('data-is_active')) || 0;
+
+            document.getElementById('galleryId').value = id;
+            document.getElementById('galleryTitle').value = title;
+            document.getElementById('galleryDescription').value = description;
+            document.getElementById('galleryCoverImage').value = coverImage;
+            document.getElementById('gallerySort').value = sortOrder;
+            document.getElementById('galleryActive').checked = isActive === 1;
+
+            const preview = document.getElementById('galleryCoverPreview');
+            if (coverImage) {
+                preview.innerHTML = '<img src="../' + coverImage + '" alt="预览" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;">';
+            } else {
+                preview.innerHTML = '';
+            }
+
+            document.getElementById('galleryModalTitle').textContent = '编辑相册';
+            openModal('galleryModal');
         }
 
         async function saveShowcase(e) {
@@ -498,6 +686,11 @@ $showcases = getShowcases(false);
 
             document.getElementById('showcaseModalTitle').textContent = '编辑展示';
             openModal('showcaseModal');
+        }
+
+        async function toggleStatus(type, id, active) {
+            const data = { id: id, is_active: active ? 1 : 0 };
+            saveData(type, data);
         }
 
         // 批量上传到图床
