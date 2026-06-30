@@ -237,7 +237,13 @@ $showcases = getShowcases(false);
                             <td><?php echo $item['id']; ?></td>
                             <td>
                                 <?php if ($item['image']): ?>
-                                    <img src="../<?php echo e($item['image']); ?>" class="showcase-preview" alt="<?php echo e($item['title']); ?>" onclick="window.open(this.src, '_blank')">
+                                    <?php
+                                    $isVideo = ($item['media_type'] ?? '') === 'video' || preg_match('/\.(mp4|webm|mov)$/i', $item['image'] ?? '');
+                                    if ($isVideo): ?>
+                                        <video src="../<?php echo e($item['image']); ?>" class="showcase-preview" style="object-fit: cover;" muted onclick="window.open(this.src, '_blank')"></video>
+                                    <?php else: ?>
+                                        <img src="../<?php echo e($item['image']); ?>" class="showcase-preview" alt="<?php echo e($item['title']); ?>" onclick="window.open(this.src, '_blank')">
+                                    <?php endif; ?>
                                 <?php else: ?>
                                     <div style="width: 80px; height: 60px; background: linear-gradient(135deg, #e94560, #ff6b6b); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff;">无图</div>
                                 <?php endif; ?>
@@ -290,6 +296,7 @@ $showcases = getShowcases(false);
                                         data-id="<?php echo $item['id']; ?>"
                                         data-title="<?php echo e($item['title']); ?>"
                                         data-image="<?php echo e($item['image']); ?>"
+                                        data-media_type="<?php echo e($item['media_type'] ?? 'image'); ?>"
                                         data-sort_order="<?php echo e($item['sort_order']); ?>"
                                         data-is_active="<?php echo e($item['is_active']); ?>">编辑</button>
                                     <button class="btn btn-danger btn-sm" onclick="deleteItem('showcase', <?php echo $item['id']; ?>, () => location.reload())">删除</button>
@@ -318,14 +325,15 @@ $showcases = getShowcases(false);
                     <input type="text" id="showcaseTitle" name="title" placeholder="请输入展示标题" required>
                 </div>
                 <div class="form-group">
-                    <label>展示图片</label>
+                    <label>展示图片/视频</label>
                     <div class="image-upload">
-                        <input type="file" id="showcaseImageFile" accept="image/*" onchange="previewShowcaseImage(this)">
+                        <input type="file" id="showcaseImageFile" accept="image/*,video/*" onchange="previewShowcaseMedia(this)">
                         <div class="upload-icon">📷</div>
-                        <div class="upload-text">点击上传图片（支持 WebP 动图）</div>
+                        <div class="upload-text">点击上传图片或视频（支持 WebP 动图、MP4、WebM）</div>
                     </div>
                     <div class="image-upload-preview" id="showcaseImagePreview"></div>
                     <input type="hidden" id="showcaseImage" name="image" value="">
+                    <input type="hidden" id="showcaseMediaType" name="media_type" value="image">
                 </div>
                 <div class="form-group">
                     <label>排序</label>
@@ -344,14 +352,20 @@ $showcases = getShowcases(false);
 
     <script src="../assets/js/admin.js"></script>
     <script>
-        function previewShowcaseImage(input) {
+        function previewShowcaseMedia(input) {
             const preview = document.getElementById('showcaseImagePreview');
             if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const isVideo = file.type.startsWith('video/');
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    preview.innerHTML = '<img src="' + e.target.result + '" alt="预览">';
+                    if (isVideo) {
+                        preview.innerHTML = '<video src="' + e.target.result + '" controls style="max-width: 200px; max-height: 150px; border-radius: 8px;"></video>';
+                    } else {
+                        preview.innerHTML = '<img src="' + e.target.result + '" alt="预览" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;">';
+                    }
                 };
-                reader.readAsDataURL(input.files[0]);
+                reader.readAsDataURL(file);
             }
         }
 
@@ -361,10 +375,14 @@ $showcases = getShowcases(false);
             const data = {};
             formData.forEach((value, key) => { data[key] = value; });
 
-            // 处理图片上传
+            // 处理文件上传
             const fileInput = document.getElementById('showcaseImageFile');
             if (fileInput.files && fileInput.files[0]) {
-                const uploadResult = await uploadImage(fileInput.files[0], 'showcase');
+                const file = fileInput.files[0];
+                const isVideo = file.type.startsWith('video/');
+                data.media_type = isVideo ? 'video' : 'image';
+
+                const uploadResult = await uploadImage(file, 'showcase');
                 if (uploadResult.success) {
                     data.image = uploadResult.data.path;
                 }
@@ -383,18 +401,25 @@ $showcases = getShowcases(false);
             const id = btn.getAttribute('data-id');
             const title = btn.getAttribute('data-title') || '';
             const image = btn.getAttribute('data-image') || '';
+            const mediaType = btn.getAttribute('data-media_type') || 'image';
             const sortOrder = parseInt(btn.getAttribute('data-sort_order')) || 0;
             const isActive = parseInt(btn.getAttribute('data-is_active')) || 0;
 
             document.getElementById('showcaseId').value = id;
             document.getElementById('showcaseTitle').value = title;
             document.getElementById('showcaseImage').value = image;
+            document.getElementById('showcaseMediaType').value = mediaType;
             document.getElementById('showcaseSort').value = sortOrder;
             document.getElementById('showcaseActive').checked = isActive === 1;
 
             const preview = document.getElementById('showcaseImagePreview');
             if (image) {
-                preview.innerHTML = '<img src="../' + image + '" alt="预览">';
+                const isVideo = mediaType === 'video' || image.toLowerCase().endsWith('.mp4') || image.toLowerCase().endsWith('.webm') || image.toLowerCase().endsWith('.mov');
+                if (isVideo) {
+                    preview.innerHTML = '<video src="../' + image + '" controls style="max-width: 200px; max-height: 150px; border-radius: 8px;"></video>';
+                } else {
+                    preview.innerHTML = '<img src="../' + image + '" alt="预览" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;">';
+                }
             } else {
                 preview.innerHTML = '';
             }

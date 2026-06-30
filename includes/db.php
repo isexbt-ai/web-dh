@@ -177,6 +177,7 @@ function initDatabase($pdo) {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
         image TEXT,
+        media_type TEXT DEFAULT 'image',
         imgbed_url TEXT DEFAULT '',
         imgbed_status INTEGER DEFAULT 0,
         imgbed_filename TEXT DEFAULT '',

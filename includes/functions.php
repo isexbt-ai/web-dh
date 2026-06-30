@@ -577,9 +577,10 @@ function formatMessageTime($timestamp) {
     return date('n月j日 H:i', $time);
 }
 function uploadImage($file, $directory = 'cards') {
-    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    $maxSize = 10 * 1024 * 1024; // 10MB
-    $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    // 支持图片和视频格式
+    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm', 'video/quicktime'];
+    $maxSize = 50 * 1024 * 1024; // 50MB（视频需要更大）
+    $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'webm', 'mov'];
 
     // 检查上传错误
     if (isset($file['error'])) {
@@ -587,13 +588,13 @@ function uploadImage($file, $directory = 'cards') {
             case UPLOAD_ERR_OK:
                 break;
             case UPLOAD_ERR_INI_SIZE:
-                return ['success' => false, 'message' => '文件超过服务器大小限制（最大10MB）'];
+                return ['success' => false, 'message' => '文件超过服务器大小限制（最大50MB）'];
             case UPLOAD_ERR_FORM_SIZE:
                 return ['success' => false, 'message' => '文件超过表单大小限制'];
             case UPLOAD_ERR_PARTIAL:
                 return ['success' => false, 'message' => '文件上传不完整，请重试'];
             case UPLOAD_ERR_NO_FILE:
-                return ['success' => false, 'message' => '请选择图片文件'];
+                return ['success' => false, 'message' => '请选择文件'];
             case UPLOAD_ERR_NO_TMP_DIR:
                 return ['success' => false, 'message' => '服务器临时目录不存在'];
             case UPLOAD_ERR_CANT_WRITE:
@@ -606,7 +607,7 @@ function uploadImage($file, $directory = 'cards') {
     }
 
     if (!isset($file['tmp_name']) || empty($file['tmp_name'])) {
-        return ['success' => false, 'message' => '请选择图片文件'];
+        return ['success' => false, 'message' => '请选择文件'];
     }
 
     // 使用 fileinfo 检测真实 MIME 类型
@@ -624,12 +625,28 @@ function uploadImage($file, $directory = 'cards') {
         return ['success' => false, 'message' => '无法检测文件类型，请确保服务器已安装fileinfo扩展'];
     }
 
-    if (!in_array($mimeType, $allowedTypes)) {
-        return ['success' => false, 'message' => '只允许上传 jpg/png/gif/webp 格式的图片'];
+    // 视频文件特殊处理：检查文件头（某些视频可能被识别为 application/octet-stream）
+    $isVideo = false;
+    if (strpos($mimeType, 'video/') === 0) {
+        $isVideo = true;
+    } elseif ($mimeType === 'application/octet-stream') {
+        // 尝试通过扩展名判断视频
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $videoExts = ['mp4', 'webm', 'mov'];
+        if (in_array($ext, $videoExts)) {
+            $isVideo = true;
+            // 根据扩展名修正 MIME 类型
+            $mimeMap = ['mp4' => 'video/mp4', 'webm' => 'video/webm', 'mov' => 'video/quicktime'];
+            $mimeType = $mimeMap[$ext] ?? $mimeType;
+        }
+    }
+
+    if (!in_array($mimeType, $allowedTypes) && !$isVideo) {
+        return ['success' => false, 'message' => '只允许上传 jpg/png/gif/webp/mp4/webm/mov 格式的文件'];
     }
 
     if ($file['size'] > $maxSize) {
-        return ['success' => false, 'message' => '图片大小不能超过10MB'];
+        return ['success' => false, 'message' => '文件大小不能超过50MB'];
     }
 
     // 扩展名白名单校验
@@ -647,10 +664,10 @@ function uploadImage($file, $directory = 'cards') {
     $filepath = $uploadDir . $filename;
 
     if (move_uploaded_file($file['tmp_name'], $filepath)) {
-        return ['success' => true, 'path' => 'uploads/' . $directory . '/' . $filename];
+        return ['success' => true, 'path' => 'uploads/' . $directory . '/' . $filename, 'is_video' => $isVideo];
     }
 
-    return ['success' => false, 'message' => '图片上传失败'];
+    return ['success' => false, 'message' => '文件上传失败'];
 }
 
 /**

@@ -156,6 +156,10 @@ recordVisit('showcase');
             background: linear-gradient(135deg, #7c4dff, #b388ff);
         }
 
+        .showcase-badge.video {
+            background: linear-gradient(135deg, #00bcd4, #4dd0e1);
+        }
+
         /* 全屏查看模态框 */
         .showcase-modal {
             position: fixed;
@@ -386,19 +390,27 @@ recordVisit('showcase');
         <?php else: ?>
             <?php foreach ($showcases as $index => $item):
                 $imageUrl = getShowcaseImageUrl($item);
+                $isVideo = ($item['media_type'] ?? '') === 'video';
                 $isWebpAnimated = false;
-                if (!empty($imageUrl)) {
-                    $ext = strtolower(pathinfo($imageUrl, PATHINFO_EXTENSION));
-                    // 检测是否为动态WebP（简单通过URL判断，也可通过文件头检测）
+                if (!empty($imageUrl) && !$isVideo) {
+                    // 检测是否为动态WebP
                     $isWebpAnimated = (strpos($imageUrl, '.webp') !== false);
                 }
             ?>
-            <div class="showcase-item" data-index="<?php echo $index; ?>" data-title="<?php echo e($item['title']); ?>" data-src="<?php echo e($imageUrl); ?>">
+            <div class="showcase-item" data-index="<?php echo $index; ?>" data-title="<?php echo e($item['title']); ?>" data-src="<?php echo e($imageUrl); ?>" data-media-type="<?php echo e($item['media_type'] ?? 'image'); ?>">
                 <div class="showcase-image-wrapper">
-                    <?php if ($isWebpAnimated): ?>
+                    <?php if ($isVideo): ?>
+                        <span class="showcase-badge video">视频</span>
+                        <video src="<?php echo e($imageUrl); ?>" muted loop playsinline preload="metadata" onloadeddata="this.play()" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"></video>
+                        <div class="video-fallback" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; align-items:center; justify-content:center; background:#333; color:#fff; font-size:14px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:32px; height:32px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        </div>
+                    <?php elseif ($isWebpAnimated): ?>
                         <span class="showcase-badge webpanimated">动图</span>
+                        <img src="<?php echo e($imageUrl); ?>" alt="<?php echo e($item['title']); ?>" loading="lazy" onerror="this.src='assets/images/logo.png'">
+                    <?php else: ?>
+                        <img src="<?php echo e($imageUrl); ?>" alt="<?php echo e($item['title']); ?>" loading="lazy" onerror="this.src='assets/images/logo.png'">
                     <?php endif; ?>
-                    <img src="<?php echo e($imageUrl); ?>" alt="<?php echo e($item['title']); ?>" loading="lazy" onerror="this.src='assets/images/logo.png'">
                 </div>
                 <div class="showcase-item-title"><?php echo e($item['title']); ?></div>
             </div>
@@ -450,19 +462,20 @@ recordVisit('showcase');
         function openModal(item) {
             const src = item.dataset.src;
             const title = item.dataset.title;
+            const mediaType = item.dataset.mediaType || 'image';
 
             modalMediaContainer.innerHTML = '';
 
-            // 判断是否为视频/动图（简单通过扩展名判断）
-            const isVideo = src.toLowerCase().endsWith('.mp4') || src.toLowerCase().endsWith('.webm');
-
-            if (isVideo) {
+            if (mediaType === 'video') {
                 const video = document.createElement('video');
                 video.src = src;
                 video.autoplay = true;
                 video.loop = true;
-                video.muted = true;
+                video.muted = false; // 全屏播放时有声音
                 video.playsInline = true;
+                video.controls = true;
+                video.style.maxWidth = '90vw';
+                video.style.maxHeight = '85vh';
                 modalMediaContainer.appendChild(video);
             } else {
                 const img = document.createElement('img');
