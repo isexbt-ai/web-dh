@@ -144,7 +144,7 @@ async function deleteItem(action, id, successCallback) {
     }
 }
 
-// ==================== 上传图片到服务器 ====================
+// ==================== 上传文件到服务器 ====================
 async function uploadImage(file, type = 'cards') {
     const formData = new FormData();
     formData.append('image', file);
@@ -156,11 +156,18 @@ async function uploadImage(file, type = 'cards') {
             body: formData
         });
 
+        // 检查HTTP状态
+        if (!response.ok) {
+            const text = await response.text();
+            console.error('Upload HTTP error:', response.status, text);
+            return { success: false, message: '服务器错误 ' + response.status + ': ' + text.substring(0, 100) };
+        }
+
         const result = await response.json();
         return result;
     } catch (error) {
         console.error('Upload error:', error);
-        return { success: false, message: '上传失败' };
+        return { success: false, message: '上传失败: ' + (error.message || '网络错误') };
     }
 }
 
