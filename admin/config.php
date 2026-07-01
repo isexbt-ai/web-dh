@@ -164,12 +164,12 @@ $config = [
                             <div>
                                 <label style="font-size: 13px; color: #666; margin-bottom: 6px; display: block;">桌面端（>768px）</label>
                                 <select name="cards_per_row_desktop" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff;">
-                                    <option value="repeat(auto-fill, 120px)" <?php echo $config['cards_per_row_desktop'] === 'repeat(auto-fill, 120px)' ? 'selected' : ''; ?>>自动填充（120px）</option>
                                     <option value="repeat(2, 1fr)" <?php echo $config['cards_per_row_desktop'] === 'repeat(2, 1fr)' ? 'selected' : ''; ?>>每行 2 个</option>
                                     <option value="repeat(3, 1fr)" <?php echo $config['cards_per_row_desktop'] === 'repeat(3, 1fr)' ? 'selected' : ''; ?>>每行 3 个</option>
                                     <option value="repeat(4, 1fr)" <?php echo $config['cards_per_row_desktop'] === 'repeat(4, 1fr)' ? 'selected' : ''; ?>>每行 4 个</option>
                                     <option value="repeat(5, 1fr)" <?php echo $config['cards_per_row_desktop'] === 'repeat(5, 1fr)' ? 'selected' : ''; ?>>每行 5 个</option>
                                     <option value="repeat(6, 1fr)" <?php echo $config['cards_per_row_desktop'] === 'repeat(6, 1fr)' ? 'selected' : ''; ?>>每行 6 个</option>
+                                    <option value="repeat(8, 1fr)" <?php echo $config['cards_per_row_desktop'] === 'repeat(8, 1fr)' ? 'selected' : ''; ?>>每行 8 个</option>
                                 </select>
                             </div>
 

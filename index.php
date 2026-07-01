@@ -34,7 +34,7 @@ if (!empty($categories)) {
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
         :root {
-            --cards-per-row-desktop: <?php echo e(getConfig('cards_per_row_desktop', 'repeat(auto-fill, 120px)')); ?>;
+            --cards-per-row-desktop: <?php echo e(getConfig('cards_per_row_desktop', 'repeat(6, 1fr)')); ?>;
             --cards-per-row-tablet: <?php echo e(getConfig('cards_per_row_tablet', 'repeat(4, 1fr)')); ?>;
             --cards-per-row-mobile: <?php echo e(getConfig('cards_per_row_mobile', 'repeat(3, 1fr)')); ?>;
         }

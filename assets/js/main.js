@@ -231,16 +231,12 @@ function renderCards(cards) {
             ? `onclick="goToDetail(${card.id})"`
             : `onclick="goToLink(${card.id}, '${encodeURIComponent(card.link || '#')}')"`;
 
-        // 处理卡片尺寸 - 统一使用正方形比例
-        const imageContainerStyle = '';
-        const imageStyle = 'style="width: 100%; height: 100%; object-fit: cover;"';
-
         return `
         <div class="card-item" ${onclickAttr}>
             <span class="card-type-badge ${badgeClass}">${badgeText}</span>
-            <div class="card-image" ${imageContainerStyle}>
+            <div class="card-image">
                 ${card.thumb_image
-                    ? `<img src="${card.thumb_image}" alt="${escapeHtml(card.title)}" loading="lazy" ${imageStyle}>`
+                    ? `<img src="${card.thumb_image}" alt="${escapeHtml(card.title)}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">`
                     : `<div class="card-placeholder">图片</div>`
                 }
             </div>

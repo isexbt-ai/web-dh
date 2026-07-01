@@ -489,12 +489,9 @@ function renderCardsHtml($cards) {
             $imageHtml = '<div class="card-placeholder">图片</div>';
         }
 
-        // 图片尺寸 - 统一使用正方形比例
-        $imageContainerStyle = '';
-
         echo '<div class="card-item" ' . $onclickAttr . '>';
         echo '<span class="card-type-badge ' . $badgeClass . '">' . e($badgeText) . '</span>';
-        echo '<div class="card-image" ' . $imageContainerStyle . '>' . $imageHtml . '</div>';
+        echo '<div class="card-image">' . $imageHtml . '</div>';
         echo '<div class="card-title">' . e($card['title']) . '</div>';
         echo '</div>';
     }
