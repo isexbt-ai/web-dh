@@ -297,8 +297,50 @@ try {
             jsonResponse(['id' => $id, 'saved' => true]);
             break;
 
-        // 保存相册合集
-        case 'gallery':
+        // 保存跳转页配置
+        case 'redirect_config':
+            $mainUrl = isset($data['redirect_main_url']) ? trim($data['redirect_main_url']) : '';
+            $mainName = isset($data['redirect_main_name']) ? trim($data['redirect_main_name']) : '';
+            $backupUrls = isset($data['backup_urls']) ? $data['backup_urls'] : [];
+            $backupNames = isset($data['backup_names']) ? $data['backup_names'] : [];
+            $countdown = isset($data['redirect_countdown']) ? intval($data['redirect_countdown']) : 3;
+            $checkTimeout = isset($data['redirect_check_timeout']) ? intval($data['redirect_check_timeout']) : 3000;
+            $fallbackFirst = isset($data['redirect_fallback_first']) ? '1' : '0';
+
+            if (empty($mainUrl) || empty($mainName)) {
+                jsonError('主站地址和名称不能为空');
+            }
+
+            // 验证URL格式
+            if (!preg_match('/^https:\/\//i', $mainUrl)) {
+                jsonError('主站地址必须以 https:// 开头');
+            }
+
+            // 构建备用地址JSON
+            $backups = [];
+            if (is_array($backupUrls) && is_array($backupNames)) {
+                foreach ($backupUrls as $index => $url) {
+                    $url = trim($url);
+                    $name = isset($backupNames[$index]) ? trim($backupNames[$index]) : '';
+                    if (!empty($url)) {
+                        $backups[] = [
+                            'url' => $url,
+                            'name' => $name ?: '备用' . ($index + 1),
+                            'priority' => $index + 2
+                        ];
+                    }
+                }
+            }
+
+            setConfig('redirect_main_url', $mainUrl);
+            setConfig('redirect_main_name', $mainName);
+            setConfig('redirect_backup_urls', json_encode($backups));
+            setConfig('redirect_countdown', strval(max(1, min(10, $countdown))));
+            setConfig('redirect_check_timeout', strval(max(1000, min(10000, $checkTimeout))));
+            setConfig('redirect_fallback_first', $fallbackFirst);
+
+            jsonResponse(['saved' => true]);
+            break;
             $id = isset($data['id']) ? intval($data['id']) : 0;
             $title = isset($data['title']) ? substr(trim($data['title']), 0, MAX_TITLE_LENGTH) : '';
             $description = isset($data['description']) ? substr(trim($data['description']), 0, MAX_CONTENT_LENGTH) : '';
@@ -404,6 +446,82 @@ try {
                 $id = $pdo->lastInsertId();
             }
             jsonResponse(['id' => $id, 'saved' => true]);
+            break;
+
+        // 保存跳转页配置
+        case 'redirect_config':
+            $mainDomain = isset($data['redirect_main_domain']) ? trim($data['redirect_main_domain']) : '';
+            $subdomainLength = isset($data['redirect_subdomain_length']) ? intval($data['redirect_subdomain_length']) : 6;
+            $countdown = isset($data['redirect_countdown']) ? intval($data['redirect_countdown']) : 3;
+            $checkTimeout = isset($data['redirect_check_timeout']) ? intval($data['redirect_check_timeout']) : 3000;
+            $fallbackFirst = isset($data['redirect_fallback_first']) ? '1' : '0';
+
+            // 验证主域名格式
+            if (!empty($mainDomain)) {
+                $mainDomain = preg_replace('/^https?:\/\//', '', $mainDomain);
+                $mainDomain = rtrim($mainDomain, '/');
+            }
+
+            setConfig('redirect_main_domain', $mainDomain);
+            setConfig('redirect_subdomain_length', strval(max(4, min(12, $subdomainLength))));
+            setConfig('redirect_countdown', strval(max(1, min(10, $countdown))));
+            setConfig('redirect_check_timeout', strval(max(1000, min(10000, $checkTimeout))));
+            setConfig('redirect_fallback_first', $fallbackFirst);
+
+            jsonResponse(['saved' => true]);
+            break;
+            $domain = isset($data['domain']) ? trim($data['domain']) : '';
+            $name = isset($data['name']) ? trim($data['name']) : '';
+
+            if (empty($domain)) {
+                jsonError('域名不能为空');
+            }
+
+            // 验证URL格式
+            if (!preg_match('/^https:\/\//i', $domain)) {
+                jsonError('域名必须以 https:// 开头');
+            }
+
+            // 确保域名以 / 结尾
+            if (!str_ends_with($domain, '/')) {
+                $domain .= '/';
+            }
+
+            $stmt = $pdo->prepare("INSERT INTO redirect_domains (domain, name, sort_order) VALUES (?, ?, ?)");
+            $stmt->execute([$domain, $name, 0]);
+            $id = $pdo->lastInsertId();
+
+            jsonResponse(['id' => $id, 'saved' => true]);
+            break;
+
+        // 封禁/解封域名
+        case 'redirect_domain_block':
+            $id = isset($data['id']) ? intval($data['id']) : 0;
+            $isBlocked = isset($data['is_blocked']) ? intval($data['is_blocked']) : 0;
+
+            if ($id <= 0) {
+                jsonError('无效的域名ID');
+            }
+
+            $blockedAt = $isBlocked ? date('Y-m-d H:i:s') : null;
+            $stmt = $pdo->prepare("UPDATE redirect_domains SET is_blocked = ?, blocked_at = ? WHERE id = ?");
+            $stmt->execute([$isBlocked, $blockedAt, $id]);
+
+            jsonResponse(['id' => $id, 'saved' => true]);
+            break;
+
+        // 删除域名
+        case 'redirect_domain_delete':
+            $id = isset($data['id']) ? intval($data['id']) : 0;
+
+            if ($id <= 0) {
+                jsonError('无效的域名ID');
+            }
+
+            $stmt = $pdo->prepare("DELETE FROM redirect_domains WHERE id = ?");
+            $stmt->execute([$id]);
+
+            jsonResponse(['id' => $id, 'deleted' => true]);
             break;
     }
 } catch (Exception $e) {

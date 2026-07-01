@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="theme-color" content="#667eea">
+    <title>安全检测中...</title>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .card {
+            width: 90%;
+            max-width: 360px;
+            padding: 40px 32px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .shield-wrap {
+            position: relative;
+            width: 120px;
+            height: 140px;
+            margin: 0 auto;
+        }
+
+        .shield {
+            width: 100%;
+            height: 100%;
+            animation: shieldPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes shieldPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        .shield-outline {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.3);
+            stroke-width: 2;
+        }
+
+        .shield-fill {
+            fill: url(#shieldGradient);
+            opacity: 0.9;
+        }
+
+        .scan-line {
+            stroke: #fff;
+            stroke-width: 2;
+            stroke-dasharray: 120;
+            stroke-dashoffset: 120;
+            animation: scan 1.5s ease-in-out infinite;
+        }
+
+        @keyframes scan {
+            0% { stroke-dashoffset: 120; opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { stroke-dashoffset: -120; opacity: 0.8; }
+        }
+
+        .check-mark {
+            fill: none;
+            stroke: #fff;
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 80;
+            stroke-dashoffset: 80;
+            transition: stroke-dashoffset 0.6s ease-out;
+        }
+
+        .check-mark.visible {
+            stroke-dashoffset: 0;
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 24px 0 8px;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 24px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #a8edea, #fed6e3);
+            border-radius: 2px;
+            transition: width 0.1s linear;
+        }
+
+        .countdown {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            margin: 16px 0;
+        }
+
+        .countdown-num {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .skip-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 36px;
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .skip-btn:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .skip-btn:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .status-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 12px;
+            min-height: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="shield-wrap">
+            <svg class="shield" viewBox="0 0 120 140" aria-hidden="true">
+                <defs>
+                    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#a8edea"/>
+                        <stop offset="100%" stop-color="#fed6e3"/>
+                    </linearGradient>
+                </defs>
+                <path class="shield-outline" d="M60 5 L110 25 V65 C110 95 85 125 60 135 C35 125 10 95 10 65 V25 Z"/>
+                <path class="shield-fill" d="M60 5 L110 25 V65 C110 95 85 125 60 135 C35 125 10 95 10 65 V25 Z"/>
+                <line class="scan-line" x1="10" y1="65" x2="110" y2="65"/>
+                <path class="check-mark" id="checkMark" d="M35 70 L50 85 L85 50"/>
+            </svg>
+        </div>
+
+        <h1 class="title" id="title">安全检测中</h1>
+        <p class="subtitle" id="subtitle">正在验证链接安全性...</p>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+
+        <div class="countdown">
+            <span class="countdown-num" id="countdown">5</span>
+            <span>秒后自动跳转</span>
+        </div>
+
+        <div class="status-text" id="statusText">正在检测目标地址...</div>
+
+        <button class="skip-btn" id="skipBtn">立即跳转</button>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="stats/tracker.js"></script>
+    <script>
+        (function() {
+            'use strict';
+
+            // 初始化统计SDK
+            StatsTracker.init({ endpoint: 'api/stats.php?action=collect' });
+            StatsTracker.send();
+
+            var targetUrl = null;
+            var countdown = 5;
+            var duration = 5000;
+            var timer = null;
+            var isChecking = true;
+
+            var countdownEl = document.getElementById('countdown');
+            var progressEl = document.getElementById('progress');
+            var checkMark = document.getElementById('checkMark');
+            var titleEl = document.getElementById('title');
+            var subtitleEl = document.getElementById('subtitle');
+            var statusTextEl = document.getElementById('statusText');
+            var skipBtn = document.getElementById('skipBtn');
+
+            // 安全：验证URL是否合法（允许当前域名的所有子域名）
+            function isUrlAllowed(url) {
+                try {
+                    var parsed = new URL(url);
+                    // 只允许HTTPS协议
+                    if (parsed.protocol !== 'https:') {
+                        return false;
+                    }
+                    // 获取当前域名
+                    var currentHost = window.location.hostname;
+                    if (!currentHost) return false;
+
+                    // 允许当前域名及其所有子域名
+                    if (parsed.hostname === currentHost) return true;
+                    if (parsed.hostname.endsWith('.' + currentHost)) return true;
+
+                    // 允许当前域名的父域名（如 abc.com 允许 *.abc.com）
+                    var parts = currentHost.split('.');
+                    if (parts.length > 2) {
+                        var parentDomain = parts.slice(-2).join('.');
+                        if (parsed.hostname === parentDomain) return true;
+                        if (parsed.hostname.endsWith('.' + parentDomain)) return true;
+                    }
+
+                    return false;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            // 倒计时跳转
+            function startCountdown(url, config) {
+                // 安全：跳转前验证URL
+                if (!isUrlAllowed(url)) {
+                    titleEl.textContent = '安全警告';
+                    subtitleEl.textContent = '目标地址不在允许列表中';
+                    statusTextEl.textContent = '跳转已阻止，请联系管理员';
+                    countdownEl.textContent = '!';
+                    skipBtn.style.display = 'none';
+                    return;
+                }
+
+                targetUrl = url;
+                isChecking = false;
+                var startTime = Date.now();
+                var totalDuration = config.settings.countdownSeconds * 1000;
+
+                function tick() {
+                    if (isChecking) return;
+
+                    var elapsed = Date.now() - startTime;
+                    var remaining = Math.max(0, totalDuration - elapsed);
+                    var seconds = Math.ceil(remaining / 1000);
+
+                    countdownEl.textContent = seconds;
+
+                    if (progressEl) {
+                        progressEl.style.width = Math.min(100, (elapsed / totalDuration) * 100) + '%';
+                    }
+
+                    if (remaining <= 0) {
+                        if (checkMark) checkMark.classList.add('visible');
+                        titleEl.textContent = '检测完成';
+                        subtitleEl.textContent = '链接安全，即将跳转';
+                        statusTextEl.textContent = '正在跳转...';
+
+                        setTimeout(function() {
+                            window.location.href = targetUrl;
+                        }, 600);
+                    } else {
+                        requestAnimationFrame(tick);
+                    }
+                }
+
+                requestAnimationFrame(tick);
+            }
+
+            // 立即跳转
+            skipBtn.addEventListener('click', function() {
+                if (targetUrl) {
+                    window.location.href = targetUrl;
+                }
+            });
+
+            // 初始化
+            var config = null;
+
+            // 加载配置
+            RedirectConfig.load().then(function(cfg) {
+                config = cfg;
+                var url = RedirectConfig.getTargetUrl();
+                if (url && url !== 'about:blank') {
+                    startCountdown(url, config);
+                } else {
+                    titleEl.textContent = '配置错误';
+                    subtitleEl.textContent = '无法获取目标地址';
+                    statusTextEl.textContent = '请联系管理员';
+                    countdownEl.textContent = '!';
+                }
+            }).catch(function(err) {
+                console.error('初始化失败:', err);
+                titleEl.textContent = '加载失败';
+                subtitleEl.textContent = '请刷新页面重试';
+            });
+        })();
+    </script>
+</body>
+</html>

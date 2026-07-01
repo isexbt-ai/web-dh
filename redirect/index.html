@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    <title>跳转中...</title>
+</head>
+<body>
+    <script src="config.js"></script>
+    <script src="stats/tracker.js"></script>
+    <script>
+        (function() {
+            'use strict';
+
+            // 初始化统计SDK
+            StatsTracker.init({ endpoint: 'api/stats.php?action=collect' });
+            StatsTracker.send();
+
+            // 检测是否在 QQ 或微信环境中
+            var ua = navigator.userAgent.toLowerCase();
+            var isQQ = ua.indexOf('qq/') > -1;
+            var isWeChat = ua.indexOf('micromessenger') > -1;
+
+            // 安全：验证URL合法性
+            function isValidUrl(url) {
+                try {
+                    var parsed = new URL(url);
+                    return parsed.protocol === 'https:';
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            // 从配置获取目标地址（动态子域名）
+            RedirectConfig.load().then(function(config) {
+                var targetUrl = RedirectConfig.getTargetUrl();
+
+                // 安全：验证目标URL
+                if (!isValidUrl(targetUrl)) {
+                    console.error('Invalid target URL:', targetUrl);
+                    document.body.innerHTML = '<h1 style="text-align:center;margin-top:50px;">配置错误，请联系管理员</h1>';
+                    return;
+                }
+
+                if (isQQ || isWeChat) {
+                    // QQ/微信环境，跳转到提示页面
+                    window.location.replace('browser-tip.html?url=' + encodeURIComponent(targetUrl));
+                } else {
+                    // 正常环境，跳转到安全检测页
+                    window.location.replace('redirect.html?url=' + encodeURIComponent(targetUrl));
+                }
+            }).catch(function(err) {
+                console.error('配置加载失败:', err);
+                document.body.innerHTML = '<h1 style="text-align:center;margin-top:50px;">加载失败，请刷新页面重试</h1>';
+            });
+        })();
+    </script>
+</body>
+</html>

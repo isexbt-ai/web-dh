@@ -1,0 +1,21 @@
+{
+  "version": "1.0.0",
+  "updatedAt": "2025-06-29T12:00:00Z",
+  "main": {
+    "url": "https://xxxxx.xxxxxxxxxxxxxxxxxxxx.xyz/",
+    "name": "主站",
+    "priority": 1
+  },
+  "backups": [
+    {
+      "url": "https://dh.xlbk.blog/",
+      "name": "备用1",
+      "priority": 2
+    }
+  ],
+  "settings": {
+    "checkTimeout": 3000,
+    "countdownSeconds": 3,
+    "fallbackToFirst": true
+  }
+}

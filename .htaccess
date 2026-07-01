@@ -63,3 +63,21 @@ php_value post_max_size 20M
     # 排除已压缩的内容
     SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png|webp|zip|gz|bz2)$ no-gzip
 </IfModule>
+
+# ========== 跳转页 QQ/微信 UA 拦截 ==========
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 仅对 redirect/ 目录下的请求生效
+    RewriteCond %{REQUEST_URI} ^/redirect/
+    # 检测 QQ 或微信 User-Agent
+    RewriteCond %{HTTP_USER_AGENT} (QQ/|MicroMessenger) [NC]
+    # 重写到 browser-tip-inline.php（内联提示页，无需额外请求）
+    RewriteRule ^redirect/(.*)$ redirect/browser-tip-inline.php [L]
+</IfModule>
+
+# 禁止访问敏感目录
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(data|includes|uploads)/ - [F,L]
+</IfModule>

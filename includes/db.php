@@ -281,3 +281,66 @@ try {
 } catch (PDOException $e) {
     // 字段已存在，忽略错误
 }
+
+// 迁移：创建跳转页访问统计表
+try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS redirect_visits (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ip TEXT NOT NULL,
+        country_code TEXT DEFAULT 'XX',
+        country_name TEXT DEFAULT '未知',
+        user_agent TEXT,
+        device_type TEXT DEFAULT 'unknown',
+        browser TEXT DEFAULT 'unknown',
+        os TEXT DEFAULT 'unknown',
+        referer TEXT,
+        page_url TEXT,
+        cf_ray TEXT,
+        created_at INTEGER DEFAULT 0
+    )");
+
+    // 创建索引
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_redirect_visits_time ON redirect_visits(created_at)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_redirect_visits_ip ON redirect_visits(ip)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_redirect_visits_country ON redirect_visits(country_code)");
+} catch (PDOException $e) {
+    // 忽略错误
+}
+
+// 迁移：插入跳转页默认配置
+$redirectConfigs = [
+    ['redirect_main_url', 'https://example.com/', 'text'],
+    ['redirect_main_name', '主站', 'text'],
+    ['redirect_backup_urls', '[]', 'text'],
+    ['redirect_countdown', '3', 'text'],
+    ['redirect_check_timeout', '3000', 'text'],
+    ['redirect_fallback_first', '1', 'toggle'],
+    ['redirect_subdomain_length', '6', 'text'],
+    ['redirect_main_domain', '', 'text'],
+];
+
+foreach ($redirectConfigs as $config) {
+    $stmt = $pdo->prepare("INSERT OR IGNORE INTO site_config (key, value, type) VALUES (?, ?, ?)");
+    $stmt->execute($config);
+}
+
+// 迁移：创建域名池表
+try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS redirect_domains (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        domain TEXT NOT NULL UNIQUE,
+        name TEXT DEFAULT '',
+        sort_order INTEGER DEFAULT 0,
+        is_active INTEGER DEFAULT 1,
+        is_blocked INTEGER DEFAULT 0,
+        blocked_at TIMESTAMP,
+        click_count INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+
+    // 创建索引
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_redirect_domains_active ON redirect_domains(is_active)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_redirect_domains_blocked ON redirect_domains(is_blocked)");
+} catch (PDOException $e) {
+    // 忽略错误
+}
