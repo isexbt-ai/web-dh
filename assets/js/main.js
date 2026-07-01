@@ -231,18 +231,9 @@ function renderCards(cards) {
             ? `onclick="goToDetail(${card.id})"`
             : `onclick="goToLink(${card.id}, '${encodeURIComponent(card.link || '#')}')"`;
 
-        // 处理卡片尺寸 - grid已控制列宽为120px，这里只控制图片区域高度
-        let imageContainerStyle = '';
-        let imageStyle = '';
-        if (card.image_height > 0) {
-            // 设置了图片高度 - 图片区域使用设置的高度
-            imageContainerStyle = `style="height: ${card.image_height}px; aspect-ratio: auto;"`;
-            imageStyle = `style="width: 100%; height: 100%; object-fit: cover;"`;
-        } else {
-            // 默认 - 图片区域使用正方形比例（120x120）
-            imageContainerStyle = '';
-            imageStyle = `style="width: 100%; height: 100%; object-fit: cover;"`;
-        }
+        // 处理卡片尺寸 - 统一使用正方形比例
+        const imageContainerStyle = '';
+        const imageStyle = 'style="width: 100%; height: 100%; object-fit: cover;"';
 
         return `
         <div class="card-item" ${onclickAttr}>

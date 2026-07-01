@@ -28,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cardsPerRowDesktop = isset($_POST['cards_per_row_desktop']) ? trim($_POST['cards_per_row_desktop']) : 'repeat(auto-fill, 120px)';
         $cardsPerRowTablet = isset($_POST['cards_per_row_tablet']) ? trim($_POST['cards_per_row_tablet']) : 'repeat(4, 1fr)';
         $cardsPerRowMobile = isset($_POST['cards_per_row_mobile']) ? trim($_POST['cards_per_row_mobile']) : 'repeat(3, 1fr)';
+        $cardSortMethod = isset($_POST['card_sort_method']) ? trim($_POST['card_sort_method']) : 'default';
 
         // 保存访客统计热度公式配置
         $visitorClickDivisor = isset($_POST['visitor_click_divisor']) ? max(1, intval($_POST['visitor_click_divisor'])) : 100;
@@ -41,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         setConfig('cards_per_row_desktop', $cardsPerRowDesktop);
         setConfig('cards_per_row_tablet', $cardsPerRowTablet);
         setConfig('cards_per_row_mobile', $cardsPerRowMobile);
+        setConfig('card_sort_method', $cardSortMethod);
         setConfig('visitor_click_divisor', (string)$visitorClickDivisor);
         setConfig('visitor_today_multiplier', (string)$visitorTodayMultiplier);
 
@@ -56,6 +58,7 @@ $config = [
     'cards_per_row_desktop' => getConfig('cards_per_row_desktop', 'repeat(auto-fill, 120px)'),
     'cards_per_row_tablet' => getConfig('cards_per_row_tablet', 'repeat(4, 1fr)'),
     'cards_per_row_mobile' => getConfig('cards_per_row_mobile', 'repeat(3, 1fr)'),
+    'card_sort_method' => getConfig('card_sort_method', 'default'),
     'visitor_click_divisor' => getConfig('visitor_click_divisor', '100'),
     'visitor_today_multiplier' => getConfig('visitor_today_multiplier', '2')
 ];
@@ -186,6 +189,14 @@ $config = [
                                     <option value="repeat(2, 1fr)" <?php echo $config['cards_per_row_mobile'] === 'repeat(2, 1fr)' ? 'selected' : ''; ?>>每行 2 个</option>
                                     <option value="repeat(3, 1fr)" <?php echo $config['cards_per_row_mobile'] === 'repeat(3, 1fr)' ? 'selected' : ''; ?>>每行 3 个</option>
                                     <option value="repeat(4, 1fr)" <?php echo $config['cards_per_row_mobile'] === 'repeat(4, 1fr)' ? 'selected' : ''; ?>>每行 4 个</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label style="font-size: 13px; color: #666; margin-bottom: 6px; display: block;">卡片排序方式</label>
+                                <select name="card_sort_method" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff;">
+                                    <option value="default" <?php echo $config['card_sort_method'] === 'default' ? 'selected' : ''; ?>>默认排序（按手动排序 + 时间）</option>
+                                    <option value="click_count" <?php echo $config['card_sort_method'] === 'click_count' ? 'selected' : ''; ?>>按点击量从高到低</option>
                                 </select>
                             </div>
                         </div>

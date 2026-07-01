@@ -12,9 +12,10 @@ $config = [
 $links = getLinks();
 
 // 获取第一个分类的卡片用于首屏SSR
+$cardSortMethod = getConfig('card_sort_method', 'default');
 $firstCategoryCards = [];
 if (!empty($categories)) {
-    $firstCategoryCards = getCards($categories[0]['id']);
+    $firstCategoryCards = getCards($categories[0]['id'], true, $cardSortMethod);
 }
 ?>
 <!DOCTYPE html>

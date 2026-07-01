@@ -168,7 +168,7 @@ function getCategories($activeOnly = true) {
 /**
  * 获取分类下的卡片
  */
-function getCards($categoryId = null, $activeOnly = true) {
+function getCards($categoryId = null, $activeOnly = true, $sortMethod = 'default') {
     global $pdo;
     $sql = "SELECT c.*, cat.name as category_name FROM cards c
             LEFT JOIN categories cat ON c.category_id = cat.id";
@@ -186,7 +186,16 @@ function getCards($categoryId = null, $activeOnly = true) {
     if (!empty($where)) {
         $sql .= " WHERE " . implode(" AND ", $where);
     }
-    $sql .= " ORDER BY c.sort_order ASC, c.id DESC";
+
+    switch ($sortMethod) {
+        case 'click_count':
+            $sql .= " ORDER BY c.click_count DESC, c.id DESC";
+            break;
+        case 'default':
+        default:
+            $sql .= " ORDER BY c.sort_order ASC, c.id DESC";
+            break;
+    }
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
@@ -480,11 +489,8 @@ function renderCardsHtml($cards) {
             $imageHtml = '<div class="card-placeholder">图片</div>';
         }
 
-        // 图片尺寸
+        // 图片尺寸 - 统一使用正方形比例
         $imageContainerStyle = '';
-        if (!empty($card['image_height']) && $card['image_height'] > 0) {
-            $imageContainerStyle = 'style="height: ' . intval($card['image_height']) . 'px; aspect-ratio: auto;"';
-        }
 
         echo '<div class="card-item" ' . $onclickAttr . '>';
         echo '<span class="card-type-badge ' . $badgeClass . '">' . e($badgeText) . '</span>';

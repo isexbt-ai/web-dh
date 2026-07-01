@@ -10,9 +10,10 @@ header('Expires: 0');
 require_once __DIR__ . '/../../includes/functions.php';
 
 $categoryId = isset($_GET['category_id']) ? intval($_GET['category_id']) : null;
+$cardSortMethod = getConfig('card_sort_method', 'default');
 
 try {
-    $cards = getCards($categoryId);
+    $cards = getCards($categoryId, true, $cardSortMethod);
 
     // 为每张卡片添加缩略图URL
     foreach ($cards as &$card) {

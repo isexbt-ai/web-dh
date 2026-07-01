@@ -33,7 +33,7 @@ try {
     switch ($action) {
         // 保存站点配置
         case 'config':
-            $allowedConfigKeys = ['site_title', 'avatar', 'contact_info', 'site_description', 'cards_per_row_desktop', 'cards_per_row_tablet', 'cards_per_row_mobile', 'guestbook_enabled', 'guestbook_title', 'guestbook_subtitle', 'guestbook_image'];
+            $allowedConfigKeys = ['site_title', 'avatar', 'contact_info', 'site_description', 'cards_per_row_desktop', 'cards_per_row_tablet', 'cards_per_row_mobile', 'card_sort_method', 'guestbook_enabled', 'guestbook_title', 'guestbook_subtitle', 'guestbook_image'];
             foreach ($data as $key => $value) {
                 if (!in_array($key, $allowedConfigKeys, true)) {
                     continue; // 跳过不在白名单中的键
@@ -171,7 +171,7 @@ try {
             $is_active = isset($data['is_active']) ? intval($data['is_active']) : 1;
 
             // card_type 白名单验证
-            $allowedCardTypes = ['link', 'image', 'video', 'text'];
+            $allowedCardTypes = ['link', 'detail', 'image', 'video', 'text'];
             if (!in_array($card_type, $allowedCardTypes, true)) {
                 $card_type = 'link'; // 默认回退到 link
             }
