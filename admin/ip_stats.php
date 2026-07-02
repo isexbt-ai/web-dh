@@ -34,25 +34,38 @@ $stmt = $pdo->query("SELECT ip, COUNT(*) as visit_count, MAX(visit_time) as last
 $ipList = $stmt->fetchAll();
 
 // 为每个IP查询归属地（从缓存或API）
+$domesticIps = [];
+$foreignIps = [];
 foreach ($ipList as &$item) {
     $location = getIpLocation($item['ip']);
     if ($location) {
-        $item['country'] = $location['country'];
+        $item['country_code'] = $location['country'];
+        $item['country'] = getCountryName($location['country']);
         $item['region'] = $location['region'];
         $item['city'] = $location['city'];
         $item['isp'] = $location['isp'];
+        $item['is_china'] = isChinaIP($location['country']);
     } else {
+        $item['country_code'] = '-';
         $item['country'] = '-';
         $item['region'] = '-';
         $item['city'] = '-';
         $item['isp'] = '-';
+        $item['is_china'] = false;
+    }
+
+    // 分类到国内/国外
+    if ($item['is_china']) {
+        $domesticIps[] = $item;
+    } else {
+        $foreignIps[] = $item;
     }
 }
 unset($item);
 
-// 地域统计
+// 地域统计（仅国内）
 $regionStats = [];
-foreach ($ipList as $item) {
+foreach ($domesticIps as $item) {
     $region = $item['region'] ?: '未知';
     if (!isset($regionStats[$region])) {
         $regionStats[$region] = 0;
@@ -524,15 +537,15 @@ $cacheOldest = $cacheStats['oldest'];
             </div>
             <?php endif; ?>
 
-            <!-- 访问IP列表 -->
-            <div class="table-section">
+            <!-- 访问IP列表 - 国内IP -->
+            <div class="table-section" style="margin-bottom: 32px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 class="section-title" style="margin-bottom: 0;">📋 访问IP列表</h2>
-                    <span style="color: #999999; font-size: 14px;">共 <?php echo count($ipList); ?> 条</span>
+                    <h2 class="section-title" style="margin-bottom: 0;">🇨🇳 国内IP列表</h2>
+                    <span style="color: #999999; font-size: 14px;">共 <?php echo count($domesticIps); ?> 条</span>
                 </div>
 
-                <?php if (empty($ipList)): ?>
-                <div class="empty-state">暂无访问记录</div>
+                <?php if (empty($domesticIps)): ?>
+                <div class="empty-state">暂无国内访问记录</div>
                 <?php else: ?>
                 <table class="data-table">
                     <thead>
@@ -545,7 +558,47 @@ $cacheOldest = $cacheStats['oldest'];
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($ipList as $item): ?>
+                        <?php foreach ($domesticIps as $item): ?>
+                        <tr>
+                            <td><code style="background: #f0f0f0; padding: 2px 8px; border-radius: 4px; font-size: 13px;"><?php echo e($item['ip']); ?></code></td>
+                            <td>
+                                <?php
+                                $locationParts = array_filter([$item['country'], $item['region'], $item['city']], function($v) { return $v && $v !== '-'; });
+                                echo e(implode(' ', $locationParts) ?: '-');
+                                ?>
+                            </td>
+                            <td><?php echo e($item['isp'] ?: '-'); ?></td>
+                            <td><?php echo $item['visit_count']; ?></td>
+                            <td><?php echo e($item['last_visit']); ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <?php endif; ?>
+            </div>
+
+            <!-- 访问IP列表 - 国外IP -->
+            <div class="table-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="section-title" style="margin-bottom: 0;">🌍 国外IP列表</h2>
+                    <span style="color: #999999; font-size: 14px;">共 <?php echo count($foreignIps); ?> 条</span>
+                </div>
+
+                <?php if (empty($foreignIps)): ?>
+                <div class="empty-state">暂无国外访问记录</div>
+                <?php else: ?>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>IP地址</th>
+                            <th>归属地</th>
+                            <th>运营商</th>
+                            <th>访问次数</th>
+                            <th>最后访问</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($foreignIps as $item): ?>
                         <tr>
                             <td><code style="background: #f0f0f0; padding: 2px 8px; border-radius: 4px; font-size: 13px;"><?php echo e($item['ip']); ?></code></td>
                             <td>
@@ -618,7 +671,7 @@ $cacheOldest = $cacheStats['oldest'];
             const ipTypeBadge = document.getElementById('ipTypeBadge');
 
             document.getElementById('resultIp').textContent = data.ip;
-            document.getElementById('resultCountry').textContent = data.country || '-';
+            document.getElementById('resultCountry').textContent = data.country_name || data.country || '-';
             document.getElementById('resultRegion').textContent = data.region || '-';
             document.getElementById('resultCity').textContent = data.city || '-';
             document.getElementById('resultIsp').textContent = data.isp || '-';
