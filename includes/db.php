@@ -281,3 +281,21 @@ try {
 } catch (PDOException $e) {
     // 字段已存在，忽略错误
 }
+
+// 迁移：创建IP归属地缓存表
+try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS ip_location_cache (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ip TEXT UNIQUE NOT NULL,
+        country TEXT,
+        region TEXT,
+        city TEXT,
+        isp TEXT,
+        org TEXT,
+        loc TEXT,
+        timezone TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+} catch (PDOException $e) {
+    // 忽略错误
+}

@@ -1013,3 +1013,148 @@ function batchUploadToImgbed($ids = []) {
 
     return ['success' => $success, 'failed' => $failed, 'details' => $details];
 }
+
+/**
+ * 判断是否为内网IP
+ */
+function isPrivateIP($ip) {
+    $parts = array_map('intval', explode('.', $ip));
+    if ($parts[0] === 10) return true;
+    if ($parts[0] === 172 && $parts[1] >= 16 && $parts[1] <= 31) return true;
+    if ($parts[0] === 192 && $parts[1] === 168) return true;
+    if ($parts[0] === 127) return true;
+    return false;
+}
+
+/**
+ * 查询IP归属地（带缓存）
+ * @param string $ip IP地址
+ * @return array|null 归属地信息
+ */
+function getIpLocation($ip) {
+    global $pdo;
+
+    // 验证IP格式
+    if (empty($ip) || !filter_var($ip, FILTER_VALIDATE_IP)) {
+        return null;
+    }
+
+    // 1. 先查缓存
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM ip_location_cache WHERE ip = ?");
+        $stmt->execute([$ip]);
+        $cached = $stmt->fetch();
+        if ($cached) {
+            return $cached;
+        }
+    } catch (PDOException $e) {
+        // 缓存表可能不存在，继续查询
+    }
+
+    // 2. 内网IP直接返回
+    if (isPrivateIP($ip)) {
+        return [
+            'ip' => $ip,
+            'country' => '内网',
+            'region' => '-',
+            'city' => '-',
+            'isp' => '-',
+            'org' => '-',
+            'loc' => '-',
+            'timezone' => '-'
+        ];
+    }
+
+    // 3. 调用 ipinfo.io API
+    $url = "https://ipinfo.io/{$ip}/json";
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if (!$response || $httpCode !== 200) {
+        return null;
+    }
+
+    $data = json_decode($response, true);
+    if (!$data || isset($data['bogon']) || isset($data['error'])) {
+        return null;
+    }
+
+    // 4. 解析ISP
+    $isp = '-';
+    $org = '-';
+    if (!empty($data['org']) && strpos($data['org'], ' ') !== false) {
+        $parts = explode(' ', $data['org'], 2);
+        $org = $parts[0];
+        $isp = $parts[1];
+    } elseif (!empty($data['org'])) {
+        $isp = $data['org'];
+    }
+
+    // 5. 存入缓存
+    try {
+        $stmt = $pdo->prepare("INSERT OR IGNORE INTO ip_location_cache (ip, country, region, city, isp, org, loc, timezone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([
+            $ip,
+            $data['country'] ?? '-',
+            $data['region'] ?? '-',
+            $data['city'] ?? '-',
+            $isp,
+            $org,
+            $data['loc'] ?? '-',
+            $data['timezone'] ?? '-'
+        ]);
+    } catch (PDOException $e) {
+        // 忽略缓存写入错误
+    }
+
+    return [
+        'ip' => $ip,
+        'country' => $data['country'] ?? '-',
+        'region' => $data['region'] ?? '-',
+        'city' => $data['city'] ?? '-',
+        'isp' => $isp,
+        'org' => $org,
+        'loc' => $data['loc'] ?? '-',
+        'timezone' => $data['timezone'] ?? '-'
+    ];
+}
+
+/**
+ * 清理IP归属地缓存
+ * @param int $maxAgeDays 清理多少天前的缓存，默认30天
+ * @return int 清理的记录数
+ */
+function clearIpLocationCache($maxAgeDays = 30) {
+    global $pdo;
+    try {
+        $stmt = $pdo->prepare("DELETE FROM ip_location_cache WHERE created_at < datetime('now', '-? days')");
+        $stmt->execute([$maxAgeDays]);
+        return $stmt->rowCount();
+    } catch (PDOException $e) {
+        error_log('Clear IP cache error: ' . $e->getMessage());
+        return 0;
+    }
+}
+
+/**
+ * 获取IP缓存统计信息
+ * @return array [total, oldest, newest]
+ */
+function getIpCacheStats() {
+    global $pdo;
+    try {
+        $total = $pdo->query("SELECT COUNT(*) FROM ip_location_cache")->fetchColumn();
+        $oldest = $pdo->query("SELECT MIN(created_at) FROM ip_location_cache")->fetchColumn();
+        $newest = $pdo->query("SELECT MAX(created_at) FROM ip_location_cache")->fetchColumn();
+        $size = $pdo->query("SELECT SUM(LENGTH(ip) + LENGTH(country) + LENGTH(region) + LENGTH(city) + LENGTH(isp) + LENGTH(org) + LENGTH(loc) + LENGTH(timezone)) FROM ip_location_cache")->fetchColumn();
+        return ['total' => $total, 'oldest' => $oldest, 'newest' => $newest, 'size' => $size];
+    } catch (PDOException $e) {
+        return ['total' => 0, 'oldest' => null, 'newest' => null, 'size' => 0];
+    }
+}

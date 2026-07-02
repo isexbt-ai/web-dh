@@ -103,6 +103,14 @@ $activeCount = $pdo->query("SELECT COUNT(*) FROM messages WHERE is_active = 1")-
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     <span>留言管理</span>
                 </a>
+                <a href="ip_stats.php" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                    <span>IP统计</span>
+                </a>
                 <a href="password.php" class="nav-item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                     <span>修改密码</span>
@@ -240,6 +248,7 @@ $activeCount = $pdo->query("SELECT COUNT(*) FROM messages WHERE is_active = 1")-
                             <th>昵称</th>
                             <th>内容</th>
                             <th>IP</th>
+                            <th>归属地</th>
                             <th>时间</th>
                             <th>状态</th>
                             <th>回复</th>
@@ -253,6 +262,17 @@ $activeCount = $pdo->query("SELECT COUNT(*) FROM messages WHERE is_active = 1")-
                             <td><?php echo e($msg['nickname'] ?: '匿名用户'); ?></td>
                             <td><?php echo e(mb_substr($msg['content'], 0, 60)) . (mb_strlen($msg['content']) > 60 ? '...' : ''); ?></td>
                             <td><?php echo e($msg['ip'] ?? '-'); ?></td>
+                            <td>
+                                <?php
+                                $loc = getIpLocation($msg['ip'] ?? '');
+                                if ($loc && $loc['country'] !== '-') {
+                                    $parts = array_filter([$loc['country'], $loc['region'], $loc['city']], function($v) { return $v && $v !== '-'; });
+                                    echo '<span style="font-size: 12px; color: #666;">' . e(implode(' ', $parts) ?: '-') . '</span>';
+                                } else {
+                                    echo '<span style="font-size: 12px; color: #999;">-</span>';
+                                }
+                                ?>
+                            </td>
                             <td><?php echo e($msg['created_at']); ?></td>
                             <td>
                                 <span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; <?php echo $msg['is_active'] ? 'background: rgba(78, 204, 163, 0.15); color: #4ecca3;' : 'background: rgba(244, 67, 54, 0.15); color: #f44336;'; ?>">
