@@ -32,6 +32,9 @@ if (!empty($categories)) {
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#e94560">
+    <link rel="apple-touch-icon" href="assets/images/logo.png">
     <style>
         :root {
             --cards-per-row-desktop: <?php echo e(getConfig('cards_per_row_desktop', 'repeat(6, 1fr)')); ?>;
@@ -185,6 +188,19 @@ if (!empty($categories)) {
 
     <script src="assets/js/main.js"></script>
     <script>
+        // 注册 Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('SW registered: ', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('SW registration failed: ', error);
+                    });
+            });
+        }
+
         // 标记首屏已加载的分类，避免JS重复请求
         window.__firstCategoryLoaded = <?php echo !empty($categories) ? $categories[0]['id'] : 'null'; ?>;
 

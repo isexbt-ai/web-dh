@@ -1,0 +1,22 @@
+{
+    "name": "美女导航",
+    "short_name": "美女导航",
+    "description": "精选美女导航网站",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#f5f7fa",
+    "theme_color": "#e94560",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "assets/images/logo.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "assets/images/logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

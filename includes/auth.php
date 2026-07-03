@@ -11,6 +11,34 @@ ini_set('session.cookie_samesite', 'Strict');
 session_start();
 
 /**
+ * 获取当前登录用户角色
+ */
+function getCurrentUserRole() {
+    return $_SESSION['admin_role'] ?? 'admin';
+}
+
+/**
+ * 检查当前用户是否为超级管理员
+ */
+function isSuperAdmin() {
+    return getCurrentUserRole() === 'superadmin';
+}
+
+/**
+ * 要求超级管理员权限
+ */
+function requireSuperAdmin() {
+    if (!isLoggedIn()) {
+        header('Location: index.php');
+        exit;
+    }
+    if (!isSuperAdmin()) {
+        http_response_code(403);
+        die('权限不足，需要超级管理员权限');
+    }
+}
+
+/**
  * 检查是否已登录（包含 session 超时检查）
  * 默认超时时间：30分钟无操作自动登出
  */
@@ -52,6 +80,8 @@ function verifyLogin($username, $password) {
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password'])) {
+        // 存储用户角色到session
+        $_SESSION['admin_role'] = $user['role'] ?? 'admin';
         return true;
     }
     return false;
@@ -68,6 +98,17 @@ function doLogin($username) {
     $_SESSION['admin_username'] = $username;
     $_SESSION['login_time'] = time();
     $_SESSION['last_activity'] = time();
+
+    // 从数据库获取用户角色
+    global $pdo;
+    try {
+        $stmt = $pdo->prepare("SELECT role FROM admin_users WHERE username = ?");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch();
+        $_SESSION['admin_role'] = $user['role'] ?? 'admin';
+    } catch (Exception $e) {
+        $_SESSION['admin_role'] = 'admin';
+    }
 
     // 记录安全日志
     logSecurityEvent('login_success', "管理员 {$username} 登录成功");

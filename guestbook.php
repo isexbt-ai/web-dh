@@ -44,6 +44,85 @@ $messages = getMessages(0, 10);
             --cards-per-row-tablet: <?php echo e(getConfig('cards_per_row_tablet', 'repeat(4, 1fr)')); ?>;
             --cards-per-row-mobile: <?php echo e(getConfig('cards_per_row_mobile', 'repeat(3, 1fr)')); ?>;
         }
+
+        /* 骨架屏动画 */
+        @keyframes skeleton-loading {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s ease-in-out infinite;
+            border-radius: 8px;
+        }
+
+        .skeleton-text {
+            height: 14px;
+            margin-bottom: 8px;
+        }
+
+        .skeleton-text.short {
+            width: 60%;
+        }
+
+        .skeleton-text.long {
+            width: 100%;
+        }
+
+        .skeleton-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .skeleton-item {
+            padding: 16px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .skeleton-item:last-child {
+            border-bottom: none;
+        }
+
+        .skeleton-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        /* 加载状态 */
+        .loading-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #999;
+            font-size: 14px;
+            gap: 8px;
+        }
+
+        .loading-indicator .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f0f0f0;
+            border-top-color: #e94560;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 无限滚动触发器 */
+        .infinite-scroll-trigger {
+            height: 20px;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
@@ -96,10 +175,54 @@ $messages = getMessages(0, 10);
                     <?php renderGuestbookMessages($messages); ?>
                 </div>
 
+                <!-- 骨架屏（初始隐藏） -->
+                <div id="skeletonContainer" style="display: none;">
+                    <div class="skeleton-item">
+                        <div class="skeleton-header">
+                            <div class="skeleton skeleton-avatar"></div>
+                            <div style="flex: 1;">
+                                <div class="skeleton skeleton-text short"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton skeleton-text long"></div>
+                        <div class="skeleton skeleton-text" style="width: 80%;"></div>
+                    </div>
+                    <div class="skeleton-item">
+                        <div class="skeleton-header">
+                            <div class="skeleton skeleton-avatar"></div>
+                            <div style="flex: 1;">
+                                <div class="skeleton skeleton-text short"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton skeleton-text long"></div>
+                        <div class="skeleton skeleton-text" style="width: 60%;"></div>
+                    </div>
+                    <div class="skeleton-item">
+                        <div class="skeleton-header">
+                            <div class="skeleton skeleton-avatar"></div>
+                            <div style="flex: 1;">
+                                <div class="skeleton skeleton-text short"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton skeleton-text long"></div>
+                    </div>
+                </div>
+
+                <!-- 无限滚动触发器 -->
+                <div class="infinite-scroll-trigger" id="scrollTrigger"></div>
+
+                <!-- 加载状态 -->
+                <div id="loadingIndicator" style="display: none;">
+                    <div class="loading-indicator">
+                        <div class="spinner"></div>
+                        <span>加载中...</span>
+                    </div>
+                </div>
+
                 <!-- 分页 -->
                 <div id="guestbookPagination" style="text-align: center; padding: 16px 0 0; border-top: 1px solid #f0f0f0; margin-top: 8px;">
                     <?php if ($totalMessages > 10): ?>
-                    <button class="pagination-btn" onclick="loadMoreMessages()">加载更多</button>
+                    <button class="pagination-btn" id="loadMoreBtn" onclick="loadMoreMessages()">加载更多</button>
                     <?php endif; ?>
                 </div>
             </div>
@@ -132,6 +255,26 @@ $messages = getMessages(0, 10);
         const GUESTBOOK_PAGE_SIZE = 10;
         let guestbookOffset = <?php echo count($messages); ?>;
         let guestbookHasMore = <?php echo $totalMessages > count($messages) ? 'true' : 'false'; ?>;
+        let isLoading = false;
+
+        // Intersection Observer 实现无限滚动
+        const scrollTrigger = document.getElementById('scrollTrigger');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+        if (scrollTrigger && guestbookHasMore) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && guestbookHasMore && !isLoading) {
+                        loadMoreMessages();
+                    }
+                });
+            }, {
+                rootMargin: '100px',
+                threshold: 0
+            });
+            observer.observe(scrollTrigger);
+        }
 
         // 字符计数
         document.getElementById('gbContent').addEventListener('input', function() {
@@ -140,25 +283,37 @@ $messages = getMessages(0, 10);
 
         // 加载更多
         function loadMoreMessages() {
-            if (!guestbookHasMore) return;
-            const btn = document.querySelector('.pagination-btn');
-            if (btn) btn.textContent = '加载中...';
+            if (!guestbookHasMore || isLoading) return;
+            isLoading = true;
+
+            // 显示加载状态
+            if (loadingIndicator) loadingIndicator.style.display = 'block';
+            if (loadMoreBtn) loadMoreBtn.textContent = '加载中...';
 
             fetch(`admin/api/messages.php?offset=${guestbookOffset}&limit=${GUESTBOOK_PAGE_SIZE}`)
                 .then(r => r.json())
                 .then(result => {
+                    isLoading = false;
+                    if (loadingIndicator) loadingIndicator.style.display = 'none';
+
                     if (result.success && result.data.length > 0) {
                         appendMessages(result.data);
                         guestbookOffset += result.data.length;
                         guestbookHasMore = result.data.length === GUESTBOOK_PAGE_SIZE;
-                        if (!guestbookHasMore && btn) btn.style.display = 'none';
+                        if (!guestbookHasMore) {
+                            if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+                            if (scrollTrigger) scrollTrigger.style.display = 'none';
+                        }
                     } else {
                         guestbookHasMore = false;
-                        if (btn) btn.style.display = 'none';
+                        if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+                        if (scrollTrigger) scrollTrigger.style.display = 'none';
                     }
                 })
                 .catch(() => {
-                    if (btn) btn.textContent = '加载失败，点击重试';
+                    isLoading = false;
+                    if (loadingIndicator) loadingIndicator.style.display = 'none';
+                    if (loadMoreBtn) loadMoreBtn.textContent = '加载失败，点击重试';
                 });
         }
 
