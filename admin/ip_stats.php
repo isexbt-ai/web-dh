@@ -82,6 +82,39 @@ $cacheCount = $pdo->query("SELECT COUNT(*) FROM ip_location_cache")->fetchColumn
 $cacheStats = getIpCacheStats();
 $cacheSizeKB = round(($cacheStats['size'] ?? 0) / 1024, 2);
 $cacheOldest = $cacheStats['oldest'];
+
+// 获取按时间排序的最近访问记录（带分页）
+$timeRecordsPerPage = 50;
+$timePage = isset($_GET['time_page']) ? max(1, intval($_GET['time_page'])) : 1;
+$timeOffset = ($timePage - 1) * $timeRecordsPerPage;
+
+// 获取总记录数
+$timeTotalRecords = $pdo->query("SELECT COUNT(*) FROM visit_stats")->fetchColumn();
+$timeTotalPages = ceil($timeTotalRecords / $timeRecordsPerPage);
+
+// 获取按时间排序的记录
+$stmt = $pdo->prepare("SELECT ip, page, user_agent, visit_time FROM visit_stats ORDER BY visit_time DESC LIMIT ? OFFSET ?");
+$stmt->execute([$timeRecordsPerPage, $timeOffset]);
+$timeRecords = $stmt->fetchAll();
+
+// 为时间记录查询归属地
+foreach ($timeRecords as &$record) {
+    $location = getIpLocation($record['ip']);
+    if ($location) {
+        $record['country'] = getCountryName($location['country']);
+        $record['region'] = $location['region'];
+        $record['city'] = $location['city'];
+        $record['isp'] = $location['isp'];
+        $record['is_china'] = isChinaIP($location['country']);
+    } else {
+        $record['country'] = '-';
+        $record['region'] = '-';
+        $record['city'] = '-';
+        $record['isp'] = '-';
+        $record['is_china'] = false;
+    }
+}
+unset($record);
 ?>
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -288,6 +321,19 @@ $cacheOldest = $cacheStats['oldest'];
 
         .query-error.show {
             display: block;
+        }
+
+        /* 分页样式 */
+        .pagination a:hover {
+            background: #e94560 !important;
+            color: #fff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(233, 69, 96, 0.3);
+        }
+
+        /* 时间记录表格 */
+        .data-table tbody tr:hover {
+            background: rgba(233, 69, 96, 0.03);
         }
     </style>
 </head>
@@ -536,6 +582,92 @@ $cacheOldest = $cacheStats['oldest'];
                 </div>
             </div>
             <?php endif; ?>
+
+            <!-- 访问记录 - 按时间排序 -->
+            <div class="table-section" style="margin-bottom: 32px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                    <h2 class="section-title" style="margin-bottom: 0;">⏰ 访问记录（按时间排序）</h2>
+                    <span style="color: #999999; font-size: 14px;">共 <?php echo $timeTotalRecords; ?> 条记录</span>
+                </div>
+
+                <?php if (empty($timeRecords)): ?>
+                <div class="empty-state">暂无访问记录</div>
+                <?php else: ?>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">序号</th>
+                            <th>IP地址</th>
+                            <th>归属地</th>
+                            <th>运营商</th>
+                            <th>访问页面</th>
+                            <th>访问时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($timeRecords as $index => $record): ?>
+                        <tr>
+                            <td><?php echo $timeOffset + $index + 1; ?></td>
+                            <td>
+                                <code style="background: #f0f0f0; padding: 2px 8px; border-radius: 4px; font-size: 13px;"><?php echo e($record['ip']); ?></code>
+                                <?php if ($record['is_china']): ?>
+                                    <span style="font-size: 12px; margin-left: 4px;">🇨🇳</span>
+                                <?php else: ?>
+                                    <span style="font-size: 12px; margin-left: 4px;">🌍</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php
+                                $locationParts = array_filter([$record['country'], $record['region'], $record['city']], function($v) { return $v && $v !== '-'; });
+                                echo e(implode(' ', $locationParts) ?: '-');
+                                ?>
+                            </td>
+                            <td><?php echo e($record['isp'] ?: '-'); ?></td>
+                            <td style="font-size: 13px; color: #666;"><?php echo e($record['page'] ?: '-'); ?></td>
+                            <td style="white-space: nowrap;"><?php echo e($record['visit_time']); ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+
+                <!-- 分页 -->
+                <?php if ($timeTotalPages > 1): ?>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 20px; flex-wrap: wrap;">
+                    <?php if ($timePage > 1): ?>
+                        <a href="?time_page=<?php echo $timePage - 1; ?>" style="padding: 8px 16px; background: #f0f0f0; border-radius: 8px; text-decoration: none; color: #333; font-size: 14px; transition: all 0.2s;">← 上一页</a>
+                    <?php endif; ?>
+
+                    <?php
+                    // 显示分页页码
+                    $startPage = max(1, $timePage - 2);
+                    $endPage = min($timeTotalPages, $timePage + 2);
+                    if ($startPage > 1) {
+                        echo '<a href="?time_page=1" style="padding: 8px 14px; background: #f0f0f0; border-radius: 8px; text-decoration: none; color: #333; font-size: 14px;">1</a>';
+                        if ($startPage > 2) {
+                            echo '<span style="color: #999; padding: 8px;">...</span>';
+                        }
+                    }
+                    for ($i = $startPage; $i <= $endPage; $i++) {
+                        $isActive = $i === $timePage;
+                        $bg = $isActive ? 'linear-gradient(135deg, #e94560, #ff6b6b)' : '#f0f0f0';
+                        $color = $isActive ? '#fff' : '#333';
+                        echo '<a href="?time_page=' . $i . '" style="padding: 8px 14px; background: ' . $bg . '; border-radius: 8px; text-decoration: none; color: ' . $color . '; font-size: 14px; font-weight: ' . ($isActive ? '600' : '400') . ';">' . $i . '</a>';
+                    }
+                    if ($endPage < $timeTotalPages) {
+                        if ($endPage < $timeTotalPages - 1) {
+                            echo '<span style="color: #999; padding: 8px;">...</span>';
+                        }
+                        echo '<a href="?time_page=' . $timeTotalPages . '" style="padding: 8px 14px; background: #f0f0f0; border-radius: 8px; text-decoration: none; color: #333; font-size: 14px;">' . $timeTotalPages . '</a>';
+                    }
+                    ?>
+
+                    <?php if ($timePage < $timeTotalPages): ?>
+                        <a href="?time_page=<?php echo $timePage + 1; ?>" style="padding: 8px 16px; background: #f0f0f0; border-radius: 8px; text-decoration: none; color: #333; font-size: 14px; transition: all 0.2s;">下一页 →</a>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
+                <?php endif; ?>
+            </div>
 
             <!-- 访问IP列表 - 国内IP -->
             <div class="table-section" style="margin-bottom: 32px;">
