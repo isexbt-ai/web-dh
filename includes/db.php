@@ -255,6 +255,34 @@ function initDatabase($pdo) {
 // 初始化数据库
 initDatabase($pdo);
 
+// 迁移：添加数据库索引（优化查询性能）
+try {
+    // cards 表索引
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_cards_category ON cards(category_id)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_cards_active ON cards(is_active)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_cards_sort ON cards(sort_order)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_cards_click ON cards(click_count)");
+
+    // visit_stats 表索引
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_visit_stats_ip ON visit_stats(ip)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_visit_stats_date ON visit_stats(visit_date)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_visit_stats_ip_date ON visit_stats(ip, visit_date)");
+
+    // messages 表索引
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_messages_ip ON messages(ip)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_messages_created ON messages(created_at)");
+
+    // showcase 表索引
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_showcase_gallery ON showcase(gallery_id)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_showcase_active ON showcase(is_active)");
+
+    // ip_location_cache 表索引（虽然 UNIQUE 已隐式创建索引，但显式创建更明确）
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_ip_location_ip ON ip_location_cache(ip)");
+} catch (PDOException $e) {
+    // 索引创建失败不影响核心功能，记录日志即可
+    error_log('Index creation failed: ' . $e->getMessage());
+}
+
 // 迁移：为已存在的 messages 表添加 reply 和 replied_at 字段
 // 注意：这段代码在 initDatabase 外部，确保每次请求都会执行
 try {

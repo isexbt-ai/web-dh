@@ -503,7 +503,24 @@ function parseDetail($text) {
     $text = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
 
     // 解析图片标记 ![alt](url) -> <img src="url" alt="alt" class="detail-img">
-    $text = preg_replace('/!\[([^\]]*)\]\(([^\)]+)\)/', '<img src="$2" alt="$1" class="detail-img" loading="lazy">', $text);
+    // 注意：对 URL 进行安全过滤，禁止 javascript: 等伪协议
+    $text = preg_replace_callback(
+        '/!\[([^\]]*)\]\(([^\)]+)\)/',
+        function($matches) {
+            $alt = $matches[1];
+            $url = $matches[2];
+            // 过滤危险协议
+            if (preg_match('/^\s*(javascript|data|vbscript|about|chrome):/i', $url)) {
+                return ''; // 危险URL，直接移除
+            }
+            // 只允许 http/https 协议或相对路径
+            if (!preg_match('/^(https?:\/\/|\/)/i', $url) && strpos($url, ':') !== false) {
+                return ''; // 包含其他协议，移除
+            }
+            return '<img src="' . $url . '" alt="' . $alt . '" class="detail-img" loading="lazy">';
+        },
+        $text
+    );
 
     // 保留换行
     $text = nl2br($text);
