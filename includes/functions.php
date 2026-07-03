@@ -997,6 +997,19 @@ function getGalleriesWithCount($activeOnly = true) {
 }
 
 /**
+ * 获取所有相册合集（兼容旧版，不带展示数量）
+ */
+function getGalleries($activeOnly = true) {
+    global $pdo;
+    $sql = "SELECT * FROM galleries";
+    if ($activeOnly) {
+        $sql .= " WHERE is_active = 1";
+    }
+    $sql .= " ORDER BY sort_order ASC, id ASC";
+    return $pdo->query($sql)->fetchAll();
+}
+
+/**
  * 获取单个相册
  */
 function getGallery($id) {
