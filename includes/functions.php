@@ -96,8 +96,70 @@ function getAds($activeOnly = true) {
 }
 
 /**
- * 获取文件缓存数据（带TTL）
+ * 记录安全日志到独立文件
+ *
+ * @param string $type 日志类型 (login_success, login_failed, logout, password_changed, permission_denied 等)
+ * @param string $message 日志内容
+ * @param array $extra 额外数据
  */
+function logSecurityEvent($type, $message, $extra = []) {
+    $logDir = __DIR__ . '/../logs';
+    if (!is_dir($logDir)) {
+        mkdir($logDir, 0755, true);
+    }
+
+    $logFile = $logDir . '/security_' . date('Y-m-d') . '.log';
+    $timestamp = date('Y-m-d H:i:s');
+    $ip = getClientIp();
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+    $username = $_SESSION['admin_username'] ?? 'guest';
+
+    $logEntry = sprintf(
+        "[%s] [%s] [IP:%s] [User:%s] %s | UA: %s | Extra: %s\n",
+        $timestamp,
+        strtoupper($type),
+        $ip,
+        $username,
+        $message,
+        $userAgent,
+        json_encode($extra, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+    );
+
+    error_log($logEntry, 3, $logFile);
+}
+
+/**
+ * 记录访问日志
+ *
+ * @param string $action 操作描述
+ * @param array $data 额外数据
+ */
+function logAccess($action, $data = []) {
+    $logDir = __DIR__ . '/../logs';
+    if (!is_dir($logDir)) {
+        mkdir($logDir, 0755, true);
+    }
+
+    $logFile = $logDir . '/access_' . date('Y-m-d') . '.log';
+    $timestamp = date('Y-m-d H:i:s');
+    $ip = getClientIp();
+    $method = $_SERVER['REQUEST_METHOD'] ?? 'UNKNOWN';
+    $uri = $_SERVER['REQUEST_URI'] ?? 'Unknown';
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+
+    $logEntry = sprintf(
+        "[%s] %s %s | IP:%s | Action:%s | UA:%s | Data:%s\n",
+        $timestamp,
+        $method,
+        $uri,
+        $ip,
+        $action,
+        $userAgent,
+        json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+    );
+
+    error_log($logEntry, 3, $logFile);
+}
 function getCache($key, $ttl = 300) {
     $cacheFile = __DIR__ . '/../data/cache_' . md5($key) . '.json';
     if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $ttl) {
@@ -125,6 +187,66 @@ function clearCache() {
     foreach (glob($cacheDir . 'cache_*.json') as $file) {
         @unlink($file);
     }
+}
+
+/**
+ * API 速率限制检查
+ * 基于IP的文件缓存实现，默认60次/分钟
+ *
+ * @param string $action 操作标识（如 'cards', 'click', 'upload' 等）
+ * @param int $maxRequests 最大请求次数（默认60）
+ * @param int $windowSeconds 时间窗口（默认60秒）
+ * @return bool true=允许请求, false=超出限制
+ */
+function checkRateLimit($action = 'default', $maxRequests = 60, $windowSeconds = 60) {
+    $ip = getClientIp();
+    $key = 'ratelimit_' . $action . '_' . md5($ip);
+    $cacheFile = __DIR__ . '/../data/cache_' . md5($key) . '.json';
+    $now = time();
+
+    $requests = [];
+    if (file_exists($cacheFile)) {
+        $data = json_decode(file_get_contents($cacheFile), true);
+        if (is_array($data)) {
+            // 过滤掉过期的请求记录
+            $requests = array_filter($data, function($timestamp) use ($now, $windowSeconds) {
+                return ($now - $timestamp) < $windowSeconds;
+            });
+        }
+    }
+
+    // 检查是否超出限制
+    if (count($requests) >= $maxRequests) {
+        return false;
+    }
+
+    // 记录本次请求
+    $requests[] = $now;
+    file_put_contents($cacheFile, json_encode(array_values($requests)), LOCK_EX);
+
+    return true;
+}
+
+/**
+ * 检查速率限制并返回JSON错误（如果超出限制）
+ *
+ * @param string $action 操作标识
+ * @param int $maxRequests 最大请求次数
+ * @param int $windowSeconds 时间窗口
+ * @return bool true=允许继续, false=已返回错误响应
+ */
+function requireRateLimit($action = 'default', $maxRequests = 60, $windowSeconds = 60) {
+    if (!checkRateLimit($action, $maxRequests, $windowSeconds)) {
+        http_response_code(429);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'success' => false,
+            'error' => '请求过于频繁，请稍后再试',
+            'code' => 'RATE_LIMITED'
+        ]);
+        return false;
+    }
+    return true;
 }
 function getNotices($activeOnly = true) {
     $cacheKey = 'notices_' . ($activeOnly ? '1' : '0');
@@ -446,6 +568,74 @@ function getThumbnailUrl($imagePath) {
 }
 
 /**
+ * 渲染响应式图片标签（支持 WebP 回退）
+ *
+ * @param string $src 图片原始路径
+ * @param string $alt 替代文本
+ * @param string $class CSS类名
+ * @param string $loading loading属性 (lazy/eager/auto)
+ * @param array $sizes 响应式尺寸配置 [width, height] 或 null
+ * @return string HTML img/picture 标签
+ */
+function renderResponsiveImage($src, $alt = '', $class = '', $loading = 'lazy', $sizes = null) {
+    if (empty($src)) {
+        return '<div class="' . e($class) . ' card-placeholder">图片</div>';
+    }
+
+    $baseDir = __DIR__ . '/../';
+    $classAttr = $class ? ' class="' . e($class) . '"' : '';
+    $loadingAttr = in_array($loading, ['lazy', 'eager']) ? ' loading="' . $loading . '"' : '';
+    $altAttr = $alt ? ' alt="' . e($alt) . '"' : '';
+
+    // 获取各种格式的缩略图路径
+    $thumbJpg = $src . '_thumb.jpg';
+    $thumbWebp = $thumbJpg . '.webp';
+
+    $hasWebp = file_exists($baseDir . $thumbWebp);
+    $hasJpg = file_exists($baseDir . $thumbJpg);
+
+    // 确定最佳图片源
+    $bestSrc = $hasWebp ? $thumbWebp : ($hasJpg ? $thumbJpg : $src);
+
+    // 构建 srcset（如果有尺寸配置）
+    $srcsetAttr = '';
+    if (!empty($sizes) && is_array($sizes)) {
+        $srcsetParts = [];
+        // 生成多种尺寸的缩略图URL（如果存在）
+        $widths = [320, 640, 960];
+        foreach ($widths as $w) {
+            if ($w <= $sizes[0]) {
+                $srcsetParts[] = $bestSrc . ' ' . $w . 'w';
+            }
+        }
+        if (!empty($srcsetParts)) {
+            $srcsetAttr = ' srcset="' . implode(', ', $srcsetParts) . '"';
+        }
+    }
+
+    // 构建 sizes 属性
+    $sizesAttr = '';
+    if (!empty($sizes) && is_array($sizes)) {
+        $sizesAttr = ' sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, 33vw"';
+    }
+
+    // 如果有 WebP 格式，使用 picture 标签提供格式回退
+    if ($hasWebp) {
+        $html = '<picture>';
+        $html .= '<source srcset="' . e($thumbWebp) . '" type="image/webp">';
+        if ($hasJpg) {
+            $html .= '<source srcset="' . e($thumbJpg) . '" type="image/jpeg">';
+        }
+        $html .= '<img src="' . e($src) . '"' . $altAttr . $classAttr . $loadingAttr . $srcsetAttr . $sizesAttr . '>';
+        $html .= '</picture>';
+        return $html;
+    }
+
+    // 没有 WebP，直接返回 img 标签
+    return '<img src="' . e($bestSrc) . '"' . $altAttr . $classAttr . $loadingAttr . $srcsetAttr . $sizesAttr . '>';
+}
+
+/**
  * 渲染卡片HTML（用于PHP端SSR）
  * 输出与JS端 renderCards() 完全一致的HTML结构
  */
@@ -480,11 +670,10 @@ function renderCardsHtml($cards) {
             ? 'onclick="goToDetail(' . intval($card['id']) . ')"'
             : 'onclick="goToLink(' . intval($card['id']) . ', \'' . rawurlencode($card['link'] ?? '#') . '\')"';
 
-        // 图片处理 - 使用缩略图
+        // 图片处理 - 使用响应式图片（支持WebP回退）
         $imageHtml = '';
         if (!empty($card['image'])) {
-            $thumbUrl = getThumbnailUrl($card['image']);
-            $imageHtml = '<img src="' . e($thumbUrl) . '" alt="' . e($card['title']) . '" loading="lazy">';
+            $imageHtml = renderResponsiveImage($card['image'], $card['title'], '', 'lazy');
         } else {
             $imageHtml = '<div class="card-placeholder">图片</div>';
         }
@@ -795,15 +984,15 @@ function getShowcases($activeOnly = true, $galleryId = null) {
 }
 
 /**
- * 获取所有相册合集
+ * 获取所有相册合集（包含展示数量）
  */
-function getGalleries($activeOnly = true) {
+function getGalleriesWithCount($activeOnly = true) {
     global $pdo;
-    $sql = "SELECT * FROM galleries";
+    $sql = "SELECT g.*, COUNT(s.id) as showcase_count FROM galleries g LEFT JOIN showcase s ON g.id = s.gallery_id AND s.is_active = 1";
     if ($activeOnly) {
-        $sql .= " WHERE is_active = 1";
+        $sql .= " WHERE g.is_active = 1";
     }
-    $sql .= " ORDER BY sort_order ASC, id ASC";
+    $sql .= " GROUP BY g.id ORDER BY g.sort_order ASC, g.id ASC";
     return $pdo->query($sql)->fetchAll();
 }
 

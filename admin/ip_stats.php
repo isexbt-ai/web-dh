@@ -30,29 +30,29 @@ $cacheSizeKB = round($cacheSize / 1024, 2);
 $cacheOldest = $cacheStats['oldest'];
 
 // 获取访问IP列表（带归属地）
-$stmt = $pdo->query("SELECT ip, COUNT(*) as visit_count, MAX(visit_time) as last_visit FROM visit_stats GROUP BY ip ORDER BY visit_count DESC LIMIT 100");
+// 使用LEFT JOIN批量查询IP归属地，避免N+1问题
+$stmt = $pdo->query("SELECT v.ip, COUNT(*) as visit_count, MAX(v.visit_time) as last_visit, c.country as country_code, c.region, c.city, c.isp FROM visit_stats v LEFT JOIN ip_location_cache c ON v.ip = c.ip GROUP BY v.ip ORDER BY visit_count DESC LIMIT 100");
 $ipList = $stmt->fetchAll();
 
 // 为每个IP查询归属地（从缓存或API）
 $domesticIps = [];
 $foreignIps = [];
 foreach ($ipList as &$item) {
-    $location = getIpLocation($item['ip']);
-    if ($location) {
-        $item['country_code'] = $location['country'];
-        $item['country'] = getCountryName($location['country']);
-        $item['region'] = $location['region'];
-        $item['city'] = $location['city'];
-        $item['isp'] = $location['isp'];
-        $item['is_china'] = isChinaIP($location['country']);
-    } else {
-        $item['country_code'] = '-';
-        $item['country'] = '-';
-        $item['region'] = '-';
-        $item['city'] = '-';
-        $item['isp'] = '-';
-        $item['is_china'] = false;
+    // 如果JOIN查询没有命中缓存，再单独查询
+    if (empty($item['country_code'])) {
+        $location = getIpLocation($item['ip']);
+        if ($location) {
+            $item['country_code'] = $location['country'];
+            $item['region'] = $location['region'];
+            $item['city'] = $location['city'];
+            $item['isp'] = $location['isp'];
+        }
     }
+
+    // 转换国家代码为国家名
+    $countryCode = $item['country_code'] ?? '-';
+    $item['country'] = getCountryName($countryCode);
+    $item['is_china'] = isChinaIP($countryCode);
 
     // 分类到国内/国外
     if ($item['is_china']) {
@@ -92,27 +92,26 @@ $timeOffset = ($timePage - 1) * $timeRecordsPerPage;
 $timeTotalRecords = $pdo->query("SELECT COUNT(*) FROM visit_stats")->fetchColumn();
 $timeTotalPages = ceil($timeTotalRecords / $timeRecordsPerPage);
 
-// 获取按时间排序的记录
-$stmt = $pdo->prepare("SELECT ip, page, user_agent, visit_time FROM visit_stats ORDER BY visit_time DESC LIMIT ? OFFSET ?");
+// 获取按时间排序的记录（带归属地）
+$stmt = $pdo->prepare("SELECT v.ip, v.page, v.user_agent, v.visit_time, c.country as country_code, c.region, c.city, c.isp FROM visit_stats v LEFT JOIN ip_location_cache c ON v.ip = c.ip ORDER BY v.visit_time DESC LIMIT ? OFFSET ?");
 $stmt->execute([$timeRecordsPerPage, $timeOffset]);
 $timeRecords = $stmt->fetchAll();
 
-// 为时间记录查询归属地
+// 处理归属地数据
 foreach ($timeRecords as &$record) {
-    $location = getIpLocation($record['ip']);
-    if ($location) {
-        $record['country'] = getCountryName($location['country']);
-        $record['region'] = $location['region'];
-        $record['city'] = $location['city'];
-        $record['isp'] = $location['isp'];
-        $record['is_china'] = isChinaIP($location['country']);
-    } else {
-        $record['country'] = '-';
-        $record['region'] = '-';
-        $record['city'] = '-';
-        $record['isp'] = '-';
-        $record['is_china'] = false;
+    // 如果JOIN没有命中缓存，再单独查询
+    if (empty($record['country_code'])) {
+        $location = getIpLocation($record['ip']);
+        if ($location) {
+            $record['country_code'] = $location['country'];
+            $record['region'] = $location['region'];
+            $record['city'] = $location['city'];
+            $record['isp'] = $location['isp'];
+        }
     }
+
+    $record['country'] = getCountryName($record['country_code'] ?? '-');
+    $record['is_china'] = isChinaIP($record['country_code'] ?? '-');
 }
 unset($record);
 ?>

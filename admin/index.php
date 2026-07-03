@@ -19,11 +19,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (verifyLogin($username, $password)) {
             resetLoginAttempts();
             doLogin($username);
+            logSecurityEvent('login_success', "管理员 {$username} 登录成功", ['ip' => getClientIp()]);
             header('Location: dashboard.php');
             exit;
         } else {
             recordLoginFailure();
-            $attemptsLeft = 5 - ($_SESSION['login_attempts'] ?? 0);
+            $attemptsLeft = 5 - ($_SESSION[$key . '_attempts'] ?? 0);
             if ($attemptsLeft > 0) {
                 $error = "用户名或密码错误，还可尝试{$attemptsLeft}次";
             } else {

@@ -250,7 +250,7 @@ $config = [
             <!-- 产品大图 -->
             <?php if ($card['image']): ?>
             <div class="detail-image">
-                <img src="<?php echo e($card['image']); ?>" alt="<?php echo e($card['title']); ?>" loading="eager">
+                <?php echo renderResponsiveImage($card['image'], $card['title'], '', 'eager'); ?>
             </div>
             <?php else: ?>
             <div class="detail-image-placeholder">

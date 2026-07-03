@@ -12,6 +12,13 @@ if (!isLoggedIn()) {
     exit;
 }
 
+// API速率限制：上传文件 10次/分钟
+if (!requireRateLimit('upload', 10, 60)) {
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['success' => false, 'message' => '上传过于频繁，请稍后再试']);
+    exit;
+}
+
 // CSRF验证
 $csrf_token = $_POST['csrf_token'] ?? '';
 if (!verifyCsrfToken($csrf_token)) {

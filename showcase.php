@@ -7,8 +7,8 @@ require_once 'includes/functions.php';
 // 获取相册参数
 $galleryId = isset($_GET['gallery']) ? intval($_GET['gallery']) : null;
 
-// 获取相册列表
-$galleries = getGalleries(true);
+// 获取相册列表（包含展示数量）
+$galleries = getGalleriesWithCount(true);
 
 // 获取效果展示列表
 $showcases = getShowcases(true, $galleryId);
@@ -446,7 +446,7 @@ recordVisit('showcase');
         <?php foreach ($galleries as $gallery): ?>
         <a href="showcase.php?gallery=<?php echo $gallery['id']; ?>" class="gallery-tab <?php echo $galleryId == $gallery['id'] ? 'active' : ''; ?>">
             <?php echo e($gallery['title']); ?>
-            <span class="gallery-count"><?php echo getGalleryShowcaseCount($gallery['id']); ?></span>
+            <span class="gallery-count"><?php echo $gallery['showcase_count']; ?></span>
         </a>
         <?php endforeach; ?>
     </div>

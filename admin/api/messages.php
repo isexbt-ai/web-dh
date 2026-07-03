@@ -10,6 +10,10 @@ require_once __DIR__ . '/../../includes/functions.php';
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
+    // API速率限制：获取留言列表 120次/分钟
+    if (!requireRateLimit('messages_get', 120, 60)) {
+        exit;
+    }
     // 获取留言列表
     $offset = isset($_GET['offset']) ? intval($_GET['offset']) : 0;
     $limit = isset($_GET['limit']) ? min(intval($_GET['limit']), 50) : 10;
@@ -18,6 +22,10 @@ if ($method === 'GET') {
     jsonResponse($messages);
 
 } elseif ($method === 'POST') {
+    // API速率限制：提交留言 5次/分钟
+    if (!requireRateLimit('messages_post', 5, 60)) {
+        exit;
+    }
     // 检查留言板是否开启
     if (getConfig('guestbook_enabled', '1') !== '1') {
         jsonError('留言板已关闭');

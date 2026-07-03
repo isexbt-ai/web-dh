@@ -10,6 +10,11 @@ if (!isLoggedIn()) {
     jsonError('请先登录');
 }
 
+// API速率限制：IP查询 30次/分钟
+if (!requireRateLimit('ip_query', 30, 60)) {
+    exit;
+}
+
 $ip = isset($_GET['ip']) ? trim($_GET['ip']) : '';
 if (empty($ip)) {
     jsonError('请输入IP地址');

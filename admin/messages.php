@@ -46,7 +46,7 @@ $gbConfig = [
 ];
 
 // 获取所有留言（包括已删除的，用于管理）
-$stmt = $pdo->query("SELECT * FROM messages ORDER BY created_at DESC");
+$stmt = $pdo->query("SELECT m.*, c.country as loc_country, c.region as loc_region, c.city as loc_city FROM messages m LEFT JOIN ip_location_cache c ON m.ip = c.ip ORDER BY m.created_at DESC");
 $messages = $stmt->fetchAll();
 
 // 获取留言统计
@@ -264,9 +264,8 @@ $activeCount = $pdo->query("SELECT COUNT(*) FROM messages WHERE is_active = 1")-
                             <td><?php echo e($msg['ip'] ?? '-'); ?></td>
                             <td>
                                 <?php
-                                $loc = getIpLocation($msg['ip'] ?? '');
-                                if ($loc && $loc['country'] !== '-') {
-                                    $parts = array_filter([$loc['country'], $loc['region'], $loc['city']], function($v) { return $v && $v !== '-'; });
+                                if (!empty($msg['loc_country'])) {
+                                    $parts = array_filter([$msg['loc_country'], $msg['loc_region'], $msg['loc_city']], function($v) { return $v && $v !== '-'; });
                                     echo '<span style="font-size: 12px; color: #666;">' . e(implode(' ', $parts) ?: '-') . '</span>';
                                 } else {
                                     echo '<span style="font-size: 12px; color: #999;">-</span>';

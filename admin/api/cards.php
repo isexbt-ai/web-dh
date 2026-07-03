@@ -9,6 +9,11 @@ header('Pragma: no-cache');
 header('Expires: 0');
 require_once __DIR__ . '/../../includes/functions.php';
 
+// API速率限制：60次/分钟
+if (!requireRateLimit('cards', 60, 60)) {
+    exit;
+}
+
 $categoryId = isset($_GET['category_id']) ? intval($_GET['category_id']) : null;
 $cardSortMethod = getConfig('card_sort_method', 'default');
 

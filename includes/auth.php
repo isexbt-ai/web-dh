@@ -68,12 +68,17 @@ function doLogin($username) {
     $_SESSION['admin_username'] = $username;
     $_SESSION['login_time'] = time();
     $_SESSION['last_activity'] = time();
+
+    // 记录安全日志
+    logSecurityEvent('login_success', "管理员 {$username} 登录成功");
 }
 
 /**
  * 执行登出
  */
 function doLogout() {
+    $username = $_SESSION['admin_username'] ?? 'unknown';
+    logSecurityEvent('logout', "管理员 {$username} 登出");
     session_destroy();
     header('Location: index.php');
     exit;
@@ -129,6 +134,9 @@ function recordLoginFailure() {
     $_SESSION[$key . '_attempts'] = ($_SESSION[$key . '_attempts'] ?? 0) + 1;
     if ($_SESSION[$key . '_attempts'] >= 5) {
         $_SESSION[$key . '_lock_time'] = time();
+        logSecurityEvent('login_locked', "IP {$ip} 登录失败次数过多，已锁定15分钟", ['attempts' => $_SESSION[$key . '_attempts']]);
+    } else {
+        logSecurityEvent('login_failed', "IP {$ip} 登录失败", ['attempts' => $_SESSION[$key . '_attempts']]);
     }
 }
 
