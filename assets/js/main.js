@@ -129,7 +129,6 @@ function initSlideCarousel() {
     const dots = slider.querySelectorAll('.slide-dot');
 
     if (slides.length <= 1) {
-        // 只有一个轮播项时，确保显示
         slides.forEach(slide => {
             slide.classList.add('active');
         });
