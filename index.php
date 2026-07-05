@@ -4,6 +4,7 @@ require_once 'includes/functions.php';
 $ads = getAds();
 $notices = getNotices();
 $categories = getCategories();
+$hotCards = getHotCards(3);
 $config = [
     'avatar' => getConfig('avatar', ''),
     'contact_info' => getConfig('contact_info', '微信：xxx'),
@@ -25,13 +26,22 @@ if (!empty($categories)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo e(getConfig('site_title', '美女导航')); ?></title>
     <meta name="description" content="<?php echo e(getConfig('site_description', '精选美女导航网站')); ?>">
+    <meta name="keywords" content="<?php echo e(getConfig('site_keywords', '美女导航,网站导航,精选网站')); ?>">
+    <link rel="canonical" href="<?php echo e(getCurrentUrl()); ?>">
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
+    <link rel="alternate" type="application/rss+xml" title="<?php echo e(getConfig('site_title', '美女导航')); ?> RSS" href="feed.php">
+    <?php if (getConfig('umami_enabled', '1') === '1'): ?>
+    <link rel="preconnect" href="https://umami.xldh.cc">
+    <?php endif; ?>
     <!-- Open Graph / Twitter Card -->
     <meta property="og:title" content="<?php echo e(getConfig('site_title', '美女导航')); ?>">
     <meta property="og:description" content="<?php echo e(getConfig('site_description', '精选美女导航网站')); ?>">
     <meta property="og:image" content="<?php echo e($config['avatar'] ?: 'assets/images/logo.png'); ?>">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="<?php echo e(getCurrentUrl()); ?>">
+    <meta property="og:site_name" content="<?php echo e(getConfig('site_title', '美女导航')); ?>">
     <meta name="twitter:card" content="summary">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#e94560">
     <link rel="apple-touch-icon" href="assets/images/logo.png">
@@ -45,10 +55,20 @@ if (!empty($categories)) {
             --cards-per-row-mobile: <?php echo e(getConfig('cards_per_row_mobile', 'repeat(3, 1fr)')); ?>;
         }
     </style>
+    <?php
+    // WebSite Schema
+    echo generateJsonLd([
+        '@type' => 'WebSite',
+        'name' => getConfig('site_title', '美女导航'),
+        'url' => getCurrentUrl(),
+        'description' => getConfig('site_description', '精选美女导航网站')
+    ]);
+    ?>
 </head>
 <body>
     <!-- 顶部栏 -->
     <header class="top-bar">
+        <h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);"><?php echo e(getConfig('site_title', '美女导航')); ?></h1>
         <div class="header-left">
             <div class="avatar-section">
                 <?php if ($config['avatar']): ?>
@@ -68,6 +88,7 @@ if (!empty($categories)) {
             <button class="func-btn" id="funcBtn" title="功能菜单">
                 <span>功能</span>
             </button>
+            <nav aria-label="功能菜单">
             <div class="func-menu" id="funcMenu">
                 <a href="javascript:void(0)" onclick="copyLink()">复制链接</a>
                 <a href="javascript:void(0)" onclick="sharePage()">分享页面</a>
@@ -76,7 +97,7 @@ if (!empty($categories)) {
                     <a href="<?php echo e($link['url']); ?>"<?php echo (strpos($link['url'], 'admin/') === false) ? ' target="_blank" rel="noopener"' : ''; ?>><?php echo e($link['title']); ?></a>
                     <?php endforeach; ?>
                 <?php endif; ?>
-            </div>
+            </nav>
         </div>
     </header>
 
@@ -126,10 +147,32 @@ if (!empty($categories)) {
         </section>
         <?php endif; ?>
 
-        <!-- 分类目录 -->
+        <!-- 热门推荐 -->
+        <?php if (!empty($hotCards)): ?>
+        <section class="hot-section">
+            <div class="section-card" style="padding: 10px;">
+                <div class="hot-header">
+                    <span class="hot-label">🔥 热门</span>
+                </div>
+                <div class="hot-grid">
+                    <?php foreach ($hotCards as $hot): ?>
+                    <a href="detail/<?php echo $hot['id']; ?>.html" class="hot-item" <?php echo ($hot['card_type'] ?? 'link') === 'link' && !empty($hot['link']) ? 'target="_blank" rel="noopener"' : ''; ?>>
+                        <?php if (!empty($hot['image'])): ?>
+                        <div class="hot-image"><?php echo renderResponsiveImage($hot['image'], $hot['title'], '', 'lazy'); ?></div>
+                        <?php else: ?>
+                        <div class="hot-image"><div class="card-placeholder" style="font-size:10px;">图片</div></div>
+                        <?php endif; ?>
+                        <span class="hot-name"><?php echo e($hot['title']); ?></span>
+                    </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </section>
+        <?php endif; ?>
         <?php if (!empty($categories)): ?>
         <section class="category-section">
             <div class="section-card" style="padding: 10px;">
+                <nav aria-label="分类导航">
                 <div class="category-tabs" id="categoryTabs">
                     <?php foreach ($categories as $index => $cat): ?>
                     <button class="category-tab <?php echo $index === 0 ? 'active' : ''; ?>"
@@ -139,6 +182,7 @@ if (!empty($categories)) {
                     </button>
                     <?php endforeach; ?>
                 </div>
+                </nav>
             </div>
         </section>
         <?php endif; ?>
@@ -146,9 +190,18 @@ if (!empty($categories)) {
         <!-- 卡片网格 -->
         <section class="card-section">
             <div class="section-card" style="padding: 14px;">
+                <?php if (!empty($categories)): ?>
+                <?php foreach ($categories as $index => $cat): ?>
+                <?php $catCards = $index === 0 ? $firstCategoryCards : getCards($cat['id'], true, $cardSortMethod); ?>
+                <div class="card-grid <?php echo $index === 0 ? '' : 'hidden'; ?>" id="cardGrid_<?php echo $cat['id']; ?>" data-category="<?php echo $cat['id']; ?>">
+                    <?php renderCardsHtml($catCards); ?>
+                </div>
+                <?php endforeach; ?>
+                <?php else: ?>
                 <div class="card-grid" id="cardGrid">
                     <?php renderCardsHtml($firstCategoryCards); ?>
                 </div>
+                <?php endif; ?>
             </div>
         </section>
     </div>
@@ -169,7 +222,7 @@ if (!empty($categories)) {
         </button>
 
         <!-- 效果展示入口 -->
-        <a href="showcase.php" class="float-btn" title="效果展示">
+        <a href="showcase.html" class="float-btn" title="效果展示">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
                 <circle cx="8.5" cy="8.5" r="1.5"/>
@@ -180,7 +233,7 @@ if (!empty($categories)) {
 
         <!-- 留言板入口 -->
         <?php if (getConfig('guestbook_enabled', '1') === '1'): ?>
-        <a href="guestbook.php" class="float-btn" title="留言板">
+        <a href="guestbook.html" class="float-btn" title="留言板">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             </svg>
@@ -189,7 +242,7 @@ if (!empty($categories)) {
         <?php endif; ?>
     </div>
 
-    <script src="assets/js/main.js"></script>
+    <script src="assets/js/main.js?v=<?php echo filemtime('assets/js/main.js'); ?>"></script>
     <script>
         // 注册 Service Worker
         if ('serviceWorker' in navigator) {
@@ -204,8 +257,8 @@ if (!empty($categories)) {
             });
         }
 
-        // 标记首屏已加载的分类，避免JS重复请求
-        window.__firstCategoryLoaded = <?php echo !empty($categories) ? $categories[0]['id'] : 'null'; ?>;
+        // 标记 SSR 模式，无需 AJAX
+        window.__ssrMode = true;
 
         document.addEventListener('DOMContentLoaded', function() {
             <?php if (!empty($categories)): ?>

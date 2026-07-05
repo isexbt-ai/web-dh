@@ -5,6 +5,10 @@
     box-sizing: border-box;
 }
 
+.hidden {
+    display: none !important;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     background: #f5f7fa;
@@ -182,6 +186,70 @@ img {
 .section-card:hover {
     box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     transform: translateY(-1px);
+}
+
+/* ==================== 热门推荐 ==================== */
+.hot-section {
+    padding: 6px 0;
+}
+
+.hot-header {
+    margin-bottom: 8px;
+}
+
+.hot-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e94560;
+}
+
+.hot-grid {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    scroll-snap-type: x mandatory;
+}
+
+.hot-item {
+    flex-shrink: 0;
+    width: 72px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease;
+    scroll-snap-align: start;
+}
+
+.hot-item:hover {
+    transform: translateY(-2px);
+}
+
+.hot-image {
+    width: 72px;
+    height: 72px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 4px;
+    background: #f8f9fa;
+}
+
+.hot-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.hot-name {
+    font-size: 11px;
+    color: #333;
+    display: block;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
 }
 
 /* ==================== 轮播图区 ==================== */
@@ -744,21 +812,21 @@ img {
 }
 
 /* 效果展示按钮 */
-.float-btn[href="showcase.php"] {
+.float-btn[href*="showcase"] {
     background: linear-gradient(135deg, #7c4dff, #b388ff);
 }
 
-.float-btn[href="showcase.php"]:hover {
+.float-btn[href*="showcase"]:hover {
     transform: scale(1.08);
     box-shadow: 0 6px 20px rgba(124, 77, 255, 0.5);
 }
 
 /* 留言板按钮 */
-.float-btn[href="guestbook.php"] {
+.float-btn[href*="guestbook"] {
     background: linear-gradient(135deg, #e94560, #ff6b6b);
 }
 
-.float-btn[href="guestbook.php"]:hover {
+.float-btn[href*="guestbook"]:hover {
     transform: scale(1.08);
     box-shadow: 0 6px 20px rgba(233, 69, 96, 0.5);
 }

@@ -177,13 +177,16 @@ function switchCategory(categoryId) {
         tab.classList.toggle('active', parseInt(tab.dataset.id) === categoryId);
     });
 
-    // 如果首屏已加载且是同一分类，跳过AJAX
-    if (window.__firstCategoryLoaded === categoryId) {
-        window.__firstCategoryLoaded = null;
+    // SSR模式：显示/隐藏对应分类的卡片网格
+    const grids = document.querySelectorAll('.card-grid[data-category]');
+    if (grids.length > 0) {
+        grids.forEach(grid => {
+            grid.classList.toggle('hidden', parseInt(grid.dataset.category) !== categoryId);
+        });
         return;
     }
 
-    // 加载卡片
+    // 降级：如果没有SSR网格，走AJAX加载
     loadCards(categoryId);
 }
 
@@ -261,8 +264,8 @@ function renderEmpty() {
 function goToDetail(cardId) {
     // 记录点击
     fetch(`admin/api/click.php?id=${cardId}`).catch(() => {});
-    // 跳转到详情页
-    window.location.href = `detail.php?id=${cardId}`;
+    // 跳转到详情页（伪静态 URL）
+    window.location.href = `detail/${cardId}.html`;
 }
 
 function goToLink(cardId, link) {

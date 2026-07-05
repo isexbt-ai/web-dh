@@ -509,11 +509,28 @@ function getLinks($activeOnly = true) {
     $sql .= " ORDER BY sort_order ASC, id DESC";
     return $pdo->query($sql)->fetchAll();
 }
-function getHotCards($limit = 10) {
+function getHotCards($perCategory = 3) {
     global $pdo;
-    $stmt = $pdo->prepare("SELECT * FROM cards WHERE is_active = 1 ORDER BY click_count DESC LIMIT ?");
-    $stmt->execute([$limit]);
-    return $stmt->fetchAll();
+    // 每个分类取点击量前 N 的卡片，合并后按点击量排序
+    $sql = "SELECT c.*, cat.name as category_name FROM cards c
+            LEFT JOIN categories cat ON c.category_id = cat.id
+            WHERE c.is_active = 1 AND c.category_id IN (SELECT id FROM categories WHERE is_active = 1)
+            ORDER BY c.category_id, c.click_count DESC";
+    $all = $pdo->query($sql)->fetchAll();
+
+    $result = [];
+    $seen = [];
+    foreach ($all as $card) {
+        $catId = $card['category_id'];
+        if (!isset($seen[$catId])) $seen[$catId] = 0;
+        if ($seen[$catId] < $perCategory) {
+            $result[] = $card;
+            $seen[$catId]++;
+        }
+    }
+    // 按点击量降序排列
+    usort($result, function($a, $b) { return $b['click_count'] - $a['click_count']; });
+    return $result;
 }
 
 /**
@@ -587,6 +604,16 @@ function renderResponsiveImage($src, $alt = '', $class = '', $loading = 'lazy', 
     $loadingAttr = in_array($loading, ['lazy', 'eager']) ? ' loading="' . $loading . '"' : '';
     $altAttr = $alt ? ' alt="' . e($alt) . '"' : '';
 
+    // 尝试读取图片尺寸，用于减少 CLS
+    $dimAttr = '';
+    $imgFile = $baseDir . $src;
+    if (file_exists($imgFile)) {
+        $imgSize = @getimagesize($imgFile);
+        if ($imgSize !== false) {
+            $dimAttr = ' width="' . $imgSize[0] . '" height="' . $imgSize[1] . '"';
+        }
+    }
+
     // 获取各种格式的缩略图路径
     $thumbJpg = $src . '_thumb.jpg';
     $thumbWebp = $thumbJpg . '.webp';
@@ -626,13 +653,13 @@ function renderResponsiveImage($src, $alt = '', $class = '', $loading = 'lazy', 
         if ($hasJpg) {
             $html .= '<source srcset="' . e($thumbJpg) . '" type="image/jpeg">';
         }
-        $html .= '<img src="' . e($src) . '"' . $altAttr . $classAttr . $loadingAttr . $srcsetAttr . $sizesAttr . '>';
+        $html .= '<img src="' . e($src) . '"' . $altAttr . $classAttr . $loadingAttr . $dimAttr . $srcsetAttr . $sizesAttr . '>';
         $html .= '</picture>';
         return $html;
     }
 
     // 没有 WebP，直接返回 img 标签
-    return '<img src="' . e($bestSrc) . '"' . $altAttr . $classAttr . $loadingAttr . $srcsetAttr . $sizesAttr . '>';
+    return '<img src="' . e($bestSrc) . '"' . $altAttr . $classAttr . $loadingAttr . $dimAttr . $srcsetAttr . $sizesAttr . '>';
 }
 
 /**
@@ -1419,4 +1446,42 @@ function getIpCacheStats() {
     } catch (PDOException $e) {
         return ['total' => 0, 'oldest' => null, 'newest' => null, 'size' => 0];
     }
+}
+
+/**
+ * 获取当前页面完整 URL
+ */
+function getCurrentUrl() {
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    return $protocol . '://' . $_SERVER['HTTP_HOST'] . strtok($_SERVER['REQUEST_URI'], '?');
+}
+
+/**
+ * 智能 HTML 截断（在完整词/句后截断）
+ */
+function smartTruncate($text, $length = 160) {
+    $text = strip_tags($text);
+    $text = preg_replace('/\s+/', ' ', trim($text));
+    if (mb_strlen($text) <= $length) return $text;
+    $truncated = mb_substr($text, 0, $length);
+    // 在最后一个标点或空格处截断
+    $lastPunct = 0;
+    for ($i = mb_strlen($truncated) - 1; $i >= 0; $i--) {
+        $char = mb_substr($truncated, $i, 1);
+        if (in_array($char, ['，', '。', '！', '？', '；', '、', ' ', ',', '.', '!', '?', ';'])) {
+            $lastPunct = $i;
+            break;
+        }
+    }
+    if ($lastPunct > $length * 0.6) {
+        $truncated = mb_substr($truncated, 0, $lastPunct);
+    }
+    return $truncated . '...';
+}
+
+/**
+ * 生成 JSON-LD 结构化数据
+ */
+function generateJsonLd($data) {
+    return '<script type="application/ld+json">' . json_encode(array_merge(['@context' => 'https://schema.org'], $data), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>';
 }

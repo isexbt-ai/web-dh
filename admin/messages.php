@@ -58,6 +58,7 @@ $activeCount = $pdo->query("SELECT COUNT(*) FROM messages WHERE is_active = 1")-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex,nofollow">
     <meta name="csrf-token" content="<?php echo generateCsrfToken(); ?>">
     <title>留言管理 - 后台管理</title>
     <link rel="stylesheet" href="../assets/css/admin.css?v=2">

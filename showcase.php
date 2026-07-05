@@ -22,11 +22,24 @@ recordVisit('showcase');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>效果展示 - <?php echo e(getConfig('site_title', '美女导航')); ?></title>
-    <meta name="description" content="精选效果展示，支持WebP动态与静态图片">
+    <meta name="description" content="<?php echo e(getConfig('site_description', '精选美女导航网站') . ' - 效果展示'); ?>">
+    <meta name="keywords" content="效果展示,<?php echo e(getConfig('site_title', '美女导航')); ?>">
+    <link rel="canonical" href="<?php echo e(getCurrentUrl()); ?>">
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
+    <?php if (getConfig('umami_enabled', '1') === '1'): ?>
+    <link rel="preconnect" href="https://umami.xldh.cc">
+    <?php endif; ?>
+    <meta property="og:title" content="效果展示 - <?php echo e(getConfig('site_title', '美女导航')); ?>">
+    <meta property="og:description" content="<?php echo e(getConfig('site_description', '精选美女导航网站')); ?>">
+    <meta property="og:image" content="<?php echo e(getConfig('avatar', '') ?: 'assets/images/logo.png'); ?>">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<?php echo e(getCurrentUrl()); ?>">
+    <meta property="og:site_name" content="<?php echo e(getConfig('site_title', '美女导航')); ?>">
+    <meta name="twitter:card" content="summary">
     <?php if (getConfig('umami_enabled', '1') === '1'): ?>
     <script defer src="<?php echo e(getConfig('umami_script_url', 'https://umami.xldh.cc/script.js')); ?>" data-website-id="<?php echo e(getConfig('umami_website_id', 'd1d35aa8-18e3-4c74-8db4-bcb610de22b5')); ?>"></script>
     <?php endif; ?>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
     <style>
         /* ==================== 效果展示页面专属样式 ==================== */
         .showcase-page {
@@ -431,7 +444,7 @@ recordVisit('showcase');
     <!-- 顶部导航 -->
     <header class="showcase-header">
         <div class="showcase-header-left">
-            <a href="index.php">
+            <a href="/">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 12H5M12 19l-7-7 7-7"/>
                 </svg>
@@ -445,9 +458,9 @@ recordVisit('showcase');
     <!-- 相册导航 -->
     <?php if (!empty($galleries)): ?>
     <div class="gallery-nav">
-        <a href="showcase.php" class="gallery-tab <?php echo $galleryId === null ? 'active' : ''; ?>">全部</a>
+        <a href="showcase.html" class="gallery-tab <?php echo $galleryId === null ? 'active' : ''; ?>">全部</a>
         <?php foreach ($galleries as $gallery): ?>
-        <a href="showcase.php?gallery=<?php echo $gallery['id']; ?>" class="gallery-tab <?php echo $galleryId == $gallery['id'] ? 'active' : ''; ?>">
+        <a href="showcase/<?php echo $gallery['id']; ?>.html" class="gallery-tab <?php echo $galleryId == $gallery['id'] ? 'active' : ''; ?>">
             <?php echo e($gallery['title']); ?>
             <span class="gallery-count"><?php echo $gallery['showcase_count']; ?></span>
         </a>

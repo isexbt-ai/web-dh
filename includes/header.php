@@ -14,6 +14,7 @@ function renderPageHeader($title = '', $description = '', $extraHead = '') {
     $siteTitle = getConfig('site_title', '美女导航');
     $pageTitle = $title ? $title . ' - ' . $siteTitle : $siteTitle;
     $pageDesc = $description ?: getConfig('site_description', '精选美女导航网站');
+    $currentUrl = getCurrentUrl();
     ?>
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -22,7 +23,12 @@ function renderPageHeader($title = '', $description = '', $extraHead = '') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo e($pageTitle); ?></title>
     <meta name="description" content="<?php echo e($pageDesc); ?>">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <meta name="keywords" content="<?php echo e(getConfig('site_keywords', '美女导航,网站导航,精选网站')); ?>">
+    <link rel="canonical" href="<?php echo e($currentUrl); ?>">
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
+    <meta property="og:url" content="<?php echo e($currentUrl); ?>">
+    <meta property="og:site_name" content="<?php echo e($siteTitle); ?>">
+    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#e94560">
     <link rel="apple-touch-icon" href="assets/images/logo.png">
