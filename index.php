@@ -156,7 +156,7 @@ if (!empty($categories)) {
                 </div>
                 <div class="hot-grid">
                     <?php foreach ($hotCards as $hot): ?>
-                    <a href="detail/<?php echo $hot['id']; ?>.html" class="hot-item" <?php echo ($hot['card_type'] ?? 'link') === 'link' && !empty($hot['link']) ? 'target="_blank" rel="noopener"' : ''; ?>>
+                    <a href="/detail/<?php echo $hot['id']; ?>.html" class="hot-item" <?php echo ($hot['card_type'] ?? 'link') === 'link' && !empty($hot['link']) ? 'target="_blank" rel="noopener"' : ''; ?>>
                         <?php if (!empty($hot['image'])): ?>
                         <div class="hot-image"><?php echo renderResponsiveImage($hot['image'], $hot['title'], '', 'lazy'); ?></div>
                         <?php else: ?>

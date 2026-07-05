@@ -594,7 +594,7 @@ function getThumbnailUrl($imagePath) {
  * @param array $sizes 响应式尺寸配置 [width, height] 或 null
  * @return string HTML img/picture 标签
  */
-function renderResponsiveImage($src, $alt = '', $class = '', $loading = 'lazy', $sizes = null) {
+function renderResponsiveImage($src, $alt = '', $class = '', $loading = 'lazy', $sizes = null, $includeDims = true) {
     if (empty($src)) {
         return '<div class="' . e($class) . ' card-placeholder">图片</div>';
     }
@@ -606,11 +606,13 @@ function renderResponsiveImage($src, $alt = '', $class = '', $loading = 'lazy', 
 
     // 尝试读取图片尺寸，用于减少 CLS
     $dimAttr = '';
-    $imgFile = $baseDir . $src;
-    if (file_exists($imgFile)) {
-        $imgSize = @getimagesize($imgFile);
-        if ($imgSize !== false) {
-            $dimAttr = ' width="' . $imgSize[0] . '" height="' . $imgSize[1] . '"';
+    if ($includeDims) {
+        $imgFile = $baseDir . $src;
+        if (file_exists($imgFile)) {
+            $imgSize = @getimagesize($imgFile);
+            if ($imgSize !== false) {
+                $dimAttr = ' width="' . $imgSize[0] . '" height="' . $imgSize[1] . '"';
+            }
         }
     }
 

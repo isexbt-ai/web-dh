@@ -338,7 +338,7 @@ $config = [
             <!-- 产品大图 -->
             <?php if ($card['image']): ?>
             <div class="detail-image">
-                <?php echo renderResponsiveImage($card['image'], $card['title'], '', 'eager'); ?>
+                <?php echo renderResponsiveImage($card['image'], $card['title'], '', 'eager', null, false); ?>
             </div>
             <?php else: ?>
             <div class="detail-image-placeholder">
@@ -431,7 +431,7 @@ $config = [
                     <h3 class="detail-related-title">相关推荐</h3>
                     <div class="detail-related-grid">
                         <?php foreach ($relatedCards as $rc): ?>
-                        <a href="detail/<?php echo $rc['id']; ?>.html" class="detail-related-item" <?php echo $rc['card_type'] === 'link' && !empty($rc['link']) ? 'target="_blank" rel="noopener"' : ''; ?>>
+                        <a href="/detail/<?php echo $rc['id']; ?>.html" class="detail-related-item" <?php echo $rc['card_type'] === 'link' && !empty($rc['link']) ? 'target="_blank" rel="noopener"' : ''; ?>>
                             <?php if (!empty($rc['image'])): ?>
                             <div class="detail-related-image"><?php echo renderResponsiveImage($rc['image'], $rc['title'], '', 'lazy'); ?></div>
                             <?php else: ?>
