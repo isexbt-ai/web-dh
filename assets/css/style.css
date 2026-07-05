@@ -217,6 +217,8 @@ img {
 .slide-item img {
     width: 100%;
     height: auto;
+    max-height: 250px;
+    object-fit: contain;
     display: block;
     border-radius: 12px;
 }
@@ -534,8 +536,8 @@ img {
         padding: 12px 16px;
     }
 
-    .ad-slide img,
-    .ad-placeholder {
+    .slide-item img,
+    .slide-placeholder {
         max-height: 180px;
     }
 
@@ -557,8 +559,8 @@ img {
         gap: 12px;
     }
 
-    .ad-slide img,
-    .ad-placeholder {
+    .slide-item img,
+    .slide-placeholder {
         max-height: 150px;
     }
 
@@ -567,7 +569,7 @@ img {
         font-size: 13px;
     }
 
-    .ad-placeholder {
+    .slide-placeholder {
         font-size: 18px;
     }
 
