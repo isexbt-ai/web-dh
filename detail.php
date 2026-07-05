@@ -70,10 +70,16 @@ $config = [
             width: 100%;
         }
 
+        .detail-image picture {
+            display: block;
+            width: 100%;
+        }
+
         .detail-image img {
             width: 100%;
             height: auto;
             object-fit: contain;
+            display: block;
         }
 
         .detail-image-placeholder {
