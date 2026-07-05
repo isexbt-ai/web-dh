@@ -34,6 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $visitorClickDivisor = isset($_POST['visitor_click_divisor']) ? max(1, intval($_POST['visitor_click_divisor'])) : 100;
         $visitorTodayMultiplier = isset($_POST['visitor_today_multiplier']) ? max(0, intval($_POST['visitor_today_multiplier'])) : 2;
 
+        // 保存热门推荐数量配置
+        $hotCardsCount = isset($_POST['hot_cards_count']) ? max(1, min(20, intval($_POST['hot_cards_count']))) : 3;
+
         // 保存配置
         setConfig('site_title', $siteTitle);
         setConfig('contact_info', $contactInfo);
@@ -45,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         setConfig('card_sort_method', $cardSortMethod);
         setConfig('visitor_click_divisor', (string)$visitorClickDivisor);
         setConfig('visitor_today_multiplier', (string)$visitorTodayMultiplier);
+        setConfig('hot_cards_count', (string)$hotCardsCount);
 
         $success = '配置保存成功';
     }
@@ -60,7 +64,8 @@ $config = [
     'cards_per_row_mobile' => getConfig('cards_per_row_mobile', 'repeat(3, 1fr)'),
     'card_sort_method' => getConfig('card_sort_method', 'default'),
     'visitor_click_divisor' => getConfig('visitor_click_divisor', '100'),
-    'visitor_today_multiplier' => getConfig('visitor_today_multiplier', '2')
+    'visitor_today_multiplier' => getConfig('visitor_today_multiplier', '2'),
+    'hot_cards_count' => getConfig('hot_cards_count', '3')
 ];
 ?>
 <!DOCTYPE html>
@@ -207,6 +212,22 @@ $config = [
                                     <option value="default" <?php echo $config['card_sort_method'] === 'default' ? 'selected' : ''; ?>>默认排序（按手动排序 + 时间）</option>
                                     <option value="click_count" <?php echo $config['card_sort_method'] === 'click_count' ? 'selected' : ''; ?>>按点击量从高到低</option>
                                 </select>
+                            </div>
+
+                            <div>
+                                <label style="font-size: 13px; color: #666; margin-bottom: 6px; display: block;">热门推荐数量</label>
+                                <select name="hot_cards_count" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff;">
+                                    <option value="1" <?php echo $config['hot_cards_count'] === '1' ? 'selected' : ''; ?>>1 个</option>
+                                    <option value="2" <?php echo $config['hot_cards_count'] === '2' ? 'selected' : ''; ?>>2 个</option>
+                                    <option value="3" <?php echo $config['hot_cards_count'] === '3' ? 'selected' : ''; ?>>3 个</option>
+                                    <option value="4" <?php echo $config['hot_cards_count'] === '4' ? 'selected' : ''; ?>>4 个</option>
+                                    <option value="5" <?php echo $config['hot_cards_count'] === '5' ? 'selected' : ''; ?>>5 个</option>
+                                    <option value="6" <?php echo $config['hot_cards_count'] === '6' ? 'selected' : ''; ?>>6 个</option>
+                                    <option value="8" <?php echo $config['hot_cards_count'] === '8' ? 'selected' : ''; ?>>8 个</option>
+                                    <option value="10" <?php echo $config['hot_cards_count'] === '10' ? 'selected' : ''; ?>>10 个</option>
+                                    <option value="12" <?php echo $config['hot_cards_count'] === '12' ? 'selected' : ''; ?>>12 个</option>
+                                </select>
+                                <p style="font-size: 11px; color: #999; margin-top: 4px;">首页热门推荐区域显示的数量</p>
                             </div>
                         </div>
                         <p style="font-size: 12px; color: #999; margin-top: 8px;">修改后刷新首页即可看到效果</p>

@@ -4,7 +4,8 @@ require_once 'includes/functions.php';
 $ads = getAds();
 $notices = getNotices();
 $categories = getCategories();
-$hotCards = getHotCards(3);
+$hotCardsCount = intval(getConfig('hot_cards_count', '3'));
+$hotCards = getHotCards($hotCardsCount);
 $config = [
     'avatar' => getConfig('avatar', ''),
     'contact_info' => getConfig('contact_info', '微信：xxx'),
