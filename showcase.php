@@ -25,7 +25,7 @@ recordVisit('showcase');
     <meta name="description" content="<?php echo e(getConfig('site_description', '精选美女导航网站') . ' - 效果展示'); ?>">
     <meta name="keywords" content="效果展示,<?php echo e(getConfig('site_title', '美女导航')); ?>">
     <link rel="canonical" href="<?php echo e(getCurrentUrl()); ?>">
-    <link rel="icon" type="image/png" href="assets/images/logo.png">
+    <link rel="icon" type="image/png" href="/assets/images/logo.png">
     <?php if (getConfig('umami_enabled', '1') === '1'): ?>
     <link rel="preconnect" href="https://umami.xldh.cc">
     <?php endif; ?>
@@ -39,7 +39,7 @@ recordVisit('showcase');
     <?php if (getConfig('umami_enabled', '1') === '1'): ?>
     <script defer src="<?php echo e(getConfig('umami_script_url', 'https://umami.xldh.cc/script.js')); ?>" data-website-id="<?php echo e(getConfig('umami_website_id', 'd1d35aa8-18e3-4c74-8db4-bcb610de22b5')); ?>"></script>
     <?php endif; ?>
-    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
+    <link rel="stylesheet" href="/assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
     <style>
         /* ==================== 效果展示页面专属样式 ==================== */
         .showcase-page {

@@ -34,20 +34,20 @@ $config = [
     <meta name="description" content="<?php echo e(smartTruncate($card['detail'] ?? '', 150)); ?>">
     <meta name="keywords" content="<?php echo e($card['title'] . ',' . ($card['category_name'] ?? '') . ',' . $config['site_title']); ?>">
     <link rel="canonical" href="<?php echo e(getCurrentUrl()); ?>">
-    <link rel="icon" type="image/png" href="assets/images/logo.png">
+    <link rel="icon" type="image/png" href="/assets/images/logo.png">
     <?php if (getConfig('umami_enabled', '1') === '1'): ?>
     <link rel="preconnect" href="https://umami.xldh.cc">
     <?php endif; ?>
     <!-- Open Graph / Twitter Card -->
     <meta property="og:title" content="<?php echo e($card['title']); ?>">
     <meta property="og:description" content="<?php echo e(smartTruncate($card['detail'] ?? '', 150)); ?>">
-    <meta property="og:image" content="<?php echo e($card['image'] ?: ($config['avatar'] ?: 'assets/images/logo.png')); ?>">
+    <meta property="og:image" content="<?php echo e($card['image'] ?: ($config['avatar'] ?: '/assets/images/logo.png')); ?>">
     <meta property="og:type" content="article">
     <meta property="og:url" content="<?php echo e(getCurrentUrl()); ?>">
     <meta property="og:site_name" content="<?php echo e($config['site_title']); ?>">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="article:published_time" content="<?php echo date('c', strtotime($card['created_at'])); ?>">
-    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
+    <link rel="stylesheet" href="/assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
     <?php if (getConfig('umami_enabled', '1') === '1'): ?>
     <script defer src="<?php echo e(getConfig('umami_script_url', 'https://umami.xldh.cc/script.js')); ?>" data-website-id="<?php echo e(getConfig('umami_website_id', 'd1d35aa8-18e3-4c74-8db4-bcb610de22b5')); ?>"></script>
     <?php endif; ?>

@@ -28,7 +28,7 @@ if (!empty($categories)) {
     <meta name="description" content="<?php echo e(getConfig('site_description', '精选美女导航网站')); ?>">
     <meta name="keywords" content="<?php echo e(getConfig('site_keywords', '美女导航,网站导航,精选网站')); ?>">
     <link rel="canonical" href="<?php echo e(getCurrentUrl()); ?>">
-    <link rel="icon" type="image/png" href="assets/images/logo.png">
+    <link rel="icon" type="image/png" href="/assets/images/logo.png">
     <link rel="alternate" type="application/rss+xml" title="<?php echo e(getConfig('site_title', '美女导航')); ?> RSS" href="feed.php">
     <?php if (getConfig('umami_enabled', '1') === '1'): ?>
     <link rel="preconnect" href="https://umami.xldh.cc">
@@ -41,10 +41,10 @@ if (!empty($categories)) {
     <meta property="og:url" content="<?php echo e(getCurrentUrl()); ?>">
     <meta property="og:site_name" content="<?php echo e(getConfig('site_title', '美女导航')); ?>">
     <meta name="twitter:card" content="summary">
-    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
+    <link rel="stylesheet" href="/assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#e94560">
-    <link rel="apple-touch-icon" href="assets/images/logo.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo.png">
     <?php if (getConfig('umami_enabled', '1') === '1'): ?>
     <script defer src="<?php echo e(getConfig('umami_script_url', 'https://umami.xldh.cc/script.js')); ?>" data-website-id="<?php echo e(getConfig('umami_website_id', 'd1d35aa8-18e3-4c74-8db4-bcb610de22b5')); ?>"></script>
     <?php endif; ?>
@@ -242,7 +242,7 @@ if (!empty($categories)) {
         <?php endif; ?>
     </div>
 
-    <script src="assets/js/main.js?v=<?php echo filemtime('assets/js/main.js'); ?>"></script>
+    <script src="/assets/js/main.js?v=<?php echo filemtime('assets/js/main.js'); ?>"></script>
     <script>
         // 注册 Service Worker
         if ('serviceWorker' in navigator) {

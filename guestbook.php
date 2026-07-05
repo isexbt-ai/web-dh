@@ -33,7 +33,7 @@ $messages = getMessages(0, 10);
     <meta name="description" content="<?php echo e(getConfig('site_description', '精选美女导航网站')); ?>">
     <meta name="keywords" content="<?php echo e($guestbookTitle . ',留言板,' . $config['site_title']); ?>">
     <link rel="canonical" href="<?php echo e(getCurrentUrl()); ?>">
-    <link rel="icon" type="image/png" href="assets/images/logo.png">
+    <link rel="icon" type="image/png" href="/assets/images/logo.png">
     <?php if (getConfig('umami_enabled', '1') === '1'): ?>
     <link rel="preconnect" href="https://umami.xldh.cc">
     <?php endif; ?>
@@ -45,7 +45,7 @@ $messages = getMessages(0, 10);
     <meta property="og:url" content="<?php echo e(getCurrentUrl()); ?>">
     <meta property="og:site_name" content="<?php echo e($config['site_title']); ?>">
     <meta name="twitter:card" content="summary">
-    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
+    <link rel="stylesheet" href="/assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
     <?php if (getConfig('umami_enabled', '1') === '1'): ?>
     <script defer src="<?php echo e(getConfig('umami_script_url', 'https://umami.xldh.cc/script.js')); ?>" data-website-id="<?php echo e(getConfig('umami_website_id', 'd1d35aa8-18e3-4c74-8db4-bcb610de22b5')); ?>"></script>
     <?php endif; ?>
@@ -261,7 +261,7 @@ $messages = getMessages(0, 10);
         <p class="visitor-count">您是本站的第 <?php echo number_format(getDisplayVisitorCount()); ?> 位访客，欢迎光临本站。</p>
     </footer>
 
-    <script src="assets/js/main.js?v=<?php echo filemtime('assets/js/main.js'); ?>"></script>
+    <script src="/assets/js/main.js?v=<?php echo filemtime('assets/js/main.js'); ?>"></script>
     <script>
         const GUESTBOOK_PAGE_SIZE = 10;
         let guestbookOffset = <?php echo count($messages); ?>;
