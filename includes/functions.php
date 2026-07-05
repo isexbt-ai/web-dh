@@ -604,6 +604,12 @@ function renderResponsiveImage($src, $alt = '', $class = '', $loading = 'lazy', 
     $loadingAttr = in_array($loading, ['lazy', 'eager']) ? ' loading="' . $loading . '"' : '';
     $altAttr = $alt ? ' alt="' . e($alt) . '"' : '';
 
+    // 确保图片路径以 / 开头（绝对路径），避免在伪静态URL下路径解析错误
+    $absSrc = $src;
+    if (strpos($src, '/') !== 0 && strpos($src, 'http') !== 0) {
+        $absSrc = '/' . $src;
+    }
+
     // 尝试读取图片尺寸，用于减少 CLS
     $dimAttr = '';
     if ($includeDims) {
@@ -620,11 +626,19 @@ function renderResponsiveImage($src, $alt = '', $class = '', $loading = 'lazy', 
     $thumbJpg = $src . '_thumb.jpg';
     $thumbWebp = $thumbJpg . '.webp';
 
+    // 缩略图也使用绝对路径
+    $absThumbJpg = $thumbJpg;
+    $absThumbWebp = $thumbWebp;
+    if (strpos($thumbJpg, '/') !== 0 && strpos($thumbJpg, 'http') !== 0) {
+        $absThumbJpg = '/' . $thumbJpg;
+        $absThumbWebp = '/' . $thumbWebp;
+    }
+
     $hasWebp = file_exists($baseDir . $thumbWebp);
     $hasJpg = file_exists($baseDir . $thumbJpg);
 
     // 确定最佳图片源
-    $bestSrc = $hasWebp ? $thumbWebp : ($hasJpg ? $thumbJpg : $src);
+    $bestSrc = $hasWebp ? $absThumbWebp : ($hasJpg ? $absThumbJpg : $absSrc);
 
     // 构建 srcset（如果有尺寸配置）
     $srcsetAttr = '';
@@ -651,11 +665,11 @@ function renderResponsiveImage($src, $alt = '', $class = '', $loading = 'lazy', 
     // 如果有 WebP 格式，使用 picture 标签提供格式回退
     if ($hasWebp) {
         $html = '<picture>';
-        $html .= '<source srcset="' . e($thumbWebp) . '" type="image/webp">';
+        $html .= '<source srcset="' . e($absThumbWebp) . '" type="image/webp">';
         if ($hasJpg) {
-            $html .= '<source srcset="' . e($thumbJpg) . '" type="image/jpeg">';
+            $html .= '<source srcset="' . e($absThumbJpg) . '" type="image/jpeg">';
         }
-        $html .= '<img src="' . e($src) . '"' . $altAttr . $classAttr . $loadingAttr . $dimAttr . $srcsetAttr . $sizesAttr . '>';
+        $html .= '<img src="' . e($absSrc) . '"' . $altAttr . $classAttr . $loadingAttr . $dimAttr . $srcsetAttr . $sizesAttr . '>';
         $html .= '</picture>';
         return $html;
     }
