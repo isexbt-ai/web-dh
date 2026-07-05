@@ -195,7 +195,6 @@ img {
     overflow: hidden;
     background: #f8f9fa;
     width: 100%;
-    height: 250px;
 }
 
 .slide-item {
@@ -217,15 +216,15 @@ img {
 
 .slide-item img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
+    object-fit: contain;
     display: block;
     border-radius: 12px;
 }
 
 .slide-placeholder {
     width: 100%;
-    height: 200px;
+    min-height: 160px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -538,7 +537,7 @@ img {
 
     .slide-item img,
     .slide-placeholder {
-        height: 180px;
+        min-height: 120px;
     }
 
     .category-tab {
@@ -561,7 +560,7 @@ img {
 
     .slide-item img,
     .slide-placeholder {
-        height: 150px;
+        min-height: 100px;
     }
 
     .category-tab {
