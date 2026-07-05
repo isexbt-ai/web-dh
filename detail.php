@@ -68,14 +68,12 @@ $config = [
 
         .detail-image {
             width: 100%;
-            max-height: 400px;
-            overflow: hidden;
         }
 
         .detail-image img {
             width: 100%;
-            height: 400px;
-            object-fit: cover;
+            height: auto;
+            object-fit: contain;
         }
 
         .detail-image-placeholder {
@@ -275,9 +273,6 @@ $config = [
         }
 
         @media (max-width: 480px) {
-            .detail-image img {
-                height: 250px;
-            }
 
             .detail-content {
                 padding: 20px;
@@ -430,7 +425,7 @@ $config = [
                     <h3 class="detail-related-title">相关推荐</h3>
                     <div class="detail-related-grid">
                         <?php foreach ($relatedCards as $rc): ?>
-                        <a href="detail/<?php echo $rc['id']; ?>.html" class="detail-related-item" <?php echo $rc['card_type'] === 'link' && !empty($rc['link']) ? 'target="_blank" rel="noopener"' : ''; ?>>
+                        <a href="detail.php?id=<?php echo $rc['id']; ?>" class="detail-related-item" <?php echo $rc['card_type'] === 'link' && !empty($rc['link']) ? 'target="_blank" rel="noopener"' : ''; ?>>
                             <?php if (!empty($rc['image'])): ?>
                             <div class="detail-related-image"><?php echo renderResponsiveImage($rc['image'], $rc['title'], '', 'lazy'); ?></div>
                             <?php else: ?>

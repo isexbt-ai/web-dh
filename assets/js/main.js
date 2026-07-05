@@ -264,8 +264,8 @@ function renderEmpty() {
 function goToDetail(cardId) {
     // 记录点击
     fetch(`admin/api/click.php?id=${cardId}`).catch(() => {});
-    // 跳转到详情页（伪静态 URL）
-    window.location.href = `detail/${cardId}.html`;
+    // 跳转到详情页
+    window.location.href = `detail.php?id=${cardId}`;
 }
 
 function goToLink(cardId, link) {
