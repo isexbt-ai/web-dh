@@ -43,8 +43,16 @@ if (!empty($categories)) {
     <meta property="og:site_name" content="<?php echo e(getConfig('site_title', '美女导航')); ?>">
     <meta name="twitter:card" content="summary">
     <link rel="stylesheet" href="/assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
+    <?php
+    $theme = getConfig('theme', 'default');
+    if ($theme === 'memphis' && file_exists('assets/css/theme-memphis.css')):
+    ?>
+    <link rel="stylesheet" href="/assets/css/theme-memphis.css?v=<?php echo filemtime('assets/css/theme-memphis.css'); ?>">
+    <?php elseif ($theme === 'dreamy' && file_exists('assets/css/theme-dreamy.css')): ?>
+    <link rel="stylesheet" href="/assets/css/theme-dreamy.css?v=<?php echo filemtime('assets/css/theme-dreamy.css'); ?>">
+    <?php endif; ?>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#e94560">
+    <meta name="theme-color" content="<?php echo $theme === 'memphis' ? '#ffe14d' : ($theme === 'dreamy' ? '#ffd6e7' : '#e94560'); ?>">
     <link rel="apple-touch-icon" href="/assets/images/logo.png">
     <?php if (getConfig('umami_enabled', '1') === '1'): ?>
     <script defer src="<?php echo e(getConfig('umami_script_url', 'https://umami.xldh.cc/script.js')); ?>" data-website-id="<?php echo e(getConfig('umami_website_id', 'd1d35aa8-18e3-4c74-8db4-bcb610de22b5')); ?>"></script>

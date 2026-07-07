@@ -4,4 +4,4 @@ Disallow: /admin/
 Disallow: /data/
 Disallow: /includes/
 
-Sitemap: /sitemap.xml
+Sitemap: https://91db.cc/sitemap.xml

@@ -1,0 +1,508 @@
+/* ==================== 孟菲斯风格主题 (Memphis Theme) ==================== */
+/* 覆盖默认主题的 CSS 变量，实现孟菲斯风格 */
+
+:root {
+    /* 背景色 - 亮黄色 */
+    --bg-body: #ffe14d;
+    --bg-card: #ffffff;
+    --bg-section: #ffffff;
+    --bg-hover: #fff8e1;
+    --bg-input: #ffffff;
+    --bg-placeholder: linear-gradient(135deg, #ff3d6f, #ff6b9d);
+
+    /* 主色调 - 更鲜艳的粉色 */
+    --color-primary: #ff3d6f;
+    --color-primary-light: #ff6b9d;
+    --color-primary-rgb: 255, 61, 111;
+
+    /* 文字色 */
+    --color-text: #2b2b2b;
+    --color-text-secondary: #7a1f00;
+    --color-text-muted: #8b5a2b;
+    --color-text-light: #333333;
+
+    /* 边框 - 粗黑边框 */
+    --border-color: #000000;
+    --border-color-light: #000000;
+    --border-color-hover: #000000;
+
+    /* 阴影 - 硬阴影 */
+    --shadow-card: 4px 4px 0 #000;
+    --shadow-card-hover: 6px 6px 0 #000;
+    --shadow-btn: 5px 5px 0 #000;
+    --shadow-btn-hover: 3px 3px 0 #000;
+    --shadow-menu: 6px 6px 0 #000;
+    --shadow-float: 4px 4px 0 #000;
+    --shadow-float-hover: 6px 6px 0 #000;
+    --shadow-back-to-top: 4px 4px 0 #000;
+    --shadow-back-to-top-hover: 6px 6px 0 #000;
+
+    /* 圆角 - 更大更活泼 */
+    --radius-card: 18px;
+    --radius-btn: 18px;
+    --radius-avatar: 50%;
+    --radius-tab: 18px;
+    --radius-input: 14px;
+    --radius-badge: 10px;
+
+    /* 间距 */
+    --section-gap: 14px;
+    --card-gap: 16px;
+
+    /* 渐变 */
+    --gradient-primary: linear-gradient(135deg, #ff3d6f, #ff6b9d);
+    --gradient-visitor: linear-gradient(135deg, #ff3d6f, #ff6b9d, #ffd60a, #22d3a0, #8b5cf6);
+    --gradient-showcase: linear-gradient(135deg, #8b5cf6, #c4b5fd);
+    --gradient-guestbook: linear-gradient(135deg, #ff3d6f, #ff6b9d);
+}
+
+/* ==================== 孟菲斯特有样式 ==================== */
+
+/* 几何图形背景层 */
+body::after {
+    content: "";
+    position: fixed;
+    inset: -20% -20% -20% -20%;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+        radial-gradient(circle at 15% 20%, #ff5e8a 0 14px, transparent 15px),
+        radial-gradient(circle at 80% 30%, transparent 0 10px, #22c1a6 10px 15px, transparent 16px),
+        radial-gradient(circle at 70% 75%, #5b9bff 0 12px, transparent 13px),
+        radial-gradient(circle at 30% 85%, transparent 0 9px, #ff5e8a 9px 14px, transparent 15px),
+        radial-gradient(circle at 90% 60%, #8b5cf6 0 8px, transparent 9px),
+        radial-gradient(circle at 45% 50%, #22c1a6 0 6px, transparent 7px);
+    background-size: 420px 420px;
+    opacity: 0.9;
+    animation: geo-drift 24s linear infinite;
+}
+
+@keyframes geo-drift {
+    to { background-position: 420px 420px; }
+}
+
+/* emoji 漂浮层 */
+body::before {
+    content: "🤣😂👊💩🐔🍜🤡👀🔥😎";
+    position: fixed;
+    inset: 0;
+    font-size: 26px;
+    opacity: 0.08;
+    white-space: nowrap;
+    letter-spacing: 70px;
+    line-height: 90px;
+    pointer-events: none;
+    word-wrap: break-word;
+    width: 200%;
+    z-index: 0;
+    animation: float-bg 40s linear infinite;
+}
+
+@keyframes float-bg {
+    to { transform: translate(-50%, -12%); }
+}
+
+/* 页面内容层 */
+.page-wrapper,
+.top-bar,
+.site-footer {
+    position: relative;
+    z-index: 1;
+}
+
+/* ==================== 顶部栏孟菲斯化 ==================== */
+.top-bar {
+    background: #ffffff;
+    border-bottom: 3px solid #000;
+    box-shadow: 4px 4px 0 #000;
+    margin: 0 16px;
+    border-radius: 0 0 18px 18px;
+    top: 0;
+}
+
+.avatar-section:hover {
+    background: #fff8e1;
+}
+
+.avatar-section:hover .avatar-img,
+.avatar-section:hover .avatar-placeholder {
+    box-shadow: 0 0 0 3px rgba(255, 61, 111, 0.3);
+}
+
+.avatar-placeholder {
+    background: var(--gradient-primary);
+    border: 3px solid #000;
+}
+
+.func-btn {
+    background: var(--gradient-primary);
+    border: 3px solid #000;
+    box-shadow: 3px 3px 0 #000;
+    transition: all 0.15s;
+}
+
+.func-btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 #000;
+}
+
+.func-btn:active {
+    transform: translate(3px, 3px);
+    box-shadow: 0 0 0 #000;
+}
+
+/* 功能菜单 */
+.func-menu {
+    background: #ffffff;
+    border: 3px solid #000;
+    box-shadow: 5px 5px 0 #000;
+    border-radius: 14px;
+}
+
+.func-menu a:hover {
+    background: #fff5f5;
+    color: var(--color-primary);
+}
+
+/* ==================== 区块卡片孟菲斯化 ==================== */
+.section-card {
+    background: #ffffff;
+    border: 3px solid #000;
+    box-shadow: 5px 5px 0 #000;
+    border-radius: 18px;
+    margin-bottom: 14px;
+}
+
+.section-card:hover {
+    box-shadow: 7px 7px 0 #000;
+    transform: translateY(-2px);
+}
+
+/* ==================== 轮播图区 ==================== */
+.slide-carousel {
+    background: #ffffff;
+    border: 3px solid #000;
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.slide-item img {
+    border-radius: 0;
+}
+
+.slide-placeholder {
+    background: var(--gradient-primary);
+    border: 3px solid #000;
+}
+
+.slide-dot.active {
+    background: var(--color-primary);
+    width: 24px;
+    border-radius: 4px;
+}
+
+/* ==================== 公告区 ==================== */
+.notice-item {
+    border-bottom: 2px dashed #000;
+    font-weight: 600;
+}
+
+.notice-item:last-child {
+    border-bottom: none;
+}
+
+.notice-item:hover {
+    background: #fff8e1;
+    color: var(--color-primary);
+}
+
+/* ==================== 热门推荐 ==================== */
+.hot-label {
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--color-primary);
+    text-shadow: 2px 2px 0 #000;
+}
+
+.hot-image {
+    border: 3px solid #000;
+    box-shadow: 3px 3px 0 #000;
+    border-radius: 14px;
+}
+
+.hot-name {
+    font-weight: 700;
+    font-size: 12px;
+}
+
+/* ==================== 分类导航孟菲斯化 ==================== */
+.category-tabs {
+    gap: 12px;
+}
+
+.category-tab {
+    border: 3px solid #000;
+    box-shadow: 3px 3px 0 #000;
+    background: #ffffff;
+    color: #000;
+    font-weight: 800;
+    font-size: 14px;
+    border-radius: 18px;
+    transition: all 0.15s;
+}
+
+.category-tab:hover {
+    background: #fff8e1;
+    border-color: #000;
+    color: #000;
+    box-shadow: 2px 2px 0 #000;
+    transform: translate(1px, 1px);
+}
+
+.category-tab.active {
+    background: var(--gradient-primary);
+    border-color: #000;
+    color: #fff;
+    box-shadow: 3px 3px 0 #000;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+}
+
+/* ==================== 卡片网格孟菲斯化 ==================== */
+.card-item {
+    background: #ffffff;
+    border: 3px solid #000;
+    box-shadow: 4px 4px 0 #000;
+    border-radius: 18px;
+    transition: all 0.15s;
+}
+
+.card-item:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #000;
+}
+
+.card-item:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0 0 0 #000;
+}
+
+.card-placeholder {
+    background: var(--gradient-primary);
+    border: 3px solid #000;
+}
+
+.card-title {
+    background: #ffffff;
+    border-top: 3px solid #000;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.card-item:hover .card-title {
+    background: #fff5f5;
+    color: var(--color-primary);
+}
+
+/* 卡片类型标签 */
+.card-type-badge {
+    border: 2px solid #000;
+    box-shadow: 2px 2px 0 #000;
+    font-weight: 800;
+}
+
+.card-type-badge.link {
+    background: #22d3a0;
+    color: #000;
+}
+
+.card-type-badge.detail {
+    background: var(--color-primary);
+    color: #fff;
+}
+
+.card-type-badge.custom {
+    background: #ffd60a;
+    color: #000;
+}
+
+/* ==================== 加载动画 ==================== */
+.spinner {
+    border: 4px solid #000;
+    border-top-color: var(--color-primary);
+}
+
+/* ==================== 页脚孟菲斯化 ==================== */
+.site-footer {
+    background: #ffffff;
+    border-top: 3px solid #000;
+    box-shadow: 0 -4px 0 #000;
+    margin: 14px 16px 0;
+    border-radius: 18px 18px 0 0;
+    font-weight: 700;
+}
+
+.site-footer .visitor-count {
+    background: var(--gradient-visitor);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 4s ease infinite;
+    font-weight: 900;
+    text-shadow: none;
+}
+
+/* ==================== 返回顶部按钮 ==================== */
+.back-to-top {
+    background: var(--gradient-primary);
+    border: 3px solid #000;
+    box-shadow: 3px 3px 0 #000;
+}
+
+.back-to-top:hover {
+    transform: translate(2px, 2px) scale(1.05);
+    box-shadow: 1px 1px 0 #000;
+}
+
+/* ==================== 悬浮按钮组 ==================== */
+.float-btn {
+    border: 3px solid #000;
+    box-shadow: 3px 3px 0 #000;
+    transition: all 0.15s;
+}
+
+.float-btn:hover {
+    transform: translate(2px, 2px) scale(1.05);
+    box-shadow: 1px 1px 0 #000;
+}
+
+.float-btn#backToTop {
+    background: linear-gradient(135deg, #666666, #999999);
+    border: 3px solid #000;
+}
+
+.float-btn#backToTop:hover {
+    transform: translate(2px, 2px) scale(1.08);
+    box-shadow: 1px 1px 0 #000;
+}
+
+/* ==================== 留言板页面 ==================== */
+.guestbook-item {
+    border-bottom: 2px dashed #000;
+}
+
+.guestbook-item:hover {
+    background: #fff8e1;
+}
+
+.guestbook-item-nickname {
+    color: var(--color-primary);
+    font-weight: 800;
+}
+
+.guestbook-form input,
+.guestbook-form textarea {
+    border: 3px solid #000;
+    box-shadow: 3px 3px 0 #000;
+    background: #ffffff;
+    border-radius: 14px;
+    font-weight: 600;
+}
+
+.guestbook-form input:focus,
+.guestbook-form textarea:focus {
+    border-color: #000;
+    box-shadow: 2px 2px 0 #000;
+    outline: none;
+    transform: translate(1px, 1px);
+}
+
+.guestbook-form button {
+    background: var(--gradient-primary);
+    border: 3px solid #000;
+    box-shadow: 4px 4px 0 #000;
+    border-radius: 18px;
+    font-weight: 800;
+    transition: all 0.15s;
+}
+
+.guestbook-form button:hover:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #000;
+}
+
+.pagination-btn {
+    background: #ffffff;
+    border: 3px solid #000;
+    box-shadow: 3px 3px 0 #000;
+    color: #000;
+    border-radius: 18px;
+    font-weight: 700;
+    transition: all 0.15s;
+}
+
+.pagination-btn:hover {
+    background: #fff8e1;
+    border-color: #000;
+    color: #000;
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 #000;
+}
+
+.guestbook-reply {
+    background: #fff8e1;
+    border: 3px solid #000;
+    box-shadow: 3px 3px 0 #000;
+    border-radius: 14px;
+    border-left: 3px solid var(--color-primary);
+}
+
+.guestbook-reply-label {
+    color: var(--color-primary);
+    font-weight: 800;
+}
+
+/* ==================== 空状态 ==================== */
+.empty-state {
+    color: var(--color-text-muted);
+    font-weight: 700;
+}
+
+/* ==================== Toast 提示 ==================== */
+#toast {
+    background: #000;
+    color: #fff;
+    border: 3px solid #000;
+    box-shadow: 5px 5px 0 rgba(0,0,0,0.3);
+    border-radius: 14px;
+    font-weight: 700;
+}
+
+/* ==================== 响应式调整 ==================== */
+@media (max-width: 480px) {
+    .top-bar {
+        margin: 0 8px;
+        border-radius: 0 0 14px 14px;
+    }
+
+    .site-footer {
+        margin: 10px 8px 0;
+        border-radius: 14px 14px 0 0;
+    }
+
+    .section-card {
+        border: 3px solid #000;
+        box-shadow: 3px 3px 0 #000;
+    }
+
+    .category-tab {
+        font-size: 12px;
+        border: 2px solid #000;
+        box-shadow: 2px 2px 0 #000;
+    }
+
+    .card-item {
+        border: 2px solid #000;
+        box-shadow: 2px 2px 0 #000;
+    }
+}

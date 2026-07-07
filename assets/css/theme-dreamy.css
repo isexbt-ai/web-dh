@@ -1,0 +1,522 @@
+/* ==================== 梦幻少女风格主题 (Dreamy/Kawaii Theme) ==================== */
+/* 覆盖默认主题的 CSS 变量，实现梦幻少女风格 */
+
+:root {
+    /* 背景色 - 柔和渐变 */
+    --bg-body: linear-gradient(135deg, #ffd6e7 0%, #fff0f5 25%, #e0f7ff 50%, #fff5e6 75%, #ffe0f0 100%);
+    --bg-card: rgba(255, 255, 255, 0.85);
+    --bg-section: rgba(255, 255, 255, 0.9);
+    --bg-hover: rgba(255, 255, 255, 0.95);
+    --bg-input: #ffffff;
+    --bg-placeholder: linear-gradient(135deg, #ff6b9d, #ffb88c);
+
+    /* 主色调 - 粉色系 */
+    --color-primary: #ff6b9d;
+    --color-primary-light: #ffb88c;
+    --color-primary-rgb: 255, 107, 157;
+
+    /* 文字色 - 柔和紫色系 */
+    --color-text: #5a3d5c;
+    --color-text-secondary: #8b6a8d;
+    --color-text-muted: #b08aab;
+    --color-text-light: #6b4e6d;
+
+    /* 边框 - 柔和半透明 */
+    --border-color: rgba(255, 184, 140, 0.3);
+    --border-color-light: rgba(255, 184, 140, 0.2);
+    --border-color-hover: rgba(255, 107, 157, 0.5);
+
+    /* 阴影 - 柔和发光 */
+    --shadow-card: 0 4px 20px rgba(255, 107, 157, 0.15);
+    --shadow-card-hover: 0 8px 30px rgba(255, 107, 157, 0.25);
+    --shadow-btn: 0 6px 20px rgba(255, 107, 157, 0.3);
+    --shadow-btn-hover: 0 8px 25px rgba(255, 107, 157, 0.4);
+    --shadow-menu: 0 8px 30px rgba(255, 107, 157, 0.2);
+    --shadow-float: 0 4px 20px rgba(201, 160, 255, 0.4);
+    --shadow-float-hover: 0 6px 25px rgba(201, 160, 255, 0.5);
+    --shadow-back-to-top: 0 4px 20px rgba(255, 107, 157, 0.4);
+    --shadow-back-to-top-hover: 0 6px 25px rgba(255, 107, 157, 0.5);
+
+    /* 圆角 - 圆润胶囊风 */
+    --radius-card: 20px;
+    --radius-btn: 50px;
+    --radius-avatar: 50%;
+    --radius-tab: 50px;
+    --radius-input: 16px;
+    --radius-badge: 20px;
+
+    /* 间距 */
+    --section-gap: 14px;
+    --card-gap: 16px;
+
+    /* 渐变 */
+    --gradient-primary: linear-gradient(135deg, #ff6b9d, #ffb88c);
+    --gradient-visitor: linear-gradient(135deg, #ff6b9d, #ffb88c, #c9a0ff, #87ceeb, #ffd76b);
+    --gradient-showcase: linear-gradient(135deg, #c9a0ff, #e0c3fc);
+    --gradient-guestbook: linear-gradient(135deg, #ff6b9d, #ffb88c);
+}
+
+/* ==================== 背景动画 ==================== */
+body {
+    background: linear-gradient(135deg, #ffd6e7 0%, #fff0f5 25%, #e0f7ff 50%, #fff5e6 75%, #ffe0f0 100%);
+    background-attachment: fixed;
+    background-size: 200% 200%;
+    animation: bg-shift 20s ease infinite;
+}
+
+@keyframes bg-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* emoji 漂浮层 */
+body::before {
+    content: "✨🌸🍡🌷💖🦄🎀☁️⭐️🍬";
+    position: fixed;
+    inset: 0;
+    font-size: 24px;
+    opacity: 0.08;
+    white-space: nowrap;
+    letter-spacing: 80px;
+    line-height: 100px;
+    pointer-events: none;
+    word-wrap: break-word;
+    width: 200%;
+    z-index: 0;
+    animation: float-bg 60s linear infinite;
+}
+
+@keyframes float-bg {
+    to { transform: translate(-50%, -10%); }
+}
+
+/* 页面内容层 */
+.page-wrapper,
+.top-bar,
+.site-footer {
+    position: relative;
+    z-index: 1;
+}
+
+/* ==================== 顶部栏梦幻化 ==================== */
+.top-bar {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 184, 140, 0.3);
+    box-shadow: 0 2px 15px rgba(255, 107, 157, 0.1);
+    border-radius: 0 0 20px 20px;
+    margin: 0 16px;
+}
+
+.avatar-section:hover {
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.avatar-section:hover .avatar-img,
+.avatar-section:hover .avatar-placeholder {
+    box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.25);
+}
+
+.avatar-placeholder {
+    background: var(--gradient-primary);
+    border: 2px solid rgba(255, 184, 140, 0.4);
+}
+
+.func-btn {
+    background: var(--gradient-primary);
+    border: none;
+    box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.func-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
+}
+
+.func-btn:active {
+    transform: translateY(0) scale(0.97);
+}
+
+/* 功能菜单 */
+.func-menu {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 184, 140, 0.3);
+    box-shadow: 0 8px 30px rgba(255, 107, 157, 0.2);
+    border-radius: 20px;
+}
+
+.func-menu a:hover {
+    background: rgba(255, 107, 157, 0.08);
+    color: var(--color-primary);
+}
+
+/* ==================== 区块卡片梦幻化 ==================== */
+.section-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 184, 140, 0.25);
+    box-shadow: 0 4px 20px rgba(255, 107, 157, 0.12);
+    border-radius: 20px;
+    margin-bottom: 14px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.section-card:hover {
+    box-shadow: 0 8px 30px rgba(255, 107, 157, 0.2);
+    transform: translateY(-2px);
+}
+
+/* ==================== 轮播图区 ==================== */
+.slide-carousel {
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 184, 140, 0.2);
+}
+
+.slide-item img {
+    border-radius: 0;
+}
+
+.slide-placeholder {
+    background: var(--gradient-primary);
+    border-radius: 20px;
+}
+
+.slide-dot.active {
+    background: var(--color-primary);
+    width: 24px;
+    border-radius: 12px;
+}
+
+/* ==================== 公告区 ==================== */
+.notice-item {
+    border-bottom: 1px dashed rgba(255, 184, 140, 0.3);
+    font-weight: 500;
+}
+
+.notice-item:last-child {
+    border-bottom: none;
+}
+
+.notice-item:hover {
+    background: rgba(255, 107, 157, 0.05);
+    color: var(--color-primary);
+}
+
+/* ==================== 热门推荐 ==================== */
+.hot-label {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-primary);
+    letter-spacing: 1px;
+}
+
+.hot-image {
+    border: 2px solid rgba(255, 184, 140, 0.3);
+    box-shadow: 0 4px 15px rgba(255, 107, 157, 0.15);
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hot-item:hover .hot-image {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255, 107, 157, 0.25);
+}
+
+.hot-name {
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--color-text);
+}
+
+/* ==================== 分类导航梦幻化 ==================== */
+.category-tabs {
+    gap: 12px;
+}
+
+.category-tab {
+    border: 1px solid rgba(255, 184, 140, 0.3);
+    box-shadow: 0 2px 10px rgba(255, 107, 157, 0.1);
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 50px;
+    padding: 10px 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.category-tab:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(255, 107, 157, 0.4);
+    color: var(--color-primary);
+    box-shadow: 0 4px 15px rgba(255, 107, 157, 0.2);
+    transform: translateY(-2px);
+}
+
+.category-tab.active {
+    background: var(--gradient-primary);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* ==================== 卡片网格梦幻化 ==================== */
+.card-item {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 184, 140, 0.25);
+    box-shadow: 0 4px 15px rgba(255, 107, 157, 0.1);
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+}
+
+.card-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(255, 107, 157, 0.2);
+    border-color: rgba(255, 107, 157, 0.3);
+}
+
+.card-item:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+.card-placeholder {
+    background: var(--gradient-primary);
+}
+
+.card-title {
+    background: rgba(255, 255, 255, 0.7);
+    border-top: 1px solid rgba(255, 184, 140, 0.2);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--color-text);
+}
+
+.card-item:hover .card-title {
+    background: rgba(255, 107, 157, 0.08);
+    color: var(--color-primary);
+}
+
+/* 卡片类型标签 */
+.card-type-badge {
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-weight: 700;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.card-type-badge.link {
+    background: rgba(135, 206, 235, 0.85);
+    color: #2c5f7c;
+}
+
+.card-type-badge.detail {
+    background: rgba(255, 107, 157, 0.85);
+    color: #fff;
+}
+
+.card-type-badge.custom {
+    background: linear-gradient(135deg, #ffd76b, #ffb74d);
+    color: #7a4a00;
+}
+
+/* ==================== 加载动画 ==================== */
+.spinner {
+    border: 3px solid rgba(255, 184, 140, 0.3);
+    border-top-color: var(--color-primary);
+}
+
+/* ==================== 页脚梦幻化 ==================== */
+.site-footer {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(255, 184, 140, 0.25);
+    box-shadow: 0 -4px 20px rgba(255, 107, 157, 0.1);
+    margin: 14px 16px 0;
+    border-radius: 20px 20px 0 0;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    letter-spacing: 1px;
+}
+
+.site-footer .visitor-count {
+    background: var(--gradient-visitor);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 4s ease infinite;
+    font-weight: 700;
+    text-shadow: none;
+    letter-spacing: 2px;
+}
+
+/* ==================== 返回顶部按钮 ==================== */
+.back-to-top {
+    background: var(--gradient-primary);
+    border: none;
+    box-shadow: 0 4px 20px rgba(255, 107, 157, 0.3);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.back-to-top:hover {
+    transform: translateY(-4px) scale(1.08);
+    box-shadow: 0 6px 25px rgba(255, 107, 157, 0.4);
+}
+
+/* ==================== 悬浮按钮组 ==================== */
+.float-btn {
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 20px rgba(201, 160, 255, 0.3);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.float-btn:hover {
+    transform: translateY(-2px) scale(1.08);
+    box-shadow: 0 6px 25px rgba(201, 160, 255, 0.4);
+}
+
+.float-btn#backToTop {
+    background: linear-gradient(135deg, #b08aab, #d4a5c9);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.float-btn#backToTop:hover {
+    transform: translateY(-2px) scale(1.08);
+    box-shadow: 0 6px 25px rgba(176, 138, 171, 0.4);
+}
+
+/* ==================== 留言板页面 ==================== */
+.guestbook-item {
+    border-bottom: 1px dashed rgba(255, 184, 140, 0.3);
+    transition: all 0.3s ease;
+}
+
+.guestbook-item:hover {
+    background: rgba(255, 107, 157, 0.05);
+    border-radius: 12px;
+}
+
+.guestbook-item-nickname {
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+.guestbook-form input,
+.guestbook-form textarea {
+    border: 1px solid rgba(255, 184, 140, 0.4);
+    box-shadow: 0 2px 10px rgba(255, 107, 157, 0.08);
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.guestbook-form input:focus,
+.guestbook-form textarea:focus {
+    border-color: rgba(255, 107, 157, 0.5);
+    box-shadow: 0 4px 15px rgba(255, 107, 157, 0.15);
+    outline: none;
+    transform: translateY(-1px);
+}
+
+.guestbook-form button {
+    background: var(--gradient-primary);
+    border: none;
+    box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+    border-radius: 50px;
+    font-weight: 700;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    padding: 12px 32px;
+}
+
+.guestbook-form button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
+}
+
+.pagination-btn {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 184, 140, 0.3);
+    box-shadow: 0 2px 10px rgba(255, 107, 157, 0.1);
+    color: var(--color-text-secondary);
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pagination-btn:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(255, 107, 157, 0.4);
+    color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 107, 157, 0.2);
+}
+
+.guestbook-reply {
+    background: rgba(255, 107, 157, 0.08);
+    border: 1px solid rgba(255, 107, 157, 0.2);
+    box-shadow: 0 2px 10px rgba(255, 107, 157, 0.1);
+    border-radius: 16px;
+    border-left: 3px solid var(--color-primary);
+}
+
+.guestbook-reply-label {
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+/* ==================== 空状态 ==================== */
+.empty-state {
+    color: var(--color-text-muted);
+    font-weight: 500;
+}
+
+/* ==================== Toast 提示 ==================== */
+#toast {
+    background: rgba(255, 107, 157, 0.9);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 20px rgba(255, 107, 157, 0.3);
+    border-radius: 16px;
+    font-weight: 600;
+}
+
+/* ==================== 响应式调整 ==================== */
+@media (max-width: 480px) {
+    .top-bar {
+        margin: 0 8px;
+        border-radius: 0 0 16px 16px;
+    }
+
+    .site-footer {
+        margin: 10px 8px 0;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .section-card {
+        border-radius: 16px;
+    }
+
+    .category-tab {
+        font-size: 12px;
+        border-radius: 40px;
+        padding: 8px 0;
+    }
+
+    .card-item {
+        border-radius: 16px;
+    }
+}

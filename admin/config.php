@@ -37,6 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // 保存热门推荐数量配置
         $hotCardsCount = isset($_POST['hot_cards_count']) ? max(1, min(20, intval($_POST['hot_cards_count']))) : 3;
 
+        // 保存主题配置
+        $theme = isset($_POST['theme']) ? trim($_POST['theme']) : 'default';
+
         // 保存配置
         setConfig('site_title', $siteTitle);
         setConfig('contact_info', $contactInfo);
@@ -49,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         setConfig('visitor_click_divisor', (string)$visitorClickDivisor);
         setConfig('visitor_today_multiplier', (string)$visitorTodayMultiplier);
         setConfig('hot_cards_count', (string)$hotCardsCount);
+        setConfig('theme', $theme);
 
         $success = '配置保存成功';
     }
@@ -65,7 +69,8 @@ $config = [
     'card_sort_method' => getConfig('card_sort_method', 'default'),
     'visitor_click_divisor' => getConfig('visitor_click_divisor', '100'),
     'visitor_today_multiplier' => getConfig('visitor_today_multiplier', '2'),
-    'hot_cards_count' => getConfig('hot_cards_count', '3')
+    'hot_cards_count' => getConfig('hot_cards_count', '3'),
+    'theme' => getConfig('theme', 'default')
 ];
 ?>
 <!DOCTYPE html>
@@ -244,6 +249,21 @@ $config = [
                             <?php if ($config['avatar']): ?>
                                 <img src="../<?php echo e($config['avatar']); ?>" style="max-width: 200px; border-radius: 8px;">
                             <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: block;">🎨 主题风格设置</label>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                            <div>
+                                <label style="font-size: 13px; color: #666; margin-bottom: 6px; display: block;">主题风格</label>
+                                <select name="theme" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff;">
+                                    <option value="default" <?php echo $config['theme'] === 'default' ? 'selected' : ''; ?>>默认主题（浅色）</option>
+                                    <option value="memphis" <?php echo $config['theme'] === 'memphis' ? 'selected' : ''; ?>>孟菲斯风格（Memphis）</option>
+                                    <option value="dreamy" <?php echo $config['theme'] === 'dreamy' ? 'selected' : ''; ?>>梦幻少女（Dreamy）</option>
+                                </select>
+                                <p style="font-size: 11px; color: #999; margin-top: 4px;">孟菲斯风格：亮黄色背景 + 粗黑边框 + 几何图形 | 梦幻少女：柔和渐变 + 圆润胶囊 + emoji 漂浮</p>
+                            </div>
                         </div>
                     </div>
 

@@ -1,3 +1,59 @@
+/* ==================== CSS 变量定义（主题系统） ==================== */
+:root {
+    /* 背景色 */
+    --bg-body: #f5f7fa;
+    --bg-card: #ffffff;
+    --bg-section: #ffffff;
+    --bg-hover: #f8f9fa;
+    --bg-input: #ffffff;
+    --bg-placeholder: linear-gradient(135deg, #e94560, #ff6b6b);
+
+    /* 主色调 */
+    --color-primary: #e94560;
+    --color-primary-light: #ff6b6b;
+    --color-primary-rgb: 233, 69, 96;
+
+    /* 文字色 */
+    --color-text: #1a1a2e;
+    --color-text-secondary: #666666;
+    --color-text-muted: #999999;
+    --color-text-light: #333333;
+
+    /* 边框 */
+    --border-color: #f0f0f0;
+    --border-color-light: #e8e8e8;
+    --border-color-hover: #e94560;
+
+    /* 阴影 */
+    --shadow-card: 0 1px 4px rgba(0,0,0,0.03);
+    --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.06);
+    --shadow-btn: 0 2px 8px rgba(233, 69, 96, 0.3);
+    --shadow-btn-hover: 0 4px 16px rgba(233, 69, 96, 0.4);
+    --shadow-menu: 0 8px 24px rgba(0, 0, 0, 0.1);
+    --shadow-float: 0 4px 16px rgba(233, 69, 96, 0.4);
+    --shadow-float-hover: 0 8px 24px rgba(233, 69, 96, 0.5);
+    --shadow-back-to-top: 0 4px 16px rgba(233, 69, 96, 0.4);
+    --shadow-back-to-top-hover: 0 8px 24px rgba(233, 69, 96, 0.5);
+
+    /* 圆角 */
+    --radius-card: 12px;
+    --radius-btn: 25px;
+    --radius-avatar: 50%;
+    --radius-tab: 25px;
+    --radius-input: 10px;
+    --radius-badge: 10px;
+
+    /* 间距 */
+    --section-gap: 10px;
+    --card-gap: 16px;
+
+    /* 渐变 */
+    --gradient-primary: linear-gradient(135deg, #e94560, #ff6b6b);
+    --gradient-visitor: linear-gradient(135deg, #e94560, #ff6b6b, #f9a825, #4ecca3, #7c4dff);
+    --gradient-showcase: linear-gradient(135deg, #7c4dff, #b388ff);
+    --gradient-guestbook: linear-gradient(135deg, #e94560, #ff6b6b);
+}
+
 /* ==================== 基础样式重置 ==================== */
 *, *::before, *::after {
     margin: 0;
@@ -11,9 +67,9 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background: #f5f7fa;
+    background: var(--bg-body);
     min-height: 100vh;
-    color: #1a1a2e;
+    color: var(--color-text);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -43,8 +99,8 @@ img {
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
-    background: #ffffff;
-    border-bottom: 1px solid #f0f0f0;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
     position: sticky;
     top: 0;
     z-index: 100;
@@ -68,32 +124,32 @@ img {
 }
 
 .avatar-section:hover {
-    background: #f8f9fa;
+    background: var(--bg-hover);
 }
 
 .avatar-section:hover .avatar-img,
 .avatar-section:hover .avatar-placeholder {
-    box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.2);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.2);
 }
 
 .avatar-img {
     width: 38px;
     height: 38px;
-    border-radius: 50%;
+    border-radius: var(--radius-avatar);
     object-fit: cover;
-    border: 2px solid #f0f0f0;
+    border: 2px solid var(--border-color);
     transition: all 0.3s ease;
 }
 
 .avatar-placeholder {
     width: 38px;
     height: 38px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #e94560, #ff6b6b);
+    border-radius: var(--radius-avatar);
+    background: var(--gradient-primary);
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid #f0f0f0;
+    border: 2px solid var(--border-color);
     transition: all 0.3s ease;
 }
 
@@ -105,7 +161,7 @@ img {
 
 .contact-info {
     font-size: 14px;
-    color: #333333;
+    color: var(--color-text-light);
     font-weight: 500;
 }
 
@@ -113,8 +169,8 @@ img {
 .func-btn {
     width: 38px;
     height: 38px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #e94560, #ff6b6b);
+    border-radius: var(--radius-avatar);
+    background: var(--gradient-primary);
     border: none;
     color: #fff;
     font-size: 12px;
@@ -124,12 +180,12 @@ img {
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(233, 69, 96, 0.3);
+    box-shadow: var(--shadow-btn);
 }
 
 .func-btn:hover {
     transform: scale(1.08);
-    box-shadow: 0 4px 16px rgba(233, 69, 96, 0.4);
+    box-shadow: var(--shadow-btn-hover);
 }
 
 .header-right {
@@ -140,12 +196,12 @@ img {
     position: absolute;
     top: 55px;
     right: 0;
-    background: #ffffff;
-    border-radius: 12px;
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
     padding: 8px 0;
     min-width: 140px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    border: 1px solid #f0f0f0;
+    box-shadow: var(--shadow-menu);
+    border: 1px solid var(--border-color);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
@@ -163,28 +219,28 @@ img {
     display: block;
     padding: 10px 16px;
     font-size: 14px;
-    color: #333333;
+    color: var(--color-text-light);
     transition: all 0.2s ease;
 }
 
 .func-menu a:hover {
     background: #fff5f5;
-    color: #e94560;
+    color: var(--color-primary);
 }
 
 /* ==================== 区块通用样式 ==================== */
 .section-card {
-    background: #ffffff;
-    border-radius: 12px;
-    border: 1px solid #f0f0f0;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
-    margin-bottom: 10px;
+    background: var(--bg-section);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-card);
+    margin-bottom: var(--section-gap);
     overflow: hidden;
     transition: all 0.3s ease;
 }
 
 .section-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    box-shadow: var(--shadow-card-hover);
     transform: translateY(-1px);
 }
 
@@ -200,7 +256,7 @@ img {
 .hot-label {
     font-size: 13px;
     font-weight: 600;
-    color: #e94560;
+    color: var(--color-primary);
 }
 
 .hot-grid {
@@ -231,7 +287,7 @@ img {
     border-radius: 10px;
     overflow: hidden;
     margin-bottom: 4px;
-    background: #f8f9fa;
+    background: var(--bg-hover);
 }
 
 .hot-image img {
@@ -259,9 +315,9 @@ img {
 
 .slide-carousel {
     position: relative;
-    border-radius: 12px;
+    border-radius: var(--radius-card);
     overflow: hidden;
-    background: #f8f9fa;
+    background: var(--bg-hover);
     width: 100%;
 }
 
@@ -287,7 +343,7 @@ img {
     height: auto;
     object-fit: contain;
     display: block;
-    border-radius: 12px;
+    border-radius: var(--radius-card);
 }
 
 .slide-placeholder {
@@ -296,11 +352,11 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #e94560, #ff6b6b);
+    background: var(--gradient-primary);
     font-size: 24px;
     font-weight: bold;
     color: #fff;
-    border-radius: 12px;
+    border-radius: var(--radius-card);
 }
 
 .slide-dots {
@@ -323,7 +379,7 @@ img {
 }
 
 .slide-dot.active {
-    background: #e94560;
+    background: var(--color-primary);
     width: 24px;
     border-radius: 4px;
 }
@@ -342,7 +398,7 @@ img {
 .notice-item {
     padding: 8px 16px;
     font-size: 13px;
-    color: #666666;
+    color: var(--color-text-secondary);
     line-height: 1.4;
     border-bottom: 1px solid #f5f5f5;
     transition: all 0.2s ease;
@@ -354,7 +410,7 @@ img {
 
 .notice-item:hover {
     background: #fafafa;
-    color: #e94560;
+    color: var(--color-primary);
 }
 
 /* ==================== 分类导航 ==================== */
@@ -372,10 +428,10 @@ img {
 .category-tab {
     flex: 1;
     padding: 8px 0;
-    border-radius: 25px;
-    border: 1px solid #e8e8e8;
-    background: #f8f9fa;
-    color: #666666;
+    border-radius: var(--radius-tab);
+    border: 1px solid var(--border-color-light);
+    background: var(--bg-hover);
+    color: var(--color-text-secondary);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -385,17 +441,17 @@ img {
 
 .category-tab:hover {
     background: #fff5f5;
-    border-color: #e94560;
-    color: #e94560;
-    box-shadow: 0 2px 8px rgba(233, 69, 96, 0.15);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.15);
     transform: translateY(-1px);
 }
 
 .category-tab.active {
-    background: linear-gradient(135deg, #e94560, #ff6b6b);
+    background: var(--gradient-primary);
     border-color: transparent;
     color: #fff;
-    box-shadow: 0 2px 8px rgba(233, 69, 96, 0.3);
+    box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
 }
 
 /* ==================== 卡片网格（CSS 变量控制） ==================== */
@@ -413,10 +469,10 @@ img {
 }
 
 .card-item {
-    background: #ffffff;
-    border-radius: 12px;
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
     overflow: hidden;
-    border: 1px solid #f0f0f0;
+    border: 1px solid var(--border-color);
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
@@ -462,7 +518,7 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #e94560, #ff6b6b);
+    background: var(--gradient-primary);
     font-size: 16px;
     font-weight: bold;
     color: #fff;
@@ -471,13 +527,13 @@ img {
 .card-title {
     padding: 6px 8px;
     font-size: 12px;
-    color: #333333;
+    color: var(--color-text-light);
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     background: #fafafa;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid var(--border-color);
     font-weight: 500;
     transition: all 0.3s ease;
     line-height: 1.3;
@@ -486,7 +542,7 @@ img {
 
 .card-item:hover .card-title {
     background: #fff5f5;
-    color: #e94560;
+    color: var(--color-primary);
 }
 
 /* 卡片类型标签 */
@@ -495,7 +551,7 @@ img {
     top: 8px;
     right: 8px;
     padding: 2px 8px;
-    border-radius: 10px;
+    border-radius: var(--radius-badge);
     font-size: 10px;
     font-weight: 600;
     z-index: 5;
@@ -507,7 +563,7 @@ img {
 }
 
 .card-type-badge.detail {
-    background: rgba(233, 69, 96, 0.9);
+    background: rgba(var(--color-primary-rgb), 0.9);
     color: #fff;
 }
 
@@ -530,8 +586,8 @@ img {
 .spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid #f0f0f0;
-    border-top-color: #e94560;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--color-primary);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
     margin-bottom: 12px;
@@ -545,10 +601,10 @@ img {
 .site-footer {
     text-align: center;
     padding: 16px;
-    color: #999999;
+    color: var(--color-text-muted);
     font-size: 13px;
-    background: #ffffff;
-    border-top: 1px solid #f0f0f0;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-color);
     margin-top: 4px;
 }
 
@@ -556,7 +612,7 @@ img {
     margin-top: 8px;
     font-size: 18px;
     font-weight: 700;
-    background: linear-gradient(135deg, #e94560, #ff6b6b, #f9a825, #4ecca3, #7c4dff);
+    background: var(--gradient-visitor);
     background-size: 300% 300%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -708,12 +764,12 @@ img {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #e94560, #ff6b6b);
+    background: var(--gradient-primary);
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 16px rgba(233, 69, 96, 0.4);
+    box-shadow: var(--shadow-back-to-top);
     z-index: 89;
     transition: all 0.3s ease;
     cursor: pointer;
@@ -731,7 +787,7 @@ img {
 
 .back-to-top:hover {
     transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 8px 24px rgba(233, 69, 96, 0.5);
+    box-shadow: var(--shadow-back-to-top-hover);
 }
 
 .back-to-top svg {
@@ -813,7 +869,7 @@ img {
 
 /* 效果展示按钮 */
 .float-btn[href*="showcase"] {
-    background: linear-gradient(135deg, #7c4dff, #b388ff);
+    background: var(--gradient-showcase);
 }
 
 .float-btn[href*="showcase"]:hover {
@@ -823,12 +879,12 @@ img {
 
 /* 留言板按钮 */
 .float-btn[href*="guestbook"] {
-    background: linear-gradient(135deg, #e94560, #ff6b6b);
+    background: var(--gradient-guestbook);
 }
 
 .float-btn[href*="guestbook"]:hover {
     transform: scale(1.08);
-    box-shadow: 0 6px 20px rgba(233, 69, 96, 0.5);
+    box-shadow: 0 6px 20px rgba(var(--color-primary-rgb), 0.5);
 }
 
 /* 小屏幕适配 */
@@ -890,19 +946,19 @@ img {
 
 .guestbook-item-nickname {
     font-weight: 600;
-    color: #e94560;
+    color: var(--color-primary);
     font-size: 14px;
 }
 
 .guestbook-item-time {
     font-size: 12px;
-    color: #999;
+    color: var(--color-text-muted);
 }
 
 /* 留言内容 */
 .guestbook-item-content {
     font-size: 14px;
-    color: #333;
+    color: var(--color-text-light);
     line-height: 1.7;
     word-break: break-all;
     white-space: pre-wrap;
@@ -919,8 +975,8 @@ img {
 .guestbook-form textarea {
     width: 100%;
     padding: 12px 16px;
-    border: 1px solid #e8e8e8;
-    border-radius: 10px;
+    border: 1px solid var(--border-color-light);
+    border-radius: var(--radius-input);
     font-size: 14px;
     font-family: inherit;
     transition: all 0.3s ease;
@@ -930,9 +986,9 @@ img {
 .guestbook-form input:focus,
 .guestbook-form textarea:focus {
     outline: none;
-    border-color: #e94560;
+    border-color: var(--color-primary);
     background: #fff;
-    box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.1);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
 }
 
 .guestbook-form textarea {
@@ -941,11 +997,11 @@ img {
 }
 
 .guestbook-form button {
-    background: linear-gradient(135deg, #e94560, #ff6b6b);
+    background: var(--gradient-primary);
     color: #fff;
     border: none;
     padding: 12px 32px;
-    border-radius: 25px;
+    border-radius: var(--radius-btn);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -955,7 +1011,7 @@ img {
 
 .guestbook-form button:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(233, 69, 96, 0.3);
+    box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3);
 }
 
 .guestbook-form button:disabled {
@@ -965,11 +1021,11 @@ img {
 
 /* 分页按钮 */
 .pagination-btn {
-    background: #f8f9fa;
-    border: 1px solid #e8e8e8;
-    color: #666;
+    background: var(--bg-hover);
+    border: 1px solid var(--border-color-light);
+    color: var(--color-text-secondary);
     padding: 10px 32px;
-    border-radius: 25px;
+    border-radius: var(--radius-btn);
     font-size: 14px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -977,21 +1033,21 @@ img {
 
 .pagination-btn:hover {
     background: #fff5f5;
-    border-color: #e94560;
-    color: #e94560;
+    border-color: var(--color-primary);
+    color: var(--color-primary);
 }
 
 /* 空状态 */
 .guestbook-empty {
     text-align: center;
     padding: 60px 20px;
-    color: #999;
+    color: var(--color-text-muted);
     font-size: 14px;
 }
 
 /* 新消息高亮动画 */
 @keyframes highlightNew {
-    0% { background: rgba(233, 69, 96, 0.1); }
+    0% { background: rgba(var(--color-primary-rgb), 0.1); }
     100% { background: transparent; }
 }
 
@@ -1027,20 +1083,20 @@ img {
     margin-top: 12px;
     padding: 12px 16px;
     background: linear-gradient(135deg, #fff5f5, #fff0f0);
-    border-radius: 10px;
-    border-left: 3px solid #e94560;
+    border-radius: var(--radius-input);
+    border-left: 3px solid var(--color-primary);
 }
 
 .guestbook-reply-label {
     font-size: 12px;
     font-weight: 600;
-    color: #e94560;
+    color: var(--color-primary);
     margin-bottom: 6px;
 }
 
 .guestbook-reply-content {
     font-size: 14px;
-    color: #333;
+    color: var(--color-text-light);
     line-height: 1.7;
     word-break: break-all;
     white-space: pre-wrap;

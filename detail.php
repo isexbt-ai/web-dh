@@ -48,6 +48,14 @@ $config = [
     <meta name="twitter:card" content="summary_large_image">
     <meta name="article:published_time" content="<?php echo date('c', strtotime($card['created_at'])); ?>">
     <link rel="stylesheet" href="/assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
+    <?php
+    $theme = getConfig('theme', 'default');
+    if ($theme === 'memphis' && file_exists('assets/css/theme-memphis.css')):
+    ?>
+    <link rel="stylesheet" href="/assets/css/theme-memphis.css?v=<?php echo filemtime('assets/css/theme-memphis.css'); ?>">
+    <?php elseif ($theme === 'dreamy' && file_exists('assets/css/theme-dreamy.css')): ?>
+    <link rel="stylesheet" href="/assets/css/theme-dreamy.css?v=<?php echo filemtime('assets/css/theme-dreamy.css'); ?>">
+    <?php endif; ?>
     <?php if (getConfig('umami_enabled', '1') === '1'): ?>
     <script defer src="<?php echo e(getConfig('umami_script_url', 'https://umami.xldh.cc/script.js')); ?>" data-website-id="<?php echo e(getConfig('umami_website_id', 'd1d35aa8-18e3-4c74-8db4-bcb610de22b5')); ?>"></script>
     <?php endif; ?>
