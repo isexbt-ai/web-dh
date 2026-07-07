@@ -1234,8 +1234,11 @@ function getShowcaseImageUrl($showcase) {
  * @param array $ids 要上传的showcase ID数组，空数组则上传所有未上传的
  * @return array ['success' => int, 'failed' => int, 'details' => array]
  */
-function batchUploadToImgbed($ids = []) {
+function batchUploadToImgbed($ids = [], $overrideCdnDomain = null) {
     global $pdo;
+
+    // 获取配置的 CDN 域名，支持覆盖
+    $cdnDomain = $overrideCdnDomain ?: getConfig('imgbed_cdn_domain', 'img.scdn.io');
 
     if (empty($ids)) {
         // 获取所有未上传图床且本地有图片的记录
@@ -1255,7 +1258,7 @@ function batchUploadToImgbed($ids = []) {
     foreach ($items as $item) {
         $result = uploadToImgbed($item['image'], [
             'outputFormat' => 'auto',
-            'cdn_domain' => 'img.scdn.io'
+            'cdn_domain' => $cdnDomain
         ]);
 
         if ($result['success']) {

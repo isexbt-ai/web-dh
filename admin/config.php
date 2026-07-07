@@ -40,6 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // 保存主题配置
         $theme = isset($_POST['theme']) ? trim($_POST['theme']) : 'default';
 
+        // 保存图床 CDN 域名配置
+        $imgbedCdnDomain = isset($_POST['imgbed_cdn_domain']) ? trim($_POST['imgbed_cdn_domain']) : 'img.scdn.io';
+
         // 保存配置
         setConfig('site_title', $siteTitle);
         setConfig('contact_info', $contactInfo);
@@ -53,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         setConfig('visitor_today_multiplier', (string)$visitorTodayMultiplier);
         setConfig('hot_cards_count', (string)$hotCardsCount);
         setConfig('theme', $theme);
+        setConfig('imgbed_cdn_domain', $imgbedCdnDomain);
 
         $success = '配置保存成功';
     }
@@ -70,7 +74,8 @@ $config = [
     'visitor_click_divisor' => getConfig('visitor_click_divisor', '100'),
     'visitor_today_multiplier' => getConfig('visitor_today_multiplier', '2'),
     'hot_cards_count' => getConfig('hot_cards_count', '3'),
-    'theme' => getConfig('theme', 'default')
+    'theme' => getConfig('theme', 'default'),
+    'imgbed_cdn_domain' => getConfig('imgbed_cdn_domain', 'img.scdn.io')
 ];
 ?>
 <!DOCTYPE html>
@@ -282,6 +287,25 @@ $config = [
                                 <label style="font-size: 13px; color: #666; margin-bottom: 6px; display: block;">今日加成倍数（默认2）</label>
                                 <input type="number" name="visitor_today_multiplier" value="<?php echo e($config['visitor_today_multiplier']); ?>" min="0" placeholder="2" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff;">
                                 <p style="font-size: 11px; color: #999; margin-top: 4px;">今日UV乘以这个数作为加成</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: block;">☁️ 图床 CDN 配置</label>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                            <div>
+                                <label style="font-size: 13px; color: #666; margin-bottom: 6px; display: block;">CDN 域名</label>
+                                <select name="imgbed_cdn_domain" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff;">
+                                    <option value="img.scdn.io" <?php echo $config['imgbed_cdn_domain'] === 'img.scdn.io' ? 'selected' : ''; ?>>失控的防御系统-海外 (img.scdn.io)</option>
+                                    <option value="cloudflareimg.cdn.sn" <?php echo $config['imgbed_cdn_domain'] === 'cloudflareimg.cdn.sn' ? 'selected' : ''; ?>>CloudFlare-海外 (cloudflareimg.cdn.sn)</option>
+                                    <option value="edgeoneimg.cdn.sn" <?php echo $config['imgbed_cdn_domain'] === 'edgeoneimg.cdn.sn' ? 'selected' : ''; ?>>EdgeOne-海外 (edgeoneimg.cdn.sn)</option>
+                                    <option value="esaimg.cdn1.vip" <?php echo $config['imgbed_cdn_domain'] === 'esaimg.cdn1.vip' ? 'selected' : ''; ?>>ESA-大陆 (esaimg.cdn1.vip)</option>
+                                    <option value="cloudflarecnimg.scdn.io" <?php echo $config['imgbed_cdn_domain'] === 'cloudflarecnimg.scdn.io' ? 'selected' : ''; ?>>CloudFlare(CN优选)-海外 (cloudflarecnimg.scdn.io)</option>
+                                    <option value="anycastimg.scdn.io" <?php echo $config['imgbed_cdn_domain'] === 'anycastimg.scdn.io' ? 'selected' : ''; ?>>失控的防御系统(Anycast)-海外 (anycastimg.scdn.io)</option>
+                                    <option value="edgeoneimg.cdn1.vip" <?php echo $config['imgbed_cdn_domain'] === 'edgeoneimg.cdn1.vip' ? 'selected' : ''; ?>>EdgeOne-大陆 (edgeoneimg.cdn1.vip)</option>
+                                </select>
+                                <p style="font-size: 11px; color: #999; margin-top: 4px;">批量上传到图床时使用的 CDN 域名</p>
                             </div>
                         </div>
                     </div>

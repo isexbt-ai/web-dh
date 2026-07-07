@@ -268,6 +268,16 @@ $galleries = getGalleries(false);
             <div class="batch-actions">
                 <button class="btn btn-primary" onclick="openModal('showcaseModal')">添加展示</button>
                 <button class="btn btn-primary" onclick="openModal('galleryModal')" style="background: linear-gradient(135deg, #00bcd4, #4dd0e1); border: none;">添加相册</button>
+                <select id="cdnDomainSelect" style="padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff; min-width: 200px;">
+                    <option value="">使用后台默认CDN</option>
+                    <option value="img.scdn.io">失控的防御系统-海外</option>
+                    <option value="cloudflareimg.cdn.sn">CloudFlare-海外</option>
+                    <option value="edgeoneimg.cdn.sn">EdgeOne-海外</option>
+                    <option value="esaimg.cdn1.vip">ESA-大陆</option>
+                    <option value="cloudflarecnimg.scdn.io">CloudFlare(CN优选)-海外</option>
+                    <option value="anycastimg.scdn.io">失控的防御系统(Anycast)-海外</option>
+                    <option value="edgeoneimg.cdn1.vip">EdgeOne-大陆</option>
+                </select>
                 <button class="btn btn-upload-imgbed" id="btnUploadImgbed" onclick="batchUploadToImgbed()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -419,12 +429,9 @@ $galleries = getGalleries(false);
                     <input type="text" id="showcaseTitle" name="title" placeholder="请输入展示标题" required>
                 </div>
                 <div class="form-group">
-                    <label>展示图片/视频</label>
-                    <div class="image-upload">
-                        <input type="file" id="showcaseImageFile" accept="image/*,video/*" onchange="previewShowcaseMedia(this)">
-                        <div class="upload-icon">📷</div>
-                        <div class="upload-text">点击上传图片或视频（支持 WebP 动图、MP4、WebM）</div>
-                    </div>
+                    <label>展示图片/视频 URL</label>
+                    <input type="text" id="showcaseImageUrl" name="image_url" placeholder="请输入图片或视频 URL（如：https://img.scdn.io/xxx.webp）" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; margin-bottom: 8px;">
+                    <p style="font-size: 12px; color: #999; margin-top: 4px;">支持图片（jpg、png、webp、gif）和视频（mp4、webm）的 URL 地址</p>
                     <div class="image-upload-preview" id="showcaseImagePreview"></div>
                     <input type="hidden" id="showcaseImage" name="image" value="">
                     <input type="hidden" id="showcaseMediaType" name="media_type" value="image">
@@ -471,12 +478,8 @@ $galleries = getGalleries(false);
                     <textarea id="galleryDescription" name="description" placeholder="请输入相册描述（可选）" rows="3"></textarea>
                 </div>
                 <div class="form-group">
-                    <label>封面图片</label>
-                    <div class="image-upload">
-                        <input type="file" id="galleryCoverFile" accept="image/*" onchange="previewGalleryCover(this)">
-                        <div class="upload-icon">📷</div>
-                        <div class="upload-text">点击上传封面图片</div>
-                    </div>
+                    <label>相册封面 URL</label>
+                    <input type="text" id="galleryCoverUrl" name="cover_url" placeholder="请输入封面图片 URL" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; margin-bottom: 8px;">
                     <div class="image-upload-preview" id="galleryCoverPreview"></div>
                     <input type="hidden" id="galleryCoverImage" name="cover_image" value="">
                 </div>
@@ -503,13 +506,10 @@ $galleries = getGalleries(false);
             const data = {};
             formData.forEach((value, key) => { data[key] = value; });
 
-            // 处理封面上传
-            const fileInput = document.getElementById('galleryCoverFile');
-            if (fileInput.files && fileInput.files[0]) {
-                const uploadResult = await uploadImage(fileInput.files[0], 'showcase');
-                if (uploadResult.success) {
-                    data.cover_image = uploadResult.data.path;
-                }
+            // 从 URL 输入框获取封面地址
+            const coverUrl = document.getElementById('galleryCoverUrl').value.trim();
+            if (coverUrl) {
+                data.cover_image = coverUrl;
             }
 
             data.is_active = document.getElementById('galleryActive').checked ? 1 : 0;
@@ -544,12 +544,13 @@ $galleries = getGalleries(false);
             document.getElementById('galleryTitle').value = title;
             document.getElementById('galleryDescription').value = description;
             document.getElementById('galleryCoverImage').value = coverImage;
+            document.getElementById('galleryCoverUrl').value = coverImage;
             document.getElementById('gallerySort').value = sortOrder;
             document.getElementById('galleryActive').checked = isActive === 1;
 
             const preview = document.getElementById('galleryCoverPreview');
             if (coverImage) {
-                preview.innerHTML = '<img src="../' + coverImage + '" alt="预览" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;">';
+                preview.innerHTML = '<img src="' + coverImage + '" alt="预览" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;">';
             } else {
                 preview.innerHTML = '';
             }
@@ -610,49 +611,19 @@ $galleries = getGalleries(false);
             }
         }
 
-        function editGallery(btn) {
-            const id = btn.getAttribute('data-id');
-            const title = btn.getAttribute('data-title') || '';
-            const description = btn.getAttribute('data-description') || '';
-            const coverImage = btn.getAttribute('data-cover_image') || '';
-            const sortOrder = parseInt(btn.getAttribute('data-sort_order')) || 0;
-            const isActive = parseInt(btn.getAttribute('data-is_active')) || 0;
-
-            document.getElementById('galleryId').value = id;
-            document.getElementById('galleryTitle').value = title;
-            document.getElementById('galleryDescription').value = description;
-            document.getElementById('galleryCoverImage').value = coverImage;
-            document.getElementById('gallerySort').value = sortOrder;
-            document.getElementById('galleryActive').checked = isActive === 1;
-
-            const preview = document.getElementById('galleryCoverPreview');
-            if (coverImage) {
-                preview.innerHTML = '<img src="../' + coverImage + '" alt="预览" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;">';
-            } else {
-                preview.innerHTML = '';
-            }
-
-            document.getElementById('galleryModalTitle').textContent = '编辑相册';
-            openModal('galleryModal');
-        }
-
         async function saveShowcase(e) {
             e.preventDefault();
             const formData = new FormData(e.target);
             const data = {};
             formData.forEach((value, key) => { data[key] = value; });
 
-            // 处理文件上传
-            const fileInput = document.getElementById('showcaseImageFile');
-            if (fileInput.files && fileInput.files[0]) {
-                const file = fileInput.files[0];
-                const isVideo = file.type.startsWith('video/');
+            // 从 URL 输入框获取图片地址
+            const imageUrl = document.getElementById('showcaseImageUrl').value.trim();
+            if (imageUrl) {
+                data.image = imageUrl;
+                // 自动判断媒体类型
+                const isVideo = /\.(mp4|webm|mov)$/i.test(imageUrl);
                 data.media_type = isVideo ? 'video' : 'image';
-
-                const uploadResult = await uploadImage(file, 'showcase');
-                if (uploadResult.success) {
-                    data.image = uploadResult.data.path;
-                }
             }
 
             data.is_active = document.getElementById('showcaseActive').checked ? 1 : 0;
@@ -676,6 +647,7 @@ $galleries = getGalleries(false);
             document.getElementById('showcaseId').value = id;
             document.getElementById('showcaseTitle').value = title;
             document.getElementById('showcaseImage').value = image;
+            document.getElementById('showcaseImageUrl').value = image; // 填充 URL 输入框
             document.getElementById('showcaseMediaType').value = mediaType;
             document.getElementById('showcaseGallery').value = galleryId;
             document.getElementById('showcaseSort').value = sortOrder;
@@ -685,9 +657,9 @@ $galleries = getGalleries(false);
             if (image) {
                 const isVideo = mediaType === 'video' || image.toLowerCase().endsWith('.mp4') || image.toLowerCase().endsWith('.webm') || image.toLowerCase().endsWith('.mov');
                 if (isVideo) {
-                    preview.innerHTML = '<video src="../' + image + '" controls style="max-width: 200px; max-height: 150px; border-radius: 8px;"></video>';
+                    preview.innerHTML = '<video src="' + image + '" controls style="max-width: 200px; max-height: 150px; border-radius: 8px;"></video>';
                 } else {
-                    preview.innerHTML = '<img src="../' + image + '" alt="预览" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;">';
+                    preview.innerHTML = '<img src="' + image + '" alt="预览" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;">';
                 }
             } else {
                 preview.innerHTML = '';
