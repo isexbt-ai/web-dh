@@ -1016,6 +1016,29 @@ function getShowcases($activeOnly = true, $galleryId = null) {
 }
 
 /**
+ * 获取效果展示图片URL
+ * 支持本地路径和外部URL
+ */
+function getShowcaseImageUrl($item) {
+    if (empty($item['image'])) {
+        return '';
+    }
+
+    // 如果已经是完整URL，直接返回
+    if (strpos($item['image'], 'http') === 0) {
+        return $item['image'];
+    }
+
+    // 确保路径以 / 开头
+    $image = $item['image'];
+    if (strpos($image, '/') !== 0) {
+        $image = '/' . $image;
+    }
+
+    return $image;
+}
+
+/**
  * 获取所有相册合集（包含展示数量）
  */
 function getGalleriesWithCount($activeOnly = true) {
