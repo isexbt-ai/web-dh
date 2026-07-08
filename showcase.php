@@ -20,9 +20,7 @@ recordVisit('showcase');
 // 构建额外的 head 内容
 $extraHead = '<style>
     /* ==================== 效果展示页面专属样式 ==================== */
-    .showcase-page {
-        min-height: 100vh;
-        background: #f5f7fa;
+    body {
     }
 
     .showcase-header {
@@ -420,7 +418,7 @@ $extraHead = '<style>
 
 renderPageHeader('效果展示', '精选美女导航网站 - 效果展示', $extraHead);
 ?>
-<body class="showcase-page">
+<div class="showcase-page">
     <!-- 顶部导航 -->
     <header class="showcase-header">
         <div class="showcase-header-left">
@@ -655,5 +653,6 @@ renderPageHeader('效果展示', '精选美女导航网站 - 效果展示', $ext
     // 页面输出完成后处理访问统计队列
     processVisitQueue();
     ?>
+</div>
 </body>
 </html>
