@@ -181,13 +181,17 @@ $galleries = getGalleries(false);
                         <tr>
                             <td><?php echo $item['id']; ?></td>
                             <td>
-                                <?php if ($item['image']): ?>
-                                    <?php
+                                <?php if ($item['image']):
+                                    // 处理图片路径：外部URL直接使用，本地路径添加../前缀
+                                    $imageUrl = $item['image'];
+                                    if (strpos($imageUrl, 'http') !== 0) {
+                                        $imageUrl = '../' . ltrim($imageUrl, '/');
+                                    }
                                     $isVideo = ($item['media_type'] ?? '') === 'video' || preg_match('/\.(mp4|webm|mov)$/i', $item['image'] ?? '');
                                     if ($isVideo): ?>
-                                        <video src="../<?php echo e($item['image']); ?>" class="showcase-preview" style="object-fit: cover;" muted onclick="window.open(this.src, '_blank')"></video>
+                                        <video src="<?php echo e($imageUrl); ?>" class="showcase-preview" style="object-fit: cover;" muted onclick="window.open(this.src, '_blank')"></video>
                                     <?php else: ?>
-                                        <img src="../<?php echo e($item['image']); ?>" class="showcase-preview" alt="<?php echo e($item['title']); ?>" onclick="window.open(this.src, '_blank')">
+                                        <img src="<?php echo e($imageUrl); ?>" class="showcase-preview" alt="<?php echo e($item['title']); ?>" onclick="window.open(this.src, '_blank')">
                                     <?php endif; ?>
                                 <?php else: ?>
                                     <div style="width: 80px; height: 60px; background: linear-gradient(135deg, #e94560, #ff6b6b); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff;">无图</div>
