@@ -409,41 +409,6 @@ $galleries = getGalleries(false);
             }
         }
 
-        async function saveGallery(e) {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = {};
-            formData.forEach((value, key) => { data[key] = value; });
-
-            // 处理封面上传
-            const fileInput = document.getElementById('galleryCoverFile');
-            if (fileInput.files && fileInput.files[0]) {
-                const uploadResult = await uploadImage(fileInput.files[0], 'showcase');
-                if (uploadResult.success) {
-                    data.cover_image = uploadResult.data.path;
-                }
-            }
-
-            data.is_active = document.getElementById('galleryActive').checked ? 1 : 0;
-
-            saveData('gallery', data, () => {
-                closeModal('galleryModal');
-                location.reload();
-            });
-            return false;
-        }
-
-        function previewGalleryCover(input) {
-            const preview = document.getElementById('galleryCoverPreview');
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.innerHTML = '<img src="' + e.target.result + '" alt="预览" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;">';
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
         async function saveShowcase(e) {
             e.preventDefault();
             const formData = new FormData(e.target);
