@@ -11,8 +11,6 @@ const IMAGE_CACHE = 'beauty-nav-images-v1';
 const STATIC_ASSETS = [
     '/',
     '/index.php',
-    '/assets/css/style.css',
-    '/assets/js/main.js',
     '/assets/css/style.min.css',
     '/assets/js/main.min.js',
     '/detail.php',

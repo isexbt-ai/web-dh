@@ -169,6 +169,7 @@ try {
             $badge_text = isset($data['badge_text']) ? substr($data['badge_text'], 0, 50) : '';
             $sort_order = isset($data['sort_order']) ? intval($data['sort_order']) : 0;
             $is_active = isset($data['is_active']) ? intval($data['is_active']) : 1;
+            $is_hot = isset($data['is_hot']) ? intval($data['is_hot']) : 0;
 
             // card_type 白名单验证
             $allowedCardTypes = ['link', 'detail', 'image', 'video', 'text'];
@@ -176,7 +177,7 @@ try {
                 $card_type = 'link'; // 默认回退到 link
             }
 
-            if (empty($title)) {
+            if (empty($title) && isset($data['title'])) {
                 jsonError('卡片标题不能为空');
             }
 
@@ -186,11 +187,57 @@ try {
             }
 
             if ($id > 0) {
-                $stmt = $pdo->prepare("UPDATE cards SET category_id = ?, title = ?, image = ?, link = ?, detail = ?, card_type = ?, badge_text = ?, sort_order = ?, is_active = ? WHERE id = ?");
-                $stmt->execute([$category_id, $title, $image, $link, $detail, $card_type, $badge_text, $sort_order, $is_active, $id]);
+                // 支持部分更新（如toggleStatus、toggleHot）
+                $updateFields = [];
+                $params = [];
+                if (isset($data['category_id'])) {
+                    $updateFields[] = "category_id = ?";
+                    $params[] = $category_id;
+                }
+                if (isset($data['title'])) {
+                    $updateFields[] = "title = ?";
+                    $params[] = $title;
+                }
+                if (isset($data['image'])) {
+                    $updateFields[] = "image = ?";
+                    $params[] = $image;
+                }
+                if (isset($data['link'])) {
+                    $updateFields[] = "link = ?";
+                    $params[] = $link;
+                }
+                if (isset($data['detail'])) {
+                    $updateFields[] = "detail = ?";
+                    $params[] = $detail;
+                }
+                if (isset($data['card_type'])) {
+                    $updateFields[] = "card_type = ?";
+                    $params[] = $card_type;
+                }
+                if (isset($data['badge_text'])) {
+                    $updateFields[] = "badge_text = ?";
+                    $params[] = $badge_text;
+                }
+                if (isset($data['sort_order'])) {
+                    $updateFields[] = "sort_order = ?";
+                    $params[] = $sort_order;
+                }
+                if (isset($data['is_active'])) {
+                    $updateFields[] = "is_active = ?";
+                    $params[] = $is_active;
+                }
+                if (isset($data['is_hot'])) {
+                    $updateFields[] = "is_hot = ?";
+                    $params[] = $is_hot;
+                }
+                if (!empty($updateFields)) {
+                    $params[] = $id;
+                    $stmt = $pdo->prepare("UPDATE cards SET " . implode(', ', $updateFields) . " WHERE id = ?");
+                    $stmt->execute($params);
+                }
             } else {
-                $stmt = $pdo->prepare("INSERT INTO cards (category_id, title, image, link, detail, card_type, badge_text, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$category_id, $title, $image, $link, $detail, $card_type, $badge_text, $sort_order, $is_active]);
+                $stmt = $pdo->prepare("INSERT INTO cards (category_id, title, image, link, detail, card_type, badge_text, sort_order, is_active, is_hot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$category_id, $title, $image, $link, $detail, $card_type, $badge_text, $sort_order, $is_active, $is_hot]);
                 $id = $pdo->lastInsertId();
             }
             jsonResponse(['id' => $id, 'saved' => true]);

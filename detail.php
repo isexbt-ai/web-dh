@@ -1,5 +1,6 @@
 <?php
 require_once 'includes/functions.php';
+require_once 'includes/header.php';
 
 $cardId = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
@@ -24,308 +25,241 @@ recordVisit('detail');
 $config = [
     'site_title' => getConfig('site_title', '美女导航')
 ];
-?>
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo e($card['title']); ?> - <?php echo e($config['site_title']); ?></title>
-    <meta name="description" content="<?php echo e(smartTruncate($card['detail'] ?? '', 150)); ?>">
-    <meta name="keywords" content="<?php echo e($card['title'] . ',' . ($card['category_name'] ?? '') . ',' . $config['site_title']); ?>">
-    <link rel="canonical" href="<?php echo e(getCurrentUrl()); ?>">
-    <link rel="icon" type="image/png" href="/assets/images/logo.png">
-    <?php if (getConfig('umami_enabled', '1') === '1'): ?>
-    <link rel="preconnect" href="https://umami.xldh.cc">
-    <?php endif; ?>
-    <!-- Open Graph / Twitter Card -->
-    <meta property="og:title" content="<?php echo e($card['title']); ?>">
-    <meta property="og:description" content="<?php echo e(smartTruncate($card['detail'] ?? '', 150)); ?>">
-    <meta property="og:image" content="<?php echo e($card['image'] ?: ($config['avatar'] ?: '/assets/images/logo.png')); ?>">
-    <meta property="og:type" content="article">
-    <meta property="og:url" content="<?php echo e(getCurrentUrl()); ?>">
-    <meta property="og:site_name" content="<?php echo e($config['site_title']); ?>">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="article:published_time" content="<?php echo date('c', strtotime($card['created_at'])); ?>">
-    <link rel="stylesheet" href="/assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
-    <?php
-    $theme = getConfig('theme', 'default');
-    if ($theme === 'memphis' && file_exists('assets/css/theme-memphis.css')):
-    ?>
-    <link rel="stylesheet" href="/assets/css/theme-memphis.css?v=<?php echo filemtime('assets/css/theme-memphis.css'); ?>">
-    <?php elseif ($theme === 'dreamy' && file_exists('assets/css/theme-dreamy.css')): ?>
-    <link rel="stylesheet" href="/assets/css/theme-dreamy.css?v=<?php echo filemtime('assets/css/theme-dreamy.css'); ?>">
-    <?php endif; ?>
-    <?php if (getConfig('umami_enabled', '1') === '1'): ?>
-    <script defer src="<?php echo e(getConfig('umami_script_url', 'https://umami.xldh.cc/script.js')); ?>" data-website-id="<?php echo e(getConfig('umami_website_id', 'd1d35aa8-18e3-4c74-8db4-bcb610de22b5')); ?>"></script>
-    <?php endif; ?>
-    <style>
-        .detail-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 24px 16px;
-        }
 
-        .detail-card {
-            background: #ffffff;
-            border-radius: 16px;
-            border: 1px solid #f0f0f0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            overflow: hidden;
-        }
-
-        .detail-image {
-            width: 100%;
-        }
-
-        .detail-image picture {
-            display: block;
-            width: 100%;
-        }
-
-        .detail-image img {
-            width: 100%;
-            height: auto;
-            object-fit: contain;
-            display: block;
-        }
-
-        .detail-image-placeholder {
-            width: 100%;
-            height: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #e94560, #ff6b6b);
-            font-size: 24px;
-            font-weight: bold;
-            color: #fff;
-        }
-
+// 构建额外的 head 内容
+$extraHead = '<meta property="og:image" content="' . e($card['image'] ?: ($config['avatar'] ?: '/assets/images/logo.png')) . '">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="article:published_time" content="' . date('c', strtotime($card['created_at'])) . '">
+<style>
+    .detail-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 24px 16px;
+    }
+    .detail-card {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid #f0f0f0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        overflow: hidden;
+    }
+    .detail-image {
+        width: 100%;
+    }
+    .detail-image picture {
+        display: block;
+        width: 100%;
+    }
+    .detail-image img {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+        display: block;
+    }
+    .detail-image-placeholder {
+        width: 100%;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #e94560, #ff6b6b);
+        font-size: 24px;
+        font-weight: bold;
+        color: #fff;
+    }
+    .detail-content {
+        padding: 28px;
+    }
+    .detail-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+        font-size: 13px;
+        color: #999999;
+    }
+    .detail-breadcrumb a {
+        color: #e94560;
+        transition: color 0.3s ease;
+    }
+    .detail-breadcrumb a:hover {
+        color: #c73e54;
+    }
+    .detail-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 12px;
+        line-height: 1.4;
+    }
+    .detail-meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 24px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .detail-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: #999999;
+    }
+    .detail-meta-item svg {
+        width: 16px;
+        height: 16px;
+    }
+    .detail-body {
+        font-size: 15px;
+        line-height: 1.8;
+        color: #333333;
+    }
+    .detail-body p {
+        margin-bottom: 16px;
+    }
+    .detail-body p:last-child {
+        margin-bottom: 0;
+    }
+    .detail-body .detail-img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 12px;
+        margin: 16px 0;
+        display: block;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .detail-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 28px;
+        padding-top: 20px;
+        border-top: 1px solid #f0f0f0;
+    }
+    .detail-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 12px 28px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    .detail-btn-primary {
+        background: linear-gradient(135deg, #e94560, #ff6b6b);
+        color: #fff;
+        border: none;
+        box-shadow: 0 2px 8px rgba(233, 69, 96, 0.3);
+    }
+    .detail-btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+    }
+    .detail-btn-secondary {
+        background: #f8f9fa;
+        color: #666666;
+        border: 1px solid #e8e8e8;
+    }
+    .detail-btn-secondary:hover {
+        background: #fff5f5;
+        border-color: #e94560;
+        color: #e94560;
+    }
+    .detail-empty {
+        text-align: center;
+        padding: 40px 0;
+        color: #999999;
+        font-size: 14px;
+    }
+    .detail-related {
+        margin-top: 28px;
+        padding-top: 20px;
+        border-top: 1px solid #f0f0f0;
+    }
+    .detail-related-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1a1a2e;
+        margin-bottom: 16px;
+    }
+    .detail-related-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 12px;
+    }
+    .detail-related-item {
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.2s ease;
+    }
+    .detail-related-item:hover {
+        transform: translateY(-2px);
+    }
+    .detail-related-image {
+        width: 100%;
+        aspect-ratio: 1;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 6px;
+        background: #f8f9fa;
+    }
+    .detail-related-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .detail-related-name {
+        font-size: 12px;
+        color: #333;
+        display: block;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    @media (max-width: 480px) {
         .detail-content {
-            padding: 28px;
+            padding: 20px;
         }
-
-        .detail-breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 16px;
-            font-size: 13px;
-            color: #999999;
-        }
-
-        .detail-breadcrumb a {
-            color: #e94560;
-            transition: color 0.3s ease;
-        }
-
-        .detail-breadcrumb a:hover {
-            color: #c73e54;
-        }
-
         .detail-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 12px;
-            line-height: 1.4;
+            font-size: 20px;
         }
-
-        .detail-meta {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 24px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .detail-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 13px;
-            color: #999999;
-        }
-
-        .detail-meta-item svg {
-            width: 16px;
-            height: 16px;
-        }
-
-        .detail-body {
-            font-size: 15px;
-            line-height: 1.8;
-            color: #333333;
-        }
-
-        .detail-body p {
-            margin-bottom: 16px;
-        }
-
-        .detail-body p:last-child {
-            margin-bottom: 0;
-        }
-
-        .detail-body .detail-img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 12px;
-            margin: 16px 0;
-            display: block;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-        }
-
         .detail-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 28px;
-            padding-top: 20px;
-            border-top: 1px solid #f0f0f0;
+            flex-direction: column;
         }
-
         .detail-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 12px 28px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-
-        .detail-btn-primary {
-            background: linear-gradient(135deg, #e94560, #ff6b6b);
-            color: #fff;
-            border: none;
-            box-shadow: 0 2px 8px rgba(233, 69, 96, 0.3);
-        }
-
-        .detail-btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
-        }
-
-        .detail-btn-secondary {
-            background: #f8f9fa;
-            color: #666666;
-            border: 1px solid #e8e8e8;
-        }
-
-        .detail-btn-secondary:hover {
-            background: #fff5f5;
-            border-color: #e94560;
-            color: #e94560;
-        }
-
-        .detail-empty {
-            text-align: center;
-            padding: 40px 0;
-            color: #999999;
-            font-size: 14px;
-        }
-
-        /* 相关推荐 */
-        .detail-related {
-            margin-top: 28px;
-            padding-top: 20px;
-            border-top: 1px solid #f0f0f0;
-        }
-
-        .detail-related-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1a1a2e;
-            margin-bottom: 16px;
-        }
-
-        .detail-related-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 12px;
-        }
-
-        .detail-related-item {
-            text-decoration: none;
-            color: inherit;
-            transition: transform 0.2s ease;
-        }
-
-        .detail-related-item:hover {
-            transform: translateY(-2px);
-        }
-
-        .detail-related-image {
             width: 100%;
-            aspect-ratio: 1;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 6px;
-            background: #f8f9fa;
         }
+    }
+</style>';
 
-        .detail-related-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
+// BreadcrumbList Schema
+$extraHead .= generateJsonLd([
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type' => 'ListItem', 'position' => 1, 'name' => '首页', 'item' => 'https://' . $_SERVER['HTTP_HOST'] . '/'],
+        ['@type' => 'ListItem', 'position' => 2, 'name' => $card['category_name'] ?? '未分类'],
+        ['@type' => 'ListItem', 'position' => 3, 'name' => $card['title']]
+    ]
+]);
+// Article Schema
+$extraHead .= generateJsonLd([
+    '@type' => 'Article',
+    'headline' => $card['title'],
+    'image' => $card['image'] ?: '',
+    'datePublished' => date('c', strtotime($card['created_at'])),
+    'author' => ['@type' => 'Organization', 'name' => $config['site_title']]
+]);
 
-        .detail-related-name {
-            font-size: 12px;
-            color: #333;
-            display: block;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        @media (max-width: 480px) {
-
-            .detail-content {
-                padding: 20px;
-            }
-
-            .detail-title {
-                font-size: 20px;
-            }
-
-            .detail-actions {
-                flex-direction: column;
-            }
-
-            .detail-btn {
-                width: 100%;
-            }
-        }
-    </style>
-    <?php
-    // BreadcrumbList Schema
-    echo generateJsonLd([
-        '@type' => 'BreadcrumbList',
-        'itemListElement' => [
-            ['@type' => 'ListItem', 'position' => 1, 'name' => '首页', 'item' => 'https://' . $_SERVER['HTTP_HOST'] . '/'],
-            ['@type' => 'ListItem', 'position' => 2, 'name' => $card['category_name'] ?? '未分类'],
-            ['@type' => 'ListItem', 'position' => 3, 'name' => $card['title']]
-        ]
-    ]);
-    // Article Schema
-    echo generateJsonLd([
-        '@type' => 'Article',
-        'headline' => $card['title'],
-        'image' => $card['image'] ?: '',
-        'datePublished' => date('c', strtotime($card['created_at'])),
-        'author' => ['@type' => 'Organization', 'name' => $config['site_title']]
-    ]);
-    ?>
-</head>
-<body>
+renderPageHeader($card['title'], smartTruncate($card['detail'] ?? '', 150), $extraHead);
+?>
     <!-- 顶部栏 -->
     <header class="top-bar">
         <div class="header-left">

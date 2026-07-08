@@ -18,118 +18,7 @@ $galleries = getGalleries(false);
     <meta name="csrf-token" content="<?php echo generateCsrfToken(); ?>">
     <title>效果展示管理 - 后台管理</title>
     <link rel="stylesheet" href="../assets/css/admin.css?v=2">
-    <style>
-        /* 图床状态标签 */
-        .imgbed-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        .imgbed-status.uploaded {
-            background: rgba(78, 204, 163, 0.15);
-            color: #4ecca3;
-        }
-        .imgbed-status.pending {
-            background: rgba(249, 168, 37, 0.15);
-            color: #f9a825;
-        }
-        .imgbed-status.failed {
-            background: rgba(244, 67, 54, 0.15);
-            color: #f44336;
-        }
-
-        /* 批量操作按钮 */
-        .batch-actions {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-
-        .btn-upload-imgbed {
-            background: linear-gradient(135deg, #7c4dff, #b388ff);
-            color: #fff;
-            border: none;
-        }
-
-        .btn-upload-imgbed:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-
-        .btn-upload-imgbed:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* 上传进度 */
-        .upload-progress {
-            display: none;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            margin-bottom: 16px;
-        }
-
-        .upload-progress.active {
-            display: flex;
-        }
-
-        .upload-progress-bar {
-            flex: 1;
-            height: 6px;
-            background: #e0e0e0;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .upload-progress-fill {
-            height: 100%;
-            background: linear-gradient(135deg, #7c4dff, #b388ff);
-            border-radius: 3px;
-            transition: width 0.3s ease;
-            width: 0%;
-        }
-
-        .upload-progress-text {
-            font-size: 13px;
-            color: #666;
-            white-space: nowrap;
-        }
-
-        /* 图片预览 */
-        .showcase-preview {
-            width: 80px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .showcase-preview:hover {
-            transform: scale(1.05);
-        }
-
-        /* 模态框图片上传 */
-        .image-upload-preview {
-            margin-top: 12px;
-        }
-
-        .image-upload-preview img {
-            max-width: 200px;
-            max-height: 150px;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-    </style>
+</head>
 </head>
 <body>
     <div class="admin-layout">
@@ -268,32 +157,6 @@ $galleries = getGalleries(false);
             <div class="batch-actions">
                 <button class="btn btn-primary" onclick="openModal('showcaseModal')">添加展示</button>
                 <button class="btn btn-primary" onclick="openModal('galleryModal')" style="background: linear-gradient(135deg, #00bcd4, #4dd0e1); border: none;">添加相册</button>
-                <select id="cdnDomainSelect" style="padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff; min-width: 200px;">
-                    <option value="">使用后台默认CDN</option>
-                    <option value="img.scdn.io">失控的防御系统-海外</option>
-                    <option value="cloudflareimg.cdn.sn">CloudFlare-海外</option>
-                    <option value="edgeoneimg.cdn.sn">EdgeOne-海外</option>
-                    <option value="esaimg.cdn1.vip">ESA-大陆</option>
-                    <option value="cloudflarecnimg.scdn.io">CloudFlare(CN优选)-海外</option>
-                    <option value="anycastimg.scdn.io">失控的防御系统(Anycast)-海外</option>
-                    <option value="edgeoneimg.cdn1.vip">EdgeOne-大陆</option>
-                </select>
-                <button class="btn btn-upload-imgbed" id="btnUploadImgbed" onclick="batchUploadToImgbed()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="17 8 12 3 7 8"/>
-                        <line x1="12" y1="3" x2="12" y2="15"/>
-                    </svg>
-                    批量上传到图床
-                </button>
-            </div>
-
-            <!-- 上传进度 -->
-            <div class="upload-progress" id="uploadProgress">
-                <div class="upload-progress-bar">
-                    <div class="upload-progress-fill" id="progressFill"></div>
-                </div>
-                <span class="upload-progress-text" id="progressText">准备上传...</span>
             </div>
 
             <div class="table-section">
@@ -308,9 +171,7 @@ $galleries = getGalleries(false);
                             <th>预览</th>
                             <th>标题</th>
                             <th>所属相册</th>
-                            <th>本地图片</th>
-                            <th>图床状态</th>
-                            <th>图床URL</th>
+                            <th>图片地址</th>
                             <th>排序</th>
                             <th>状态</th>
                             <th>操作</th>
@@ -355,33 +216,6 @@ $galleries = getGalleries(false);
                             <td>
                                 <?php if ($item['image']): ?>
                                     <span style="font-size: 12px; color: #666; word-break: break-all;"><?php echo e($item['image']); ?></span>
-                                <?php else: ?>
-                                    <span style="color: #999;">-</span>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <?php if ($item['imgbed_status'] == 1): ?>
-                                    <span class="imgbed-status uploaded">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;"><polyline points="20 6 9 17 4 12"/></svg>
-                                        已上传
-                                    </span>
-                                <?php elseif ($item['imgbed_status'] == 2): ?>
-                                    <span class="imgbed-status failed">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                                        失败
-                                    </span>
-                                <?php else: ?>
-                                    <span class="imgbed-status pending">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                        待上传
-                                    </span>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <?php if ($item['imgbed_url']): ?>
-                                    <a href="<?php echo e($item['imgbed_url']); ?>" target="_blank" style="font-size: 12px; color: #7c4dff; word-break: break-all;">
-                                        <?php echo e(mb_substr($item['imgbed_url'], 0, 40)); ?><?php echo mb_strlen($item['imgbed_url']) > 40 ? '...' : ''; ?>
-                                    </a>
                                 <?php else: ?>
                                     <span style="color: #999;">-</span>
                                 <?php endif; ?>
@@ -672,54 +506,6 @@ $galleries = getGalleries(false);
         async function toggleStatus(type, id, active) {
             const data = { id: id, is_active: active ? 1 : 0 };
             saveData(type, data);
-        }
-
-        // 批量上传到图床
-        async function batchUploadToImgbed() {
-            const btn = document.getElementById('btnUploadImgbed');
-            const progress = document.getElementById('uploadProgress');
-            const fill = document.getElementById('progressFill');
-            const text = document.getElementById('progressText');
-
-            btn.disabled = true;
-            progress.classList.add('active');
-
-            try {
-                const response = await fetch('api/upload_to_imgbed.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({})
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    fill.style.width = '100%';
-                    text.textContent = `上传完成：成功 ${result.data.success} 个，失败 ${result.data.failed} 个`;
-                    showToast(`批量上传完成！成功 ${result.data.success} 个，失败 ${result.data.failed} 个`, 'success');
-
-                    // 显示详细结果
-                    if (result.data.failed > 0) {
-                        const failedItems = result.data.details.filter(d => d.status === 'failed');
-                        console.log('上传失败详情:', failedItems);
-                    }
-
-                    setTimeout(() => {
-                        location.reload();
-                    }, 2000);
-                } else {
-                    text.textContent = '上传失败：' + (result.message || '未知错误');
-                    showToast(result.message || '批量上传失败', 'error');
-                    btn.disabled = false;
-                }
-            } catch (error) {
-                text.textContent = '上传出错：' + error.message;
-                showToast('批量上传出错：' + error.message, 'error');
-                btn.disabled = false;
-            }
         }
     </script>
 </body>

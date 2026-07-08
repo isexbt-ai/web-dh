@@ -10,7 +10,7 @@ $totalVisits = getTotalVisits();
 $totalClicks = getTotalClicks();
 $totalPv = getTotalPv();
 $weekData = getWeekVisits();
-$hotCards = getHotCards(5);
+$hotCards = getHotCards();
 
 // 获取各模块数量
 $adsCount = $pdo->query("SELECT COUNT(*) FROM ads")->fetchColumn();

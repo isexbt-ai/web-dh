@@ -1,11 +1,11 @@
 <?php
 require_once 'includes/functions.php';
+require_once 'includes/header.php';
 
 $ads = getAds();
 $notices = getNotices();
 $categories = getCategories();
-$hotCardsCount = intval(getConfig('hot_cards_count', '3'));
-$hotCards = getHotCards($hotCardsCount);
+$hotCards = getHotCards();
 $config = [
     'avatar' => getConfig('avatar', ''),
     'contact_info' => getConfig('contact_info', '微信：xxx'),
@@ -19,62 +19,25 @@ $firstCategoryCards = [];
 if (!empty($categories)) {
     $firstCategoryCards = getCards($categories[0]['id'], true, $cardSortMethod);
 }
+
+// 构建额外的 head 内容
+$extraHead = '<style>
+    :root {
+        --cards-per-row-desktop: ' . e(getConfig('cards_per_row_desktop', 'repeat(6, 1fr)')) . ';
+        --cards-per-row-tablet: ' . e(getConfig('cards_per_row_tablet', 'repeat(4, 1fr)')) . ';
+        --cards-per-row-mobile: ' . e(getConfig('cards_per_row_mobile', 'repeat(3, 1fr)')) . ';
+    }
+</style>';
+// WebSite Schema
+$extraHead .= generateJsonLd([
+    '@type' => 'WebSite',
+    'name' => getConfig('site_title', '美女导航'),
+    'url' => getCurrentUrl(),
+    'description' => getConfig('site_description', '精选美女导航网站')
+]);
+
+renderPageHeader('', '', $extraHead);
 ?>
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo e(getConfig('site_title', '美女导航')); ?></title>
-    <meta name="description" content="<?php echo e(getConfig('site_description', '精选美女导航网站')); ?>">
-    <meta name="keywords" content="<?php echo e(getConfig('site_keywords', '美女导航,网站导航,精选网站')); ?>">
-    <link rel="canonical" href="<?php echo e(getCurrentUrl()); ?>">
-    <link rel="icon" type="image/png" href="/assets/images/logo.png">
-    <link rel="alternate" type="application/rss+xml" title="<?php echo e(getConfig('site_title', '美女导航')); ?> RSS" href="feed.php">
-    <?php if (getConfig('umami_enabled', '1') === '1'): ?>
-    <link rel="preconnect" href="https://umami.xldh.cc">
-    <?php endif; ?>
-    <!-- Open Graph / Twitter Card -->
-    <meta property="og:title" content="<?php echo e(getConfig('site_title', '美女导航')); ?>">
-    <meta property="og:description" content="<?php echo e(getConfig('site_description', '精选美女导航网站')); ?>">
-    <meta property="og:image" content="<?php echo e($config['avatar'] ?: 'assets/images/logo.png'); ?>">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="<?php echo e(getCurrentUrl()); ?>">
-    <meta property="og:site_name" content="<?php echo e(getConfig('site_title', '美女导航')); ?>">
-    <meta name="twitter:card" content="summary">
-    <link rel="stylesheet" href="/assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
-    <?php
-    $theme = getConfig('theme', 'default');
-    if ($theme === 'memphis' && file_exists('assets/css/theme-memphis.css')):
-    ?>
-    <link rel="stylesheet" href="/assets/css/theme-memphis.css?v=<?php echo filemtime('assets/css/theme-memphis.css'); ?>">
-    <?php elseif ($theme === 'dreamy' && file_exists('assets/css/theme-dreamy.css')): ?>
-    <link rel="stylesheet" href="/assets/css/theme-dreamy.css?v=<?php echo filemtime('assets/css/theme-dreamy.css'); ?>">
-    <?php endif; ?>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="<?php echo $theme === 'memphis' ? '#ffe14d' : ($theme === 'dreamy' ? '#ffd6e7' : '#e94560'); ?>">
-    <link rel="apple-touch-icon" href="/assets/images/logo.png">
-    <?php if (getConfig('umami_enabled', '1') === '1'): ?>
-    <script defer src="<?php echo e(getConfig('umami_script_url', 'https://umami.xldh.cc/script.js')); ?>" data-website-id="<?php echo e(getConfig('umami_website_id', 'd1d35aa8-18e3-4c74-8db4-bcb610de22b5')); ?>"></script>
-    <?php endif; ?>
-    <style>
-        :root {
-            --cards-per-row-desktop: <?php echo e(getConfig('cards_per_row_desktop', 'repeat(6, 1fr)')); ?>;
-            --cards-per-row-tablet: <?php echo e(getConfig('cards_per_row_tablet', 'repeat(4, 1fr)')); ?>;
-            --cards-per-row-mobile: <?php echo e(getConfig('cards_per_row_mobile', 'repeat(3, 1fr)')); ?>;
-        }
-    </style>
-    <?php
-    // WebSite Schema
-    echo generateJsonLd([
-        '@type' => 'WebSite',
-        'name' => getConfig('site_title', '美女导航'),
-        'url' => getCurrentUrl(),
-        'description' => getConfig('site_description', '精选美女导航网站')
-    ]);
-    ?>
-</head>
-<body>
     <!-- 顶部栏 -->
     <header class="top-bar">
         <h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);"><?php echo e(getConfig('site_title', '美女导航')); ?></h1>
@@ -167,7 +130,7 @@ if (!empty($categories)) {
                     <?php foreach ($hotCards as $hot): ?>
                     <a href="/detail/<?php echo $hot['id']; ?>.html" class="hot-item" <?php echo ($hot['card_type'] ?? 'link') === 'link' && !empty($hot['link']) ? 'target="_blank" rel="noopener"' : ''; ?>>
                         <?php if (!empty($hot['image'])): ?>
-                        <div class="hot-image"><?php echo renderResponsiveImage($hot['image'], $hot['title'], '', 'lazy'); ?></div>
+                        <div class="hot-image"><?php echo renderResponsiveImage($hot['image'], $hot['title'], '', 'lazy', null, false); ?></div>
                         <?php else: ?>
                         <div class="hot-image"><div class="card-placeholder" style="font-size:10px;">图片</div></div>
                         <?php endif; ?>
@@ -270,13 +233,8 @@ if (!empty($categories)) {
         window.__ssrMode = true;
 
         document.addEventListener('DOMContentLoaded', function() {
-            <?php if (!empty($categories)): ?>
-            // 更新Tab状态但不触发AJAX（首屏已由PHP渲染）
-            const tabs = document.querySelectorAll('.category-tab');
-            tabs.forEach(tab => {
-                tab.classList.toggle('active', parseInt(tab.dataset.id) === <?php echo $categories[0]['id']; ?>);
-            });
-            <?php endif; ?>
+            // SSR模式下，第一个分类的卡片已经由PHP渲染显示
+            // 无需额外操作，switchCategory函数已在点击时正确处理显示/隐藏
         });
     </script>
     <?php

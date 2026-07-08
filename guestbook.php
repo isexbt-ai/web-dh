@@ -1,5 +1,6 @@
 <?php
 require_once 'includes/functions.php';
+require_once 'includes/header.php';
 
 // 检查留言板是否开启
 if (getConfig('guestbook_enabled', '1') !== '1') {
@@ -23,11 +24,49 @@ $totalMessages = getMessageCount();
 
 // 获取最新留言（首屏SSR，避免白屏）
 $messages = getMessages(0, 10);
+
+// 构建额外的 head 内容
+$extraHead = '<style>
+    :root {
+        --cards-per-row-desktop: ' . e(getConfig('cards_per_row_desktop', 'repeat(auto-fill, 120px)')) . ';
+        --cards-per-row-tablet: ' . e(getConfig('cards_per_row_tablet', 'repeat(4, 1fr)')) . ';
+        --cards-per-row-mobile: ' . e(getConfig('cards_per_row_mobile', 'repeat(3, 1fr)')) . ';
+    }
+    /* 骨架屏动画 */
+    @keyframes skeleton-loading {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+    .skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: skeleton-loading 1.5s ease-in-out infinite;
+        border-radius: 8px;
+    }
+    .skeleton-text { height: 14px; margin-bottom: 8px; }
+    .skeleton-text.short { width: 60%; }
+    .skeleton-text.long { width: 100%; }
+    .skeleton-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; }
+    .skeleton-item { padding: 16px 0; border-bottom: 1px solid #f0f0f0; }
+    .skeleton-item:last-child { border-bottom: none; }
+    .skeleton-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    /* 加载状态 */
+    .loading-indicator {
+        display: flex; align-items: center; justify-content: center;
+        padding: 20px; color: #999; font-size: 14px; gap: 8px;
+    }
+    .loading-indicator .spinner {
+        width: 20px; height: 20px; border: 2px solid #f0f0f0;
+        border-top-color: #e94560; border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    /* 无限滚动触发器 */
+    .infinite-scroll-trigger { height: 20px; margin: 10px 0; }
+</style>';
+
+renderPageHeader($guestbookTitle, getConfig('site_description', '精选美女导航网站'), $extraHead);
 ?>
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo e($guestbookTitle); ?> - <?php echo e($config['site_title']); ?></title>
     <meta name="description" content="<?php echo e(getConfig('site_description', '精选美女导航网站')); ?>">

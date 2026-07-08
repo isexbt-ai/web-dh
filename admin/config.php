@@ -40,8 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // 保存主题配置
         $theme = isset($_POST['theme']) ? trim($_POST['theme']) : 'default';
 
-        // 保存图床 CDN 域名配置
-        $imgbedCdnDomain = isset($_POST['imgbed_cdn_domain']) ? trim($_POST['imgbed_cdn_domain']) : 'img.scdn.io';
+        // 保存自定义头部代码
+        $customHeaderCode = isset($_POST['custom_header_code']) ? $_POST['custom_header_code'] : '';
 
         // 保存配置
         setConfig('site_title', $siteTitle);
@@ -54,9 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         setConfig('card_sort_method', $cardSortMethod);
         setConfig('visitor_click_divisor', (string)$visitorClickDivisor);
         setConfig('visitor_today_multiplier', (string)$visitorTodayMultiplier);
-        setConfig('hot_cards_count', (string)$hotCardsCount);
         setConfig('theme', $theme);
-        setConfig('imgbed_cdn_domain', $imgbedCdnDomain);
+        setConfig('custom_header_code', $customHeaderCode);
 
         $success = '配置保存成功';
     }
@@ -73,9 +72,8 @@ $config = [
     'card_sort_method' => getConfig('card_sort_method', 'default'),
     'visitor_click_divisor' => getConfig('visitor_click_divisor', '100'),
     'visitor_today_multiplier' => getConfig('visitor_today_multiplier', '2'),
-    'hot_cards_count' => getConfig('hot_cards_count', '3'),
     'theme' => getConfig('theme', 'default'),
-    'imgbed_cdn_domain' => getConfig('imgbed_cdn_domain', 'img.scdn.io')
+    'custom_header_code' => getConfig('custom_header_code', '')
 ];
 ?>
 <!DOCTYPE html>
@@ -223,22 +221,6 @@ $config = [
                                     <option value="click_count" <?php echo $config['card_sort_method'] === 'click_count' ? 'selected' : ''; ?>>按点击量从高到低</option>
                                 </select>
                             </div>
-
-                            <div>
-                                <label style="font-size: 13px; color: #666; margin-bottom: 6px; display: block;">热门推荐数量</label>
-                                <select name="hot_cards_count" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff;">
-                                    <option value="1" <?php echo $config['hot_cards_count'] === '1' ? 'selected' : ''; ?>>1 个</option>
-                                    <option value="2" <?php echo $config['hot_cards_count'] === '2' ? 'selected' : ''; ?>>2 个</option>
-                                    <option value="3" <?php echo $config['hot_cards_count'] === '3' ? 'selected' : ''; ?>>3 个</option>
-                                    <option value="4" <?php echo $config['hot_cards_count'] === '4' ? 'selected' : ''; ?>>4 个</option>
-                                    <option value="5" <?php echo $config['hot_cards_count'] === '5' ? 'selected' : ''; ?>>5 个</option>
-                                    <option value="6" <?php echo $config['hot_cards_count'] === '6' ? 'selected' : ''; ?>>6 个</option>
-                                    <option value="8" <?php echo $config['hot_cards_count'] === '8' ? 'selected' : ''; ?>>8 个</option>
-                                    <option value="10" <?php echo $config['hot_cards_count'] === '10' ? 'selected' : ''; ?>>10 个</option>
-                                    <option value="12" <?php echo $config['hot_cards_count'] === '12' ? 'selected' : ''; ?>>12 个</option>
-                                </select>
-                                <p style="font-size: 11px; color: #999; margin-top: 4px;">首页热门推荐区域显示的数量</p>
-                            </div>
                         </div>
                         <p style="font-size: 12px; color: #999; margin-top: 8px;">修改后刷新首页即可看到效果</p>
                     </div>
@@ -292,22 +274,9 @@ $config = [
                     </div>
 
                     <div class="form-group">
-                        <label style="font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: block;">☁️ 图床 CDN 配置</label>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-                            <div>
-                                <label style="font-size: 13px; color: #666; margin-bottom: 6px; display: block;">CDN 域名</label>
-                                <select name="imgbed_cdn_domain" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff;">
-                                    <option value="img.scdn.io" <?php echo $config['imgbed_cdn_domain'] === 'img.scdn.io' ? 'selected' : ''; ?>>失控的防御系统-海外 (img.scdn.io)</option>
-                                    <option value="cloudflareimg.cdn.sn" <?php echo $config['imgbed_cdn_domain'] === 'cloudflareimg.cdn.sn' ? 'selected' : ''; ?>>CloudFlare-海外 (cloudflareimg.cdn.sn)</option>
-                                    <option value="edgeoneimg.cdn.sn" <?php echo $config['imgbed_cdn_domain'] === 'edgeoneimg.cdn.sn' ? 'selected' : ''; ?>>EdgeOne-海外 (edgeoneimg.cdn.sn)</option>
-                                    <option value="esaimg.cdn1.vip" <?php echo $config['imgbed_cdn_domain'] === 'esaimg.cdn1.vip' ? 'selected' : ''; ?>>ESA-大陆 (esaimg.cdn1.vip)</option>
-                                    <option value="cloudflarecnimg.scdn.io" <?php echo $config['imgbed_cdn_domain'] === 'cloudflarecnimg.scdn.io' ? 'selected' : ''; ?>>CloudFlare(CN优选)-海外 (cloudflarecnimg.scdn.io)</option>
-                                    <option value="anycastimg.scdn.io" <?php echo $config['imgbed_cdn_domain'] === 'anycastimg.scdn.io' ? 'selected' : ''; ?>>失控的防御系统(Anycast)-海外 (anycastimg.scdn.io)</option>
-                                    <option value="edgeoneimg.cdn1.vip" <?php echo $config['imgbed_cdn_domain'] === 'edgeoneimg.cdn1.vip' ? 'selected' : ''; ?>>EdgeOne-大陆 (edgeoneimg.cdn1.vip)</option>
-                                </select>
-                                <p style="font-size: 11px; color: #999; margin-top: 4px;">批量上传到图床时使用的 CDN 域名</p>
-                            </div>
-                        </div>
+                        <label style="font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: block;">📝 自定义头部代码</label>
+                        <p style="font-size: 12px; color: #999; margin-bottom: 12px;">在此处添加自定义的 &lt;head&gt; 代码，如统计代码、广告代码、验证代码等。代码将插入到所有前台页面的 &lt;/head&gt; 标签之前。</p>
+                        <textarea name="custom_header_code" placeholder="例如：&lt;script src=...&gt;&lt;/script&gt;" rows="8" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff; font-family: monospace;"><?php echo e($config['custom_header_code']); ?></textarea>
                     </div>
 
                     <button type="submit" class="btn btn-primary">保存配置</button>

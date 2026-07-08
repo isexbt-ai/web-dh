@@ -125,9 +125,9 @@ function initDatabase($pdo) {
         // 字段已存在，忽略错误
     }
 
-    // 迁移：为已存在的cards表添加badge_text字段（自定义角标文字）
+    // 迁移：为已存在的cards表添加is_hot字段（热门标记）
     try {
-        $pdo->exec("ALTER TABLE cards ADD COLUMN badge_text TEXT DEFAULT ''");
+        $pdo->exec("ALTER TABLE cards ADD COLUMN is_hot INTEGER DEFAULT 0");
     } catch (PDOException $e) {
         // 字段已存在，忽略错误
     }
@@ -179,10 +179,6 @@ function initDatabase($pdo) {
         title TEXT NOT NULL,
         image TEXT,
         media_type TEXT DEFAULT 'image',
-        imgbed_url TEXT DEFAULT '',
-        imgbed_status INTEGER DEFAULT 0,
-        imgbed_filename TEXT DEFAULT '',
-        imgbed_uploaded_at TIMESTAMP,
         sort_order INTEGER DEFAULT 0,
         is_active INTEGER DEFAULT 1,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

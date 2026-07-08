@@ -125,6 +125,7 @@ if ($categoryFilter) {
                             <th>分类</th>
                             <th>类型</th>
                             <th>点击</th>
+                            <th>热门</th>
                             <th>排序</th>
                             <th>状态</th>
                             <th>操作</th>
@@ -151,6 +152,12 @@ if ($categoryFilter) {
                                 <?php endif; ?>
                             </td>
                             <td><?php echo $card['click_count']; ?></td>
+                            <td>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" <?php echo ($card['is_hot'] ?? 0) ? 'checked' : ''; ?> onchange="toggleHot(<?php echo $card['id']; ?>, this.checked)">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </td>
                             <td><?php echo $card['sort_order']; ?></td>
                             <td>
                                 <label class="toggle-switch">
@@ -160,7 +167,7 @@ if ($categoryFilter) {
                             </td>
                             <td>
                                 <div class="table-actions">
-                                    <button class="btn btn-secondary btn-sm" onclick="editCard(this)" data-category_id="<?php echo e($card['category_id']); ?>" data-title="<?php echo e($card['title']); ?>" data-image="<?php echo e($card['image']); ?>" data-link="<?php echo e($card['link']); ?>" data-detail="<?php echo e($card['detail']); ?>" data-sort_order="<?php echo e($card['sort_order']); ?>" data-is_active="<?php echo e($card['is_active']); ?>" data-card_type="<?php echo e($card['card_type']); ?>" data-badge_text="<?php echo e($card['badge_text']); ?>" style="padding: 6px 12px; font-size: 12px; background: #f8f9fa; border: 1px solid #e0e0e0; color: #333333; border-radius: 8px; cursor: pointer; transition: all 0.3s;">编辑</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="editCard(this)" data-category_id="<?php echo e($card['category_id']); ?>" data-title="<?php echo e($card['title']); ?>" data-image="<?php echo e($card['image']); ?>" data-link="<?php echo e($card['link']); ?>" data-detail="<?php echo e($card['detail']); ?>" data-sort_order="<?php echo e($card['sort_order']); ?>" data-is_active="<?php echo e($card['is_active']); ?>" data-card_type="<?php echo e($card['card_type']); ?>" data-badge_text="<?php echo e($card['badge_text']); ?>" data-is_hot="<?php echo e($card['is_hot'] ?? 0); ?>" style="padding: 6px 12px; font-size: 12px; background: #f8f9fa; border: 1px solid #e0e0e0; color: #333333; border-radius: 8px; cursor: pointer; transition: all 0.3s;">编辑</button>
                                     <button class="btn btn-danger btn-sm" onclick="deleteItem('card', <?php echo $card['id']; ?>, () => location.reload())" style="padding: 6px 12px; font-size: 12px; background: rgba(244,67,54,0.1); border: 1px solid rgba(244,67,54,0.2); color: #f44336; border-radius: 8px; cursor: pointer; transition: all 0.3s;">删除</button>
                                 </div>
                             </td>
@@ -243,6 +250,12 @@ if ($categoryFilter) {
                     <label>
                         <input type="checkbox" id="cardActive" name="is_active" value="1" checked>
                         启用
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="cardHot" name="is_hot" value="1">
+                        标记为热门（首页热门推荐显示）
                     </label>
                 </div>
                 <button type="submit" class="btn btn-primary">保存</button>
@@ -359,6 +372,7 @@ if ($categoryFilter) {
             const isActive = parseInt(btn.getAttribute('data-is_active')) || 0;
             const cardType = btn.getAttribute('data-card_type') || '';
             const badgeText = btn.getAttribute('data-badge_text') || '';
+            const isHot = parseInt(btn.getAttribute('data-is_hot')) || 0;
 
             document.getElementById('cardId').value = id;
             document.getElementById('cardCategory').value = categoryId || '';
@@ -370,6 +384,7 @@ if ($categoryFilter) {
             document.getElementById('cardImage').value = image;
             document.getElementById('cardType').value = cardType || 'link';
             document.getElementById('cardBadgeText').value = badgeText || '';
+            document.getElementById('cardHot').checked = isHot === 1;
 
             const preview = document.getElementById('cardImagePreview');
             if (image) {
@@ -385,6 +400,11 @@ if ($categoryFilter) {
         async function toggleStatus(type, id, active) {
             const data = { id: id, is_active: active ? 1 : 0 };
             saveData(type, data);
+        }
+
+        async function toggleHot(id, isHot) {
+            const data = { id: id, is_hot: isHot ? 1 : 0 };
+            saveData('card', data);
         }
     </script>
 </body>
