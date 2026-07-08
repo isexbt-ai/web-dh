@@ -19,7 +19,6 @@ $galleries = getGalleries(false);
     <title>效果展示管理 - 后台管理</title>
     <link rel="stylesheet" href="../assets/css/admin.css?v=2">
 </head>
-</head>
 <body>
     <div class="admin-layout">
         <!-- 侧边栏 -->
