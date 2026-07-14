@@ -31,7 +31,7 @@ try {
  */
 function initDatabase($pdo) {
     // 快速检查：如果所有核心表都已存在，跳过初始化
-    $requiredTables = ['site_config', 'ads', 'notices', 'categories', 'cards', 'visit_stats', 'admin_users', 'links', 'messages', 'showcase', 'galleries'];
+    $requiredTables = ['site_config', 'ads', 'notices', 'categories', 'cards', 'visit_stats', 'admin_users', 'links', 'messages', 'showcase'];
     try {
         $existing = $pdo->query("SELECT name FROM sqlite_master WHERE type='table'")
                         ->fetchAll(PDO::FETCH_COLUMN);
@@ -94,6 +94,7 @@ function initDatabase($pdo) {
         image_height INTEGER DEFAULT 0,
         sort_order INTEGER DEFAULT 0,
         click_count INTEGER DEFAULT 0,
+        view_count INTEGER DEFAULT 0,
         is_active INTEGER DEFAULT 1,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (category_id) REFERENCES categories(id)
@@ -184,27 +185,6 @@ function initDatabase($pdo) {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
 
-    // 相册合集表
-    $pdo->exec("CREATE TABLE IF NOT EXISTS galleries (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        description TEXT DEFAULT '',
-        cover_image TEXT DEFAULT '',
-        sort_order INTEGER DEFAULT 0,
-        is_active INTEGER DEFAULT 1,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )");
-
-    // 插入默认相册合集
-    $stmt = $pdo->query("SELECT COUNT(*) FROM galleries");
-    if ($stmt->fetchColumn() == 0) {
-        $galleries = ['默认相册', '精选推荐', '最新上传'];
-        foreach ($galleries as $index => $name) {
-            $stmt = $pdo->prepare("INSERT INTO galleries (title, sort_order) VALUES (?, ?)");
-            $stmt->execute([$name, $index]);
-        }
-    }
-
     // 插入默认管理员账号 (admin / 随机强密码)
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM admin_users WHERE username = ?");
     $stmt->execute(['admin']);
@@ -270,11 +250,10 @@ try {
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_messages_created ON messages(created_at)");
 
     // showcase 表索引
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_showcase_gallery ON showcase(gallery_id)");
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_showcase_active ON showcase(is_active)");
 
-    // ip_location_cache 表索引（虽然 UNIQUE 已隐式创建索引，但显式创建更明确）
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_ip_location_ip ON ip_location_cache(ip)");
+    // cards 表 view_count 索引
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_cards_view ON cards(view_count)");
 } catch (PDOException $e) {
     // 索引创建失败不影响核心功能，记录日志即可
     error_log('Index creation failed: ' . $e->getMessage());
@@ -300,27 +279,16 @@ try {
     // 字段已存在，忽略错误
 }
 
+// 迁移：为已存在的 cards 表添加 view_count 字段
+try {
+    $pdo->exec("ALTER TABLE cards ADD COLUMN view_count INTEGER DEFAULT 0");
+} catch (PDOException $e) {
+    // 字段已存在，忽略错误
+}
+
 // 迁移：为已存在的 showcase 表添加 gallery_id 字段
 try {
     $pdo->exec("ALTER TABLE showcase ADD COLUMN gallery_id INTEGER DEFAULT 1");
 } catch (PDOException $e) {
     // 字段已存在，忽略错误
-}
-
-// 迁移：创建IP归属地缓存表
-try {
-    $pdo->exec("CREATE TABLE IF NOT EXISTS ip_location_cache (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        ip TEXT UNIQUE NOT NULL,
-        country TEXT,
-        region TEXT,
-        city TEXT,
-        isp TEXT,
-        org TEXT,
-        loc TEXT,
-        timezone TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )");
-} catch (PDOException $e) {
-    // 忽略错误
 }

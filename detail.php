@@ -22,6 +22,9 @@ if (!$card) {
 // 记录访问
 recordVisit('detail');
 
+// 增加卡片访问量
+incrementCardView($cardId);
+
 $config = [
     'site_title' => getConfig('site_title', '美女导航')
 ];
@@ -46,25 +49,33 @@ $extraHead = '<meta property="og:image" content="' . e($card['image'] ?: ($confi
     }
     .detail-image {
         width: 100%;
+        max-height: 280px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f9fa;
+        overflow: hidden;
     }
     .detail-image picture {
         display: block;
         width: 100%;
+        height: 100%;
     }
     .detail-image img {
         width: 100%;
-        height: auto;
-        object-fit: contain;
+        height: 100%;
+        max-height: 280px;
+        object-fit: cover;
         display: block;
     }
     .detail-image-placeholder {
         width: 100%;
-        height: 300px;
+        height: 200px;
         display: flex;
         align-items: center;
         justify-content: center;
         background: linear-gradient(135deg, #e94560, #ff6b6b);
-        font-size: 24px;
+        font-size: 18px;
         font-weight: bold;
         color: #fff;
     }

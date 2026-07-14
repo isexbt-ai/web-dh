@@ -30,11 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cardsPerRowMobile = isset($_POST['cards_per_row_mobile']) ? trim($_POST['cards_per_row_mobile']) : 'repeat(3, 1fr)';
         $cardSortMethod = isset($_POST['card_sort_method']) ? trim($_POST['card_sort_method']) : 'default';
 
-        // 保存访客统计热度公式配置
-        $visitorClickDivisor = isset($_POST['visitor_click_divisor']) ? max(1, intval($_POST['visitor_click_divisor'])) : 100;
-        $visitorTodayMultiplier = isset($_POST['visitor_today_multiplier']) ? max(0, intval($_POST['visitor_today_multiplier'])) : 2;
-
-        // 保存热门推荐数量配置
+        // 保存主题配置
         $hotCardsCount = isset($_POST['hot_cards_count']) ? max(1, min(20, intval($_POST['hot_cards_count']))) : 3;
 
         // 保存主题配置
@@ -52,8 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         setConfig('cards_per_row_tablet', $cardsPerRowTablet);
         setConfig('cards_per_row_mobile', $cardsPerRowMobile);
         setConfig('card_sort_method', $cardSortMethod);
-        setConfig('visitor_click_divisor', (string)$visitorClickDivisor);
-        setConfig('visitor_today_multiplier', (string)$visitorTodayMultiplier);
         setConfig('theme', $theme);
         setConfig('custom_header_code', $customHeaderCode);
 
@@ -70,8 +64,6 @@ $config = [
     'cards_per_row_tablet' => getConfig('cards_per_row_tablet', 'repeat(4, 1fr)'),
     'cards_per_row_mobile' => getConfig('cards_per_row_mobile', 'repeat(3, 1fr)'),
     'card_sort_method' => getConfig('card_sort_method', 'default'),
-    'visitor_click_divisor' => getConfig('visitor_click_divisor', '100'),
-    'visitor_today_multiplier' => getConfig('visitor_today_multiplier', '2'),
     'theme' => getConfig('theme', 'default'),
     'custom_header_code' => getConfig('custom_header_code', '')
 ];
@@ -126,14 +118,6 @@ $config = [
                                 <a href="messages.php" class="nav-item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     <span>留言管理</span>
-                </a>
-                <a href="ip_stats.php" class="nav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="2" y1="12" x2="22" y2="12"/>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                    </svg>
-                    <span>IP统计</span>
                 </a>
                 <a href="password.php" class="nav-item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -256,21 +240,7 @@ $config = [
 
                     <div class="form-group">
                         <label style="font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: block;">🔥 访客统计热度公式配置</label>
-                        <p style="font-size: 12px; color: #999; margin-bottom: 16px;">前台页脚显示的热度访客数 = 真实UV + (点击量 ÷ 除数) + (今日UV × 倍数)。数值越大，前台显示的人越多。</p>
-
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-                            <div>
-                                <label style="font-size: 13px; color: #666; margin-bottom: 6px; display: block;">点击除数（默认100）</label>
-                                <input type="number" name="visitor_click_divisor" value="<?php echo e($config['visitor_click_divisor']); ?>" min="1" placeholder="100" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff;">
-                                <p style="font-size: 11px; color: #999; margin-top: 4px;">点击量除以这个数作为加成</p>
-                            </div>
-
-                            <div>
-                                <label style="font-size: 13px; color: #666; margin-bottom: 6px; display: block;">今日加成倍数（默认2）</label>
-                                <input type="number" name="visitor_today_multiplier" value="<?php echo e($config['visitor_today_multiplier']); ?>" min="0" placeholder="2" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff;">
-                                <p style="font-size: 11px; color: #999; margin-top: 4px;">今日UV乘以这个数作为加成</p>
-                            </div>
-                        </div>
+                        <p style="font-size: 12px; color: #999; margin-bottom: 16px;">前台页脚显示的热度访客数 = 网站整体访问量 + 点击卡片的数量</p>
                     </div>
 
                     <div class="form-group">

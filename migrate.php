@@ -123,15 +123,15 @@ try {
     }
 }
 
-// 9. 检查并添加 showcase 表的 gallery_id 字段
+// 9. 检查并添加 cards 表的 view_count 字段
 try {
-    $pdo->exec("ALTER TABLE showcase ADD COLUMN gallery_id INTEGER DEFAULT 1");
-    $success[] = "showcase.gallery_id 字段已添加";
+    $pdo->exec("ALTER TABLE cards ADD COLUMN view_count INTEGER DEFAULT 0");
+    $success[] = "cards.view_count 字段已添加";
 } catch (PDOException $e) {
     if (strpos($e->getMessage(), 'duplicate column name') !== false || strpos($e->getMessage(), 'already exists') !== false) {
-        $success[] = "showcase.gallery_id 字段已存在，跳过";
+        $success[] = "cards.view_count 字段已存在，跳过";
     } else {
-        $errors[] = "showcase.gallery_id 添加失败: " . $e->getMessage();
+        $errors[] = "cards.view_count 添加失败: " . $e->getMessage();
     }
 }
 
@@ -171,42 +171,7 @@ try {
     }
 }
 
-// 13. 检查并创建 ip_location_cache 表
-try {
-    $pdo->exec("CREATE TABLE IF NOT EXISTS ip_location_cache (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        ip TEXT UNIQUE NOT NULL,
-        country TEXT,
-        region TEXT,
-        city TEXT,
-        isp TEXT,
-        org TEXT,
-        loc TEXT,
-        timezone TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )");
-    $success[] = "ip_location_cache 表已创建或已存在";
-} catch (PDOException $e) {
-    $errors[] = "ip_location_cache 表创建失败: " . $e->getMessage();
-}
-
-// 14. 检查并创建 galleries 表
-try {
-    $pdo->exec("CREATE TABLE IF NOT EXISTS galleries (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        description TEXT DEFAULT '',
-        cover_image TEXT DEFAULT '',
-        sort_order INTEGER DEFAULT 0,
-        is_active INTEGER DEFAULT 1,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )");
-    $success[] = "galleries 表已创建或已存在";
-} catch (PDOException $e) {
-    $errors[] = "galleries 表创建失败: " . $e->getMessage();
-}
-
-// 15. 检查并添加 showcase 表的 sort_order 字段
+// 13. 检查并添加 showcase 表的 sort_order 字段
 try {
     $pdo->exec("ALTER TABLE showcase ADD COLUMN sort_order INTEGER DEFAULT 0");
     $success[] = "showcase.sort_order 字段已添加";
@@ -218,7 +183,7 @@ try {
     }
 }
 
-// 16. 检查并添加 showcase 表的 is_active 字段
+// 14. 检查并添加 showcase 表的 is_active 字段
 try {
     $pdo->exec("ALTER TABLE showcase ADD COLUMN is_active INTEGER DEFAULT 1");
     $success[] = "showcase.is_active 字段已添加";

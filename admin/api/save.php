@@ -344,58 +344,6 @@ try {
             jsonResponse(['id' => $id, 'saved' => true]);
             break;
 
-        // 保存相册合集
-        case 'gallery':
-            $id = isset($data['id']) ? intval($data['id']) : 0;
-            $title = isset($data['title']) ? substr(trim($data['title']), 0, MAX_TITLE_LENGTH) : '';
-            $description = isset($data['description']) ? substr(trim($data['description']), 0, MAX_CONTENT_LENGTH) : '';
-            $cover_image = isset($data['cover_image']) ? substr($data['cover_image'], 0, MAX_URL_LENGTH) : '';
-            $sort_order = isset($data['sort_order']) ? intval($data['sort_order']) : 0;
-            $is_active = isset($data['is_active']) ? intval($data['is_active']) : 1;
-
-            if ($id > 0) {
-                // 更新现有记录 - 只更新提供的字段（支持toggleStatus部分更新）
-                $updateFields = [];
-                $params = [];
-                if (isset($data['title'])) {
-                    if (empty($title)) {
-                        jsonError('相册标题不能为空');
-                    }
-                    $updateFields[] = "title = ?";
-                    $params[] = $title;
-                }
-                if (isset($data['description'])) {
-                    $updateFields[] = "description = ?";
-                    $params[] = $description;
-                }
-                if (isset($data['cover_image'])) {
-                    $updateFields[] = "cover_image = ?";
-                    $params[] = $cover_image;
-                }
-                if (isset($data['sort_order'])) {
-                    $updateFields[] = "sort_order = ?";
-                    $params[] = $sort_order;
-                }
-                if (isset($data['is_active'])) {
-                    $updateFields[] = "is_active = ?";
-                    $params[] = $is_active;
-                }
-                if (!empty($updateFields)) {
-                    $params[] = $id;
-                    $stmt = $pdo->prepare("UPDATE galleries SET " . implode(', ', $updateFields) . " WHERE id = ?");
-                    $stmt->execute($params);
-                }
-            } else {
-                if (empty($title)) {
-                    jsonError('相册标题不能为空');
-                }
-                $stmt = $pdo->prepare("INSERT INTO galleries (title, description, cover_image, sort_order, is_active) VALUES (?, ?, ?, ?, ?)");
-                $stmt->execute([$title, $description, $cover_image, $sort_order, $is_active]);
-                $id = $pdo->lastInsertId();
-            }
-            jsonResponse(['id' => $id, 'saved' => true]);
-            break;
-
         // 保存效果展示
         case 'showcase':
             $id = isset($data['id']) ? intval($data['id']) : 0;
@@ -446,8 +394,8 @@ try {
                 if (empty($title)) {
                     jsonError('展示标题不能为空');
                 }
-                $stmt = $pdo->prepare("INSERT INTO showcase (title, image, media_type, gallery_id, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$title, $image, $media_type, $gallery_id, $sort_order, $is_active]);
+                $stmt = $pdo->prepare("INSERT INTO showcase (title, image, media_type, sort_order, is_active) VALUES (?, ?, ?, ?, ?)");
+                $stmt->execute([$title, $image, $media_type, $sort_order, $is_active]);
                 $id = $pdo->lastInsertId();
             }
             jsonResponse(['id' => $id, 'saved' => true]);

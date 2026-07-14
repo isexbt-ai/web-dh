@@ -82,19 +82,15 @@ fi
 
 # 检查是否是git仓库
 if [ ! -d ".git" ]; then
-    echo -e "${YELLOW}⚠️  未检测到git仓库，正在初始化...${NC}"
-    git init
-    git remote add origin https://github.com/isexbt-ai/web-dh.git
-    echo -e "${GREEN}✅ Git仓库初始化完成${NC}"
-    echo ""
+    echo -e "${RED}❌ 未检测到git仓库，请先初始化${NC}"
+    exit 1
 fi
 
 # 检查远程仓库配置
 REMOTE_URL=$(git remote get-url origin 2>/dev/null || echo "")
 if [ -z "$REMOTE_URL" ]; then
-    echo -e "${BLUE}🔗 配置远程仓库...${NC}"
-    git remote add origin https://github.com/isexbt-ai/web-dh.git
-    REMOTE_URL=$(git remote get-url origin)
+    echo -e "${RED}❌ 未配置远程仓库${NC}"
+    exit 1
 fi
 echo -e "${GREEN}✅ 远程仓库: $REMOTE_URL${NC}"
 echo ""

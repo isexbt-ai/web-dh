@@ -419,23 +419,14 @@ function getTotalVisitsAll() {
 
 /**
  * 获取显示用的热度访客数（前台页脚使用）
- * 公式：真实UV + (点击量/click_divisor) + (今日UV × today_multiplier)
- * 倍数可通过后台配置调整
+ * 公式：网站整体访问量 + 点击卡片的数量
  */
 function getDisplayVisitorCount() {
-    $realUv = getTotalVisits();           // 真实总独立IP
-    $totalClicks = getTotalClicks();      // 总点击量
-    $todayUv = getTodayIpCount();         // 今日独立IP
-
-    // 从配置读取倍数，默认：点击除数100，今日加成倍数2
-    $clickDivisor = max(1, intval(getConfig('visitor_click_divisor', '100')));
-    $todayMultiplier = max(0, intval(getConfig('visitor_today_multiplier', '2')));
+    $totalPv = getTotalPv();           // 网站整体访问量（visit_stats总记录数）
+    $totalClicks = getTotalClicks();   // 点击卡片的数量（所有卡片点击数之和）
 
     // 热度公式
-    $clickBonus = floor($totalClicks / $clickDivisor);
-    $todayBonus = $todayUv * $todayMultiplier;
-
-    $displayCount = $realUv + $clickBonus + $todayBonus;
+    $displayCount = $totalPv + $totalClicks;
 
     // 保底显示，新站也不尴尬
     return max($displayCount, 88);
@@ -511,11 +502,11 @@ function getLinks($activeOnly = true) {
 }
 function getHotCards($limit = 12) {
     global $pdo;
-    // 获取标记为热门的卡片，按点击量排序
+    // 获取标记为热门的卡片，按(访问量+点击量)排序
     $sql = "SELECT c.*, cat.name as category_name FROM cards c
             LEFT JOIN categories cat ON c.category_id = cat.id
             WHERE c.is_active = 1 AND c.is_hot = 1 AND c.category_id IN (SELECT id FROM categories WHERE is_active = 1)
-            ORDER BY c.click_count DESC, c.sort_order ASC
+            ORDER BY (c.view_count + c.click_count) DESC, c.sort_order ASC
             LIMIT ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$limit]);
@@ -528,6 +519,15 @@ function getHotCards($limit = 12) {
 function incrementCardClick($cardId) {
     global $pdo;
     $stmt = $pdo->prepare("UPDATE cards SET click_count = click_count + 1 WHERE id = ?");
+    return $stmt->execute([$cardId]);
+}
+
+/**
+ * 增加卡片访问次数
+ */
+function incrementCardView($cardId) {
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE cards SET view_count = view_count + 1 WHERE id = ?");
     return $stmt->execute([$cardId]);
 }
 
@@ -989,20 +989,15 @@ function deleteImage($path) {
 }
 
 /**
- * 获取效果展示列表（可按相册筛选）
+ * 获取效果展示列表
  */
-function getShowcases($activeOnly = true, $galleryId = null) {
+function getShowcases($activeOnly = true) {
     global $pdo;
     $sql = "SELECT * FROM showcase";
     $where = [];
-    $params = [];
 
     if ($activeOnly) {
         $where[] = "is_active = 1";
-    }
-    if ($galleryId !== null) {
-        $where[] = "gallery_id = ?";
-        $params[] = $galleryId;
     }
 
     if (!empty($where)) {
@@ -1010,9 +1005,7 @@ function getShowcases($activeOnly = true, $galleryId = null) {
     }
     $sql .= " ORDER BY sort_order ASC, id DESC";
 
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    return $stmt->fetchAll();
+    return $pdo->query($sql)->fetchAll();
 }
 
 /**
@@ -1036,242 +1029,6 @@ function getShowcaseImageUrl($item) {
     }
 
     return $image;
-}
-
-/**
- * 获取所有相册合集（包含展示数量）
- */
-function getGalleriesWithCount($activeOnly = true) {
-    global $pdo;
-    $sql = "SELECT g.*, COUNT(s.id) as showcase_count FROM galleries g LEFT JOIN showcase s ON g.id = s.gallery_id AND s.is_active = 1";
-    if ($activeOnly) {
-        $sql .= " WHERE g.is_active = 1";
-    }
-    $sql .= " GROUP BY g.id ORDER BY g.sort_order ASC, g.id ASC";
-    return $pdo->query($sql)->fetchAll();
-}
-
-/**
- * 获取所有相册合集（兼容旧版，不带展示数量）
- */
-function getGalleries($activeOnly = true) {
-    global $pdo;
-    $sql = "SELECT * FROM galleries";
-    if ($activeOnly) {
-        $sql .= " WHERE is_active = 1";
-    }
-    $sql .= " ORDER BY sort_order ASC, id ASC";
-    return $pdo->query($sql)->fetchAll();
-}
-
-/**
- * 获取单个相册
- */
-function getGallery($id) {
-    global $pdo;
-    $stmt = $pdo->prepare("SELECT * FROM galleries WHERE id = ?");
-    $stmt->execute([$id]);
-    return $stmt->fetch();
-}
-
-/**
- * 获取相册下的展示数量
- */
-function getGalleryShowcaseCount($galleryId) {
-    global $pdo;
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM showcase WHERE gallery_id = ? AND is_active = 1");
-    $stmt->execute([$galleryId]);
-    return $stmt->fetchColumn();
-}
-
-/**
- * 国家代码转中文名称映射
- */
-function getCountryName($code) {
-    $map = [
-        'CN' => '中国', 'US' => '美国', 'JP' => '日本', 'KR' => '韩国',
-        'GB' => '英国', 'DE' => '德国', 'FR' => '法国', 'RU' => '俄罗斯',
-        'CA' => '加拿大', 'AU' => '澳大利亚', 'SG' => '新加坡', 'HK' => '中国香港',
-        'TW' => '中国台湾', 'MO' => '中国澳门', 'IN' => '印度', 'BR' => '巴西',
-        'MX' => '墨西哥', 'ID' => '印度尼西亚', 'TH' => '泰国', 'VN' => '越南',
-        'MY' => '马来西亚', 'PH' => '菲律宾', 'IT' => '意大利', 'ES' => '西班牙',
-        'NL' => '荷兰', 'SE' => '瑞典', 'NO' => '挪威', 'FI' => '芬兰',
-        'DK' => '丹麦', 'PL' => '波兰', 'CZ' => '捷克', 'HU' => '匈牙利',
-        'AT' => '奥地利', 'CH' => '瑞士', 'BE' => '比利时', 'IE' => '爱尔兰',
-        'PT' => '葡萄牙', 'GR' => '希腊', 'TR' => '土耳其', 'IL' => '以色列',
-        'SA' => '沙特阿拉伯', 'AE' => '阿联酋', 'ZA' => '南非', 'EG' => '埃及',
-        'NG' => '尼日利亚', 'KE' => '肯尼亚', 'AR' => '阿根廷', 'CL' => '智利',
-        'CO' => '哥伦比亚', 'PE' => '秘鲁', 'VE' => '委内瑞拉', 'UA' => '乌克兰',
-        'BY' => '白俄罗斯', 'KZ' => '哈萨克斯坦', 'UZ' => '乌兹别克斯坦',
-        'PK' => '巴基斯坦', 'BD' => '孟加拉国', 'LK' => '斯里兰卡', 'NP' => '尼泊尔',
-        'MM' => '缅甸', 'KH' => '柬埔寨', 'LA' => '老挝', 'MN' => '蒙古',
-        'KP' => '朝鲜', 'IR' => '伊朗', 'IQ' => '伊拉克', 'SY' => '叙利亚',
-        'JO' => '约旦', 'LB' => '黎巴嫩', 'KW' => '科威特', 'QA' => '卡塔尔',
-        'OM' => '阿曼', 'BH' => '巴林', 'YE' => '也门', 'AF' => '阿富汗',
-        'TJ' => '塔吉克斯坦', 'KG' => '吉尔吉斯斯坦', 'TM' => '土库曼斯坦',
-        'GE' => '格鲁吉亚', 'AM' => '亚美尼亚', 'AZ' => '阿塞拜疆',
-        'RO' => '罗马尼亚', 'BG' => '保加利亚', 'RS' => '塞尔维亚',
-        'HR' => '克罗地亚', 'SI' => '斯洛文尼亚', 'SK' => '斯洛伐克',
-        'LT' => '立陶宛', 'LV' => '拉脱维亚', 'EE' => '爱沙尼亚',
-        'MD' => '摩尔多瓦', 'AL' => '阿尔巴尼亚', 'BA' => '波黑',
-        'MK' => '北马其顿', 'ME' => '黑山', 'XK' => '科索沃',
-        'NZ' => '新西兰', 'FJI' => '斐济', 'PG' => '巴布亚新几内亚',
-        'IS' => '冰岛', 'GL' => '格陵兰', 'FO' => '法罗群岛',
-        'SJ' => '斯瓦尔巴', 'AX' => '奥兰群岛',
-    ];
-    return $map[$code] ?? $code;
-}
-
-/**
- * 判断IP是否为中国IP（根据国家代码或地区判断）
- */
-function isChinaIP($countryCode, $region = '') {
-    $chinaCodes = ['CN', 'HK', 'TW', 'MO'];
-    return in_array($countryCode, $chinaCodes, true);
-}
-function isPrivateIP($ip) {
-    $parts = array_map('intval', explode('.', $ip));
-    if ($parts[0] === 10) return true;
-    if ($parts[0] === 172 && $parts[1] >= 16 && $parts[1] <= 31) return true;
-    if ($parts[0] === 192 && $parts[1] === 168) return true;
-    if ($parts[0] === 127) return true;
-    return false;
-}
-
-/**
- * 查询IP归属地（带缓存）
- * @param string $ip IP地址
- * @return array|null 归属地信息
- */
-function getIpLocation($ip) {
-    global $pdo;
-
-    // 验证IP格式
-    if (empty($ip) || !filter_var($ip, FILTER_VALIDATE_IP)) {
-        return null;
-    }
-
-    // 1. 先查缓存
-    try {
-        $stmt = $pdo->prepare("SELECT * FROM ip_location_cache WHERE ip = ?");
-        $stmt->execute([$ip]);
-        $cached = $stmt->fetch();
-        if ($cached) {
-            return $cached;
-        }
-    } catch (PDOException $e) {
-        // 缓存表可能不存在，继续查询
-    }
-
-    // 2. 内网IP直接返回
-    if (isPrivateIP($ip)) {
-        return [
-            'ip' => $ip,
-            'country' => '内网',
-            'region' => '-',
-            'city' => '-',
-            'isp' => '-',
-            'org' => '-',
-            'loc' => '-',
-            'timezone' => '-'
-        ];
-    }
-
-    // 3. 调用 ipinfo.io API
-    $url = "https://ipinfo.io/{$ip}/json";
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-    // 生产环境应启用SSL验证，开发环境可临时禁用
-    // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-    // curl_setopt($ch, CURLOPT_CAINFO, '/path/to/ca-bundle.crt');
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if (!$response || $httpCode !== 200) {
-        return null;
-    }
-
-    $data = json_decode($response, true);
-    if (!$data || isset($data['bogon']) || isset($data['error'])) {
-        return null;
-    }
-
-    // 4. 解析ISP
-    $isp = '-';
-    $org = '-';
-    if (!empty($data['org']) && strpos($data['org'], ' ') !== false) {
-        $parts = explode(' ', $data['org'], 2);
-        $org = $parts[0];
-        $isp = $parts[1];
-    } elseif (!empty($data['org'])) {
-        $isp = $data['org'];
-    }
-
-    // 5. 存入缓存
-    try {
-        $stmt = $pdo->prepare("INSERT OR IGNORE INTO ip_location_cache (ip, country, region, city, isp, org, loc, timezone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([
-            $ip,
-            $data['country'] ?? '-',
-            $data['region'] ?? '-',
-            $data['city'] ?? '-',
-            $isp,
-            $org,
-            $data['loc'] ?? '-',
-            $data['timezone'] ?? '-'
-        ]);
-    } catch (PDOException $e) {
-        // 忽略缓存写入错误
-    }
-
-    return [
-        'ip' => $ip,
-        'country' => $data['country'] ?? '-',
-        'country_name' => getCountryName($data['country'] ?? ''),
-        'region' => $data['region'] ?? '-',
-        'city' => $data['city'] ?? '-',
-        'isp' => $isp,
-        'org' => $org,
-        'loc' => $data['loc'] ?? '-',
-        'timezone' => $data['timezone'] ?? '-'
-    ];
-}
-
-/**
- * 清理IP归属地缓存
- * @param int $maxAgeDays 清理多少天前的缓存，默认30天
- * @return int 清理的记录数
- */
-function clearIpLocationCache($maxAgeDays = 30) {
-    global $pdo;
-    try {
-        $stmt = $pdo->prepare("DELETE FROM ip_location_cache WHERE created_at < datetime('now', '-? days')");
-        $stmt->execute([$maxAgeDays]);
-        return $stmt->rowCount();
-    } catch (PDOException $e) {
-        error_log('Clear IP cache error: ' . $e->getMessage());
-        return 0;
-    }
-}
-
-/**
- * 获取IP缓存统计信息
- * @return array [total, oldest, newest]
- */
-function getIpCacheStats() {
-    global $pdo;
-    try {
-        $total = $pdo->query("SELECT COUNT(*) FROM ip_location_cache")->fetchColumn();
-        $oldest = $pdo->query("SELECT MIN(created_at) FROM ip_location_cache")->fetchColumn();
-        $newest = $pdo->query("SELECT MAX(created_at) FROM ip_location_cache")->fetchColumn();
-        $size = $pdo->query("SELECT SUM(LENGTH(ip) + LENGTH(country) + LENGTH(region) + LENGTH(city) + LENGTH(isp) + LENGTH(org) + LENGTH(loc) + LENGTH(timezone)) FROM ip_location_cache")->fetchColumn();
-        return ['total' => $total, 'oldest' => $oldest, 'newest' => $newest, 'size' => $size];
-    } catch (PDOException $e) {
-        return ['total' => 0, 'oldest' => null, 'newest' => null, 'size' => 0];
-    }
 }
 
 /**

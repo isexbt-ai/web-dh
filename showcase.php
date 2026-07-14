@@ -5,14 +5,8 @@
 require_once 'includes/functions.php';
 require_once 'includes/header.php';
 
-// 获取相册参数
-$galleryId = isset($_GET['gallery']) ? intval($_GET['gallery']) : null;
-
-// 获取相册列表（包含展示数量）
-$galleries = getGalleriesWithCount(true);
-
 // 获取效果展示列表
-$showcases = getShowcases(true, $galleryId);
+$showcases = getShowcases(true);
 
 // 记录访问
 recordVisit('showcase');
@@ -318,63 +312,6 @@ $extraHead = '<style>
         to { transform: rotate(360deg); }
     }
 
-    /* 相册导航 */
-    .gallery-nav {
-        display: flex;
-        gap: 10px;
-        padding: 16px 20px;
-        max-width: 1200px;
-        margin: 0 auto;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .gallery-tab {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 16px;
-        border-radius: 20px;
-        background: #ffffff;
-        border: 1px solid #e8e8e8;
-        color: #666666;
-        font-size: 14px;
-        font-weight: 500;
-        text-decoration: none;
-        white-space: nowrap;
-        transition: all 0.3s ease;
-    }
-
-    .gallery-tab:hover {
-        background: #fff5f5;
-        border-color: #e94560;
-        color: #e94560;
-    }
-
-    .gallery-tab.active {
-        background: linear-gradient(135deg, #e94560, #ff6b6b);
-        border-color: transparent;
-        color: #fff;
-        box-shadow: 0 2px 8px rgba(233, 69, 96, 0.3);
-    }
-
-    .gallery-count {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 20px;
-        height: 20px;
-        padding: 0 6px;
-        border-radius: 10px;
-        background: rgba(255,255,255,0.3);
-        font-size: 11px;
-        font-weight: 600;
-    }
-
-    .gallery-tab.active .gallery-count {
-        background: rgba(255,255,255,0.3);
-    }
-
     /* 响应式 */
     @media (max-width: 768px) {
         .showcase-grid {
@@ -432,19 +369,6 @@ renderPageHeader('效果展示', '精选美女导航网站 - 效果展示', $ext
         <h1>效果展示</h1>
         <span class="showcase-count">共 <?php echo count($showcases); ?> 张</span>
     </header>
-
-    <!-- 相册导航 -->
-    <?php if (!empty($galleries)): ?>
-    <div class="gallery-nav">
-        <a href="showcase.html" class="gallery-tab <?php echo $galleryId === null ? 'active' : ''; ?>">全部</a>
-        <?php foreach ($galleries as $gallery): ?>
-        <a href="showcase/<?php echo $gallery['id']; ?>.html" class="gallery-tab <?php echo $galleryId == $gallery['id'] ? 'active' : ''; ?>">
-            <?php echo e($gallery['title']); ?>
-            <span class="gallery-count"><?php echo $gallery['showcase_count']; ?></span>
-        </a>
-        <?php endforeach; ?>
-    </div>
-    <?php endif; ?>
 
     <!-- 展示网格 -->
     <div class="showcase-grid" id="showcaseGrid">

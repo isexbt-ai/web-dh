@@ -5,10 +5,8 @@ requireLogin();
 
 // 获取统计数据
 $todayVisits = getTodayVisits();
-$todayIpCount = getTodayIpCount();
 $totalVisits = getTotalVisits();
 $totalClicks = getTotalClicks();
-$totalPv = getTotalPv();
 $weekData = getWeekVisits();
 $hotCards = getHotCards();
 
@@ -96,14 +94,6 @@ $cardsCount = $pdo->query("SELECT COUNT(*) FROM cards")->fetchColumn();
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     <span>留言管理</span>
                 </a>
-                <a href="ip_stats.php" class="nav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="2" y1="12" x2="22" y2="12"/>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                    </svg>
-                    <span>IP统计</span>
-                </a>
                 <a href="password.php" class="nav-item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                     <span>修改密码</span>
@@ -138,19 +128,8 @@ $cardsCount = $pdo->query("SELECT COUNT(*) FROM cards")->fetchColumn();
                         </svg>
                     </div>
                     <div class="stat-info">
-                        <h3><?php echo $todayIpCount; ?></h3>
-                        <p>今日IP数量</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: linear-gradient(135deg, #ff6b6b, #ff8e8e);">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-                        </svg>
-                    </div>
-                    <div class="stat-info">
                         <h3><?php echo $todayVisits; ?></h3>
-                        <p>今日PV</p>
+                        <p>今日访问量</p>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -164,7 +143,7 @@ $cardsCount = $pdo->query("SELECT COUNT(*) FROM cards")->fetchColumn();
                     </div>
                     <div class="stat-info">
                         <h3><?php echo $totalVisits; ?></h3>
-                        <p>总独立IP</p>
+                        <p>总访问量</p>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -176,8 +155,8 @@ $cardsCount = $pdo->query("SELECT COUNT(*) FROM cards")->fetchColumn();
                         </svg>
                     </div>
                     <div class="stat-info">
-                        <h3><?php echo $totalPv; ?></h3>
-                        <p>总访问量</p>
+                        <h3><?php echo $cardsCount; ?></h3>
+                        <p>卡片数量</p>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -194,23 +173,9 @@ $cardsCount = $pdo->query("SELECT COUNT(*) FROM cards")->fetchColumn();
                 <div class="stat-card">
                     <div class="stat-icon" style="background: linear-gradient(135deg, #7c4dff, #b388ff);">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="7" height="7" rx="1"/>
-                            <rect x="14" y="3" width="7" height="7" rx="1"/>
-                            <rect x="14" y="14" width="7" height="7" rx="1"/>
-                            <rect x="3" y="14" width="7" height="7" rx="1"/>
-                        </svg>
-                    </div>
-                    <div class="stat-info">
-                        <h3><?php echo $cardsCount; ?></h3>
-                        <p>卡片数量</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: linear-gradient(135deg, #00bcd4, #4dd0e1);">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="4" y1="6" x2="20" y2="6"/>
-                            <line x1="4" y1="12" x2="20" y2="12"/>
-                            <line x1="4" y1="18" x2="20" y2="18"/>
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="3" y1="9" x2="21" y2="9"/>
+                            <line x1="9" y1="21" x2="9" y2="9"/>
                         </svg>
                     </div>
                     <div class="stat-info">
@@ -240,7 +205,8 @@ $cardsCount = $pdo->query("SELECT COUNT(*) FROM cards")->fetchColumn();
                             <th>排名</th>
                             <th>标题</th>
                             <th>分类</th>
-                            <th>点击次数</th>
+                            <th>访问量</th>
+                            <th>点击量</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -253,6 +219,7 @@ $cardsCount = $pdo->query("SELECT COUNT(*) FROM cards")->fetchColumn();
                             </td>
                             <td><?php echo e($card['title']); ?></td>
                             <td><?php echo e($card['category_name'] ?? '未分类'); ?></td>
+                            <td><?php echo $card['view_count'] ?? 0; ?></td>
                             <td><?php echo $card['click_count']; ?></td>
                         </tr>
                         <?php endforeach; ?>

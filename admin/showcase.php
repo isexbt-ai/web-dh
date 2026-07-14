@@ -7,7 +7,6 @@ require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
 
 $showcases = getShowcases(false);
-$galleries = getGalleries(false);
 ?>
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -61,14 +60,6 @@ $galleries = getGalleries(false);
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     <span>留言管理</span>
                 </a>
-                <a href="ip_stats.php" class="nav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="2" y1="12" x2="22" y2="12"/>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                    </svg>
-                    <span>IP统计</span>
-                </a>
                 <a href="password.php" class="nav-item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                     <span>修改密码</span>
@@ -89,73 +80,9 @@ $galleries = getGalleries(false);
                 <p>管理效果展示图片（支持WebP动图）</p>
             </header>
 
-            <!-- 相册列表 -->
-            <div class="table-section">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 class="section-title" style="margin-bottom: 0;">相册列表</h2>
-                    <button class="btn btn-primary" onclick="openModal('galleryModal')">添加相册</button>
-                </div>
-
-                <?php if (empty($galleries)): ?>
-                <div class="empty-state">暂无相册，点击上方按钮添加</div>
-                <?php else: ?>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>封面</th>
-                            <th>标题</th>
-                            <th>描述</th>
-                            <th>内容数</th>
-                            <th>排序</th>
-                            <th>状态</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($galleries as $gallery): ?>
-                        <tr>
-                            <td><?php echo $gallery['id']; ?></td>
-                            <td>
-                                <?php if ($gallery['cover_image']): ?>
-                                    <img src="../<?php echo e($gallery['cover_image']); ?>" class="showcase-preview" alt="<?php echo e($gallery['title']); ?>" onclick="window.open(this.src, '_blank')">
-                                <?php else: ?>
-                                    <div style="width: 80px; height: 60px; background: linear-gradient(135deg, #e94560, #ff6b6b); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff;">无封面</div>
-                                <?php endif; ?>
-                            </td>
-                            <td><?php echo e($gallery['title']); ?></td>
-                            <td><?php echo e($gallery['description'] ?: '-'); ?></td>
-                            <td><?php echo getGalleryShowcaseCount($gallery['id']); ?></td>
-                            <td><?php echo $gallery['sort_order']; ?></td>
-                            <td>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" <?php echo $gallery['is_active'] ? 'checked' : ''; ?> onchange="toggleStatus('gallery', <?php echo $gallery['id']; ?>, this.checked)">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </td>
-                            <td>
-                                <div class="table-actions">
-                                    <button class="btn btn-secondary btn-sm" onclick="editGallery(this)"
-                                        data-id="<?php echo $gallery['id']; ?>"
-                                        data-title="<?php echo e($gallery['title']); ?>"
-                                        data-description="<?php echo e($gallery['description']); ?>"
-                                        data-cover_image="<?php echo e($gallery['cover_image']); ?>"
-                                        data-sort_order="<?php echo e($gallery['sort_order']); ?>"
-                                        data-is_active="<?php echo e($gallery['is_active']); ?>">编辑</button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteItem('gallery', <?php echo $gallery['id']; ?>, () => location.reload())">删除</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-                <?php endif; ?>
-            </div>
-
             <!-- 批量操作 -->
             <div class="batch-actions">
                 <button class="btn btn-primary" onclick="openModal('showcaseModal')">添加展示</button>
-                <button class="btn btn-primary" onclick="openModal('galleryModal')" style="background: linear-gradient(135deg, #00bcd4, #4dd0e1); border: none;">添加相册</button>
             </div>
 
             <div class="table-section">
@@ -169,7 +96,6 @@ $galleries = getGalleries(false);
                             <th>ID</th>
                             <th>预览</th>
                             <th>标题</th>
-                            <th>所属相册</th>
                             <th>图片地址</th>
                             <th>排序</th>
                             <th>状态</th>
@@ -189,33 +115,15 @@ $galleries = getGalleries(false);
                                     }
                                     $isVideo = ($item['media_type'] ?? '') === 'video' || preg_match('/\.(mp4|webm|mov)$/i', $item['image'] ?? '');
                                     if ($isVideo): ?>
-                                        <video src="<?php echo e($imageUrl); ?>" class="showcase-preview" style="object-fit: cover;" muted onclick="window.open(this.src, '_blank')"></video>
+                                        <video src="<?php echo e($imageUrl); ?>" class="showcase-preview" muted onclick="window.open(this.src, '_blank')" style="width: 80px; height: 60px; object-fit: cover; border-radius: 8px; cursor: pointer;"></video>
                                     <?php else: ?>
-                                        <img src="<?php echo e($imageUrl); ?>" class="showcase-preview" alt="<?php echo e($item['title']); ?>" onclick="window.open(this.src, '_blank')">
+                                        <img src="<?php echo e($imageUrl); ?>" class="showcase-preview" alt="<?php echo e($item['title']); ?>" onclick="window.open(this.src, '_blank')" style="width: 80px; height: 60px; object-fit: cover; border-radius: 8px; cursor: pointer;">
                                     <?php endif; ?>
                                 <?php else: ?>
                                     <div style="width: 80px; height: 60px; background: linear-gradient(135deg, #e94560, #ff6b6b); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff;">无图</div>
                                 <?php endif; ?>
                             </td>
                             <td><?php echo e($item['title']); ?></td>
-                            <td>
-                                <?php
-                                $galleryName = '默认相册';
-                                $foundGallery = false;
-                                foreach ($galleries as $g) {
-                                    if ($g['id'] == ($item['gallery_id'] ?? 1)) {
-                                        $galleryName = $g['title'];
-                                        $foundGallery = true;
-                                        break;
-                                    }
-                                }
-                                // 如果gallery_id存在但找不到对应相册，显示相册ID
-                                if (!$foundGallery && !empty($item['gallery_id']) && $item['gallery_id'] != 1) {
-                                    $galleryName = '相册ID:' . $item['gallery_id'];
-                                }
-                                echo e($galleryName);
-                                ?>
-                            </td>
                             <td>
                                 <?php if ($item['image']): ?>
                                     <span style="font-size: 12px; color: #666; word-break: break-all;"><?php echo e($item['image']); ?></span>
@@ -237,7 +145,6 @@ $galleries = getGalleries(false);
                                         data-title="<?php echo e($item['title']); ?>"
                                         data-image="<?php echo e($item['image']); ?>"
                                         data-media_type="<?php echo e($item['media_type'] ?? 'image'); ?>"
-                                        data-gallery_id="<?php echo e($item['gallery_id'] ?? 1); ?>"
                                         data-sort_order="<?php echo e($item['sort_order']); ?>"
                                         data-is_active="<?php echo e($item['is_active']); ?>">编辑</button>
                                     <button class="btn btn-danger btn-sm" onclick="deleteItem('showcase', <?php echo $item['id']; ?>, () => location.reload())">删除</button>
@@ -274,15 +181,6 @@ $galleries = getGalleries(false);
                     <input type="hidden" id="showcaseMediaType" name="media_type" value="image">
                 </div>
                 <div class="form-group">
-                    <label>所属相册</label>
-                    <select id="showcaseGallery" name="gallery_id" required>
-                        <option value="">请选择相册</option>
-                        <?php foreach ($galleries as $g): ?>
-                        <option value="<?php echo $g['id']; ?>"><?php echo e($g['title']); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="form-group">
                     <label>排序</label>
                     <input type="number" id="showcaseSort" name="sort_order" value="0" min="0">
                 </div>
@@ -297,105 +195,8 @@ $galleries = getGalleries(false);
         </div>
     </div>
 
-    <!-- 添加/编辑相册模态框 -->
-    <div class="modal-overlay" id="galleryModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="galleryModalTitle">添加相册</h2>
-                <button class="modal-close" onclick="closeModal('galleryModal')">&times;</button>
-            </div>
-            <form id="galleryForm" onsubmit="return saveGallery(event)">
-                <input type="hidden" id="galleryId" name="id" value="0">
-                <div class="form-group">
-                    <label>相册标题</label>
-                    <input type="text" id="galleryTitle" name="title" placeholder="请输入相册标题" required>
-                </div>
-                <div class="form-group">
-                    <label>相册描述</label>
-                    <textarea id="galleryDescription" name="description" placeholder="请输入相册描述（可选）" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>相册封面 URL</label>
-                    <input type="text" id="galleryCoverUrl" name="cover_url" placeholder="请输入封面图片 URL" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; margin-bottom: 8px;">
-                    <div class="image-upload-preview" id="galleryCoverPreview"></div>
-                    <input type="hidden" id="galleryCoverImage" name="cover_image" value="">
-                </div>
-                <div class="form-group">
-                    <label>排序</label>
-                    <input type="number" id="gallerySort" name="sort_order" value="0" min="0">
-                </div>
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="galleryActive" name="is_active" value="1" checked>
-                        启用
-                    </label>
-                </div>
-                <button type="submit" class="btn btn-primary">保存</button>
-            </form>
-        </div>
-    </div>
-
     <script src="../assets/js/admin.js"></script>
     <script>
-        async function saveGallery(e) {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = {};
-            formData.forEach((value, key) => { data[key] = value; });
-
-            // 从 URL 输入框获取封面地址
-            const coverUrl = document.getElementById('galleryCoverUrl').value.trim();
-            if (coverUrl) {
-                data.cover_image = coverUrl;
-            }
-
-            data.is_active = document.getElementById('galleryActive').checked ? 1 : 0;
-
-            saveData('gallery', data, () => {
-                closeModal('galleryModal');
-                location.reload();
-            });
-            return false;
-        }
-
-        function previewGalleryCover(input) {
-            const preview = document.getElementById('galleryCoverPreview');
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.innerHTML = '<img src="' + e.target.result + '" alt="预览" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;">';
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function editGallery(btn) {
-            const id = btn.getAttribute('data-id');
-            const title = btn.getAttribute('data-title') || '';
-            const description = btn.getAttribute('data-description') || '';
-            const coverImage = btn.getAttribute('data-cover_image') || '';
-            const sortOrder = parseInt(btn.getAttribute('data-sort_order')) || 0;
-            const isActive = parseInt(btn.getAttribute('data-is_active')) || 0;
-
-            document.getElementById('galleryId').value = id;
-            document.getElementById('galleryTitle').value = title;
-            document.getElementById('galleryDescription').value = description;
-            document.getElementById('galleryCoverImage').value = coverImage;
-            document.getElementById('galleryCoverUrl').value = coverImage;
-            document.getElementById('gallerySort').value = sortOrder;
-            document.getElementById('galleryActive').checked = isActive === 1;
-
-            const preview = document.getElementById('galleryCoverPreview');
-            if (coverImage) {
-                preview.innerHTML = '<img src="' + coverImage + '" alt="预览" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;">';
-            } else {
-                preview.innerHTML = '';
-            }
-
-            document.getElementById('galleryModalTitle').textContent = '编辑相册';
-            openModal('galleryModal');
-        }
-
         function previewShowcaseMedia(input) {
             const preview = document.getElementById('showcaseImagePreview');
             if (input.files && input.files[0]) {
@@ -409,7 +210,7 @@ $galleries = getGalleries(false);
                         preview.innerHTML = '<img src="' + e.target.result + '" alt="预览" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;">';
                     }
                 };
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(input.files[0]);
             }
         }
 
@@ -442,7 +243,6 @@ $galleries = getGalleries(false);
             const title = btn.getAttribute('data-title') || '';
             const image = btn.getAttribute('data-image') || '';
             const mediaType = btn.getAttribute('data-media_type') || 'image';
-            const galleryId = parseInt(btn.getAttribute('data-gallery_id')) || 1;
             const sortOrder = parseInt(btn.getAttribute('data-sort_order')) || 0;
             const isActive = parseInt(btn.getAttribute('data-is_active')) || 0;
 
@@ -451,7 +251,6 @@ $galleries = getGalleries(false);
             document.getElementById('showcaseImage').value = image;
             document.getElementById('showcaseImageUrl').value = image; // 填充 URL 输入框
             document.getElementById('showcaseMediaType').value = mediaType;
-            document.getElementById('showcaseGallery').value = galleryId;
             document.getElementById('showcaseSort').value = sortOrder;
             document.getElementById('showcaseActive').checked = isActive === 1;
 
