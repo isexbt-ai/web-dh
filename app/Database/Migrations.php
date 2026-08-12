@@ -179,6 +179,7 @@ final class Migrations
     {
         // 兼容性兜底：老库缺失字段时补列
         $checks = [
+            ['admin_users', 'role', "TEXT DEFAULT 'admin'"],
             ['cards', 'detail', "TEXT DEFAULT ''"],
             ['cards', 'card_type', "TEXT DEFAULT 'link'"],
             ['cards', 'image_width', 'INTEGER DEFAULT 0'],
