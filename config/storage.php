@@ -9,7 +9,8 @@ return [
 
     // Cloudflare R2（生产配置从 .env 读取，禁止硬编码）
     'r2' => [
-        'enabled' => (bool) ($_ENV['R2_ENABLED'] ?? false),
+        // 严格比对字符串 'true'，避免 (bool)'false' 恒为 true 的坑
+        'enabled' => ($_ENV['R2_ENABLED'] ?? '') === 'true',
         'account_id' => $_ENV['R2_ACCOUNT_ID'] ?? '',
         'access_key_id' => $_ENV['R2_ACCESS_KEY_ID'] ?? '',
         'secret_access_key' => $_ENV['R2_SECRET_ACCESS_KEY'] ?? '',

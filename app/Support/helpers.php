@@ -97,3 +97,17 @@ if (!function_exists('str_slug')) {
         return substr(strtolower($slug), 0, $max);
     }
 }
+
+if (!function_exists('image_url')) {
+    /**
+     * 图片地址规范化：绝对 URL（http/data:/）/绝对路径（/开头）原样返回，
+     * 相对路径（uploads/...）补 / 前缀，避免子页面相对解析错误。
+     */
+    function image_url(string $path): string
+    {
+        if ($path === '') {
+            return '';
+        }
+        return preg_match('/^(https?:|data:|blob:|\/)/i', $path) ? $path : '/' . ltrim($path, '/');
+    }
+}

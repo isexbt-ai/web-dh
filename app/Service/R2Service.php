@@ -95,7 +95,10 @@ final class R2Service
         $now = gmdate('Ymd\THis\Z');
         $dateStamp = gmdate('Ymd');
 
-        $canonicalUri = '/' . implode('/', array_map('rawurlencode', explode('/', ltrim($key, '/'))));
+        // canonicalUri 必须包含完整请求路径（R2 的 bucket 在路径前缀：/bucket/key）
+        $endpointPath = (string) (parse_url($this->endpoint(), PHP_URL_PATH) ?? '');
+        $fullPath = rtrim($endpointPath, '/') . '/' . ltrim($key, '/');
+        $canonicalUri = '/' . implode('/', array_map('rawurlencode', explode('/', ltrim($fullPath, '/'))));
         $canonicalHeaders = "host:$host\nx-amz-content-sha256:$payloadHash\nx-amz-date:$now\n";
         $signedHeadersList = 'host;x-amz-content-sha256;x-amz-date';
         $canonicalRequest = $method . "\n" . $canonicalUri . "\n\n" . $canonicalHeaders . "\n" . $signedHeadersList . "\n" . $payloadHash;

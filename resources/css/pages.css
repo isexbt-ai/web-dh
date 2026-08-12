@@ -1007,3 +1007,7 @@
 .category-page-breadcrumb { font-size: 13px; color: #999; margin-bottom: 8px; }
 .category-page-breadcrumb a { color: #e94560; text-decoration: none; }
 .category-page-title { font-size: 22px; font-weight: 700; color: #1a1a2e; }
+
+/* ===== 文章列表返回首页 ===== */
+.articles-back { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 8px 16px; border-radius: 8px; background: #f8f9fa; color: #666; font-size: 13px; text-decoration: none; border: 1px solid #eee; transition: all .3s; }
+.articles-back:hover { color: #e94560; border-color: #e94560; }

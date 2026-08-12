@@ -12,7 +12,7 @@ if ($badgeText === '') {
 } else {
     $badgeClass = 'custom';
 }
-$imageSrc = $card['image'] ?? '';
+$imageSrc = image_url((string) ($card['image'] ?? ''));
 $link = $card['link'] ?? '#';
 ?>
 <div class="card-item"

@@ -9,7 +9,7 @@ $card = $card ?? [];
     <div class="detail-card">
         <?php if (!empty($card['image'])): ?>
         <div class="detail-image">
-            <img src="<?= e($card['image']) ?>" alt="<?= e($card['title']) ?>" loading="eager"
+            <img src="<?= e(image_url((string) $card['image'])) ?>" alt="<?= e($card['title']) ?>" loading="eager"
                  width="<?= (int) ($card['image_width'] ?? 0) ?>" height="<?= (int) ($card['image_height'] ?? 0) ?>">
         </div>
         <?php else: ?>

@@ -11,6 +11,10 @@ $pages = (int) ($pages ?? 1);
     <div class="articles-header">
         <h1>文章资讯</h1>
         <p>精选实用技巧与站点动态</p>
+        <a href="/" class="articles-back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            返回首页
+        </a>
     </div>
 
     <?php if ($articles !== []): ?>
