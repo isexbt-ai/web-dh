@@ -9,3 +9,6 @@
 /data/.initial_password
 /node_modules/
 /uploads/
+/logs/
+/data/cache_*.json
+/data/countries.json
