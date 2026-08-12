@@ -1,7 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /data/
-Disallow: /includes/
-
-Sitemap: https://91db.cc/sitemap.xml

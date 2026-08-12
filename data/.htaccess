@@ -1,3 +1,0 @@
-# 禁止直接访问此目录下的所有文件
-Order Allow,Deny
-Deny from all
