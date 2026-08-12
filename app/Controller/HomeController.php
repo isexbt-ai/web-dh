@@ -88,6 +88,7 @@ final class HomeController
             'notices' => $this->noticeModel->getAll(true),
             'visitorCount' => (int) $stats['total_visitors'],
             'recentVisitors' => (int) $stats['recent_visitors'],
+            'guestbookEnabled' => $this->settings->get('guestbook_enabled', '1') === '1',
         ]);
 
         $data['content'] = $this->view->partial('front/home', $data);
