@@ -78,13 +78,27 @@ final class HomeController
 
         $stats = $this->visitService->displayStats((int) config('app.visitor_display_days', 30));
 
+        // 轮播容器比例：按第一张广告图尺寸自适应（避免固定 16:9 cover 裁剪显示不全）
+        $ads = $this->adModel->getAll(true);
+        $carouselStyle = 'height: 180px;';
+        if (isset($ads[0]['image']) && is_string($ads[0]['image']) && str_starts_with($ads[0]['image'], 'uploads/')) {
+            $imgPath = base_path('/') . ltrim($ads[0]['image'], '/');
+            if (is_file($imgPath)) {
+                $size = @getimagesize($imgPath);
+                if (is_array($size) && ($size[0] ?? 0) > 0 && ($size[1] ?? 0) > 0) {
+                    $carouselStyle = 'aspect-ratio: ' . (int) $size[0] . '/' . (int) $size[1] . ';';
+                }
+            }
+        }
+
         $seo = $this->seo->page($siteTitle, $siteSubtitle, '/', [], $jsonld);
         $data = array_merge($seo, [
             'siteTitle' => $siteTitle,
             'siteSubtitle' => $siteSubtitle,
             'categories' => $categories,
             'categoryCards' => $categoryCards,
-            'ads' => $this->adModel->getAll(true),
+            'ads' => $ads,
+            'carouselStyle' => $carouselStyle,
             'notices' => $this->noticeModel->getAll(true),
             'visitorCount' => (int) $stats['total_visitors'],
             'recentVisitors' => (int) $stats['recent_visitors'],

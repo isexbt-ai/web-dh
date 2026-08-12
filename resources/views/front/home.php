@@ -14,7 +14,7 @@ $notices = $notices ?? [];
 <?php if (!empty($ads)): ?>
 <section class="slide-section">
     <div class="section-card">
-        <div class="slide-carousel" id="slideCarousel">
+        <div class="slide-carousel" id="slideCarousel" style="<?= e($carouselStyle ?? '') ?>">
             <?php foreach ($ads as $i => $ad): ?>
             <div class="slide-item<?= $i === 0 ? ' active' : '' ?>">
                 <?php if (!empty($ad['image'])): ?>

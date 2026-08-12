@@ -72,20 +72,8 @@ final class ApiController
 
     private function listMessages(Request $request, Response $response): Response
     {
-        $params = $request->getQueryParams();
-        $page = max(1, (int) ($params['page'] ?? 1));
-        $perPage = max(1, (int) config('app.guestbook_per_page', 10));
-
-        $messages = $this->messageModel->getApproved(($page - 1) * $perPage, $perPage);
-        $data = array_map(static fn (array $m): array => [
-            'id' => (int) $m['id'],
-            'nickname' => (string) ($m['nickname'] ?? ''),
-            'content' => (string) $m['content'],
-            'reply' => (string) ($m['reply'] ?? ''),
-            'created_at' => (string) $m['created_at'],
-        ], $messages);
-
-        return $this->json($response, ['ok' => true, 'messages' => $data, 'total' => $this->messageModel->countApproved()]);
+        // 留言仅管理员可见：公开 API 不再返回留言内容（后台「留言管理」查看）
+        return $this->json($response, ['ok' => true, 'messages' => [], 'total' => 0]);
     }
 
     private function submitMessage(Request $request, Response $response): Response

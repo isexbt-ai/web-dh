@@ -42,32 +42,7 @@ $visitorCount = (int) ($visitorCount ?? 0);
         </div>
     </section>
 
-    <section class="guestbook-list-section">
-        <h3 class="guestbook-list-title">全部留言</h3>
-        <?php if ($messages !== []): ?>
-        <div class="guestbook-list">
-            <?php foreach ($messages as $m): ?>
-            <div class="guestbook-item">
-                <div class="guestbook-item-header">
-                    <span class="guestbook-item-nickname"><?= e($m['nickname'] ?: '匿名') ?></span>
-                    <span class="guestbook-item-time"><?= e(date('Y-m-d H:i', strtotime((string) $m['created_at']))) ?></span>
-                </div>
-                <div class="guestbook-item-content"><?= e($m['content']) ?></div>
-                <?php if (!empty($m['reply'])): ?>
-                <div class="guestbook-reply">
-                    <span class="guestbook-reply-label">站长回复</span>
-                    <span class="guestbook-reply-content"><?= e($m['reply']) ?></span>
-                </div>
-                <?php endif; ?>
-            </div>
-            <?php endforeach; ?>
-        </div>
-        <?php else: ?>
-        <div class="guestbook-empty">暂无留言，快来抢沙发</div>
-        <?php endif; ?>
-    </section>
-
-    <?= $__view->partial('partials/pagination', ['page' => $page, 'pages' => $pages, 'base' => '/guestbook']) ?>
+    <?php /* 留言列表仅管理员可见，前台不展示（管理员在后台「留言管理」查看） */ ?>
 
     <?php if ($visitorCount > 0): ?>
     <p class="visitor-count">您是本站的第 <?= number_format($visitorCount) ?> 位访客，欢迎光临本站。</p>
