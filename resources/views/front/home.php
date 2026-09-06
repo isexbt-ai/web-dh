@@ -80,7 +80,7 @@ $notices = $notices ?? [];
 <?php endif; ?>
 
 <?php if (!empty($visitorCount)): ?>
-<p class="visitor-count">您是本站的第 <?= number_format((int) $visitorCount) ?> 位访客，欢迎光临本站。</p>
+<p class="visitor-count">您是本站的第 <!--VISITOR_COUNT--> 位访客，欢迎光临本站。</p>
 <?php endif; ?>
 
 <?php

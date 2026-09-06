@@ -40,6 +40,13 @@ final class HomeController
         $cacheKey = 'page_home';
         $cached = $this->cache->get($cacheKey);
         if (is_string($cached) && $cached !== '') {
+            // 缓存命中：访客数仍每次实时计算并替换占位符（避免被 5 分钟缓存冻结）
+            $stats = $this->visitService->displayStats((int) config('app.visitor_display_days', 30));
+            $cached = str_replace(
+                '<!--VISITOR_COUNT-->',
+                number_format((int) $stats['total_visitors']),
+                $cached
+            );
             $response->getBody()->write($cached);
             return $response;
         }
