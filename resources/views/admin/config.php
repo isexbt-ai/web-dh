@@ -46,6 +46,13 @@ $values = $values ?? [];
         <div class="form-group"><label>umami 脚本地址</label><input name="umami_script_url" value="<?= e($values['umami_script_url'] ?? '') ?>" placeholder="https://umami.example.com/script.js"></div>
         <div class="form-group"><label>umami 站点 ID</label><input name="umami_website_id" value="<?= e($values['umami_website_id'] ?? '') ?>"></div>
 
+        <div class="section-title">前台访客显示（虚拟人气加成）</div>
+        <p class="form-hint">展示值 = 真实访客数 + 基数 + 开站天数 × 日增量 + 当天随机抖动；后台仪表盘仍显示真实数。</p>
+        <div class="form-row">
+            <div class="form-group"><label>人气基数</label><input type="number" min="0" name="visitor_base_offset" value="<?= e($values['visitor_base_offset'] ?? '88888') ?>"></div>
+            <div class="form-group"><label>每日净增</label><input type="number" min="0" name="visitor_daily_increment" value="<?= e($values['visitor_daily_increment'] ?? '137') ?>"></div>
+        </div>
+
         <div class="form-row">
             <div class="form-group"><label>PC 卡片列数</label><input name="cards_per_row_desktop" value="<?= e($values['cards_per_row_desktop'] ?? 'repeat(6,1fr)') ?>" placeholder="repeat(6,1fr)"></div>
             <div class="form-group"><label>平板列数</label><input name="cards_per_row_tablet" value="<?= e($values['cards_per_row_tablet'] ?? 'repeat(4,1fr)') ?>" placeholder="repeat(4,1fr)"></div>

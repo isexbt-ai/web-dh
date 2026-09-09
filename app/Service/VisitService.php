@@ -12,8 +12,15 @@ use App\Support\Context;
  */
 final class VisitService
 {
-    public function __construct(private VisitStat $model)
-    {
+    /** 前台人气基数默认值（看起来很多人）。 */
+    private const DEFAULT_BASE_OFFSET = 88888;
+    /** 每天净增默认值。 */
+    private const DEFAULT_DAILY_INCREMENT = 137;
+
+    public function __construct(
+        private VisitStat $model,
+        private SettingService $settings,
+    ) {
     }
 
     /** 记录一次访问：同一 IP 当天只记一条（明细防刷）。 */
@@ -27,13 +34,35 @@ final class VisitService
         $this->model->add($page, $clientIp, mb_substr($ua, 0, 255));
     }
 
-    /** 前台访客数展示：总访客 + 近 N 天访客。 */
+    /** 前台访客数展示：真实数 + 人气基数 + 按天增量 + 小幅抖动，看起来人多且每天增长。 */
     public function displayStats(int $days = 30): array
     {
+        $realTotal = $this->model->countUniqueTotal();
+        $realRecent = $this->model->countUniqueSince($days);
+        $boost = $this->popularityBoost();
         return [
-            'total_visitors' => $this->model->countUniqueTotal(),
-            'recent_visitors' => $this->model->countUniqueSince($days),
+            'total_visitors' => $realTotal,
+            'recent_visitors' => $realRecent,
+            'display_total' => $realTotal + $boost,
+            'display_recent' => $realRecent + $boost,
         ];
+    }
+
+    /** 人气加成：基数 + 开站天数 × 日增量 + 当天固定抖动（同一天内数字稳定）。 */
+    private function popularityBoost(): int
+    {
+        $base = (int) $this->settings->get('visitor_base_offset', (string) self::DEFAULT_BASE_OFFSET);
+        $inc = (int) $this->settings->get('visitor_daily_increment', (string) self::DEFAULT_DAILY_INCREMENT);
+        $firstDate = $this->model->fetchColumn('SELECT MIN(visit_date) FROM visit_stats');
+        $daysSinceStart = 0;
+        if (is_string($firstDate) && $firstDate !== '') {
+            $ts = strtotime($firstDate);
+            if ($ts !== false) {
+                $daysSinceStart = max(0, (int) floor((time() - $ts) / 86400));
+            }
+        }
+        mt_srand((int) date('Ymd'));
+        return $base + $daysSinceStart * $inc + mt_rand(0, 99);
     }
 
     /** 后台仪表盘统计汇总。 */

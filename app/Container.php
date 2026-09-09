@@ -52,7 +52,10 @@ final class Container
                 (int) config('app.cache_ttl', 300)
             ),
             SettingService::class => fn (ContainerInterface $c) => new SettingService($c->get(Setting::class)),
-            VisitService::class => fn (ContainerInterface $c) => new VisitService($c->get(VisitStat::class)),
+            VisitService::class => fn (ContainerInterface $c) => new VisitService(
+                $c->get(VisitStat::class),
+                $c->get(SettingService::class),
+            ),
             RateLimitService::class => fn (ContainerInterface $c) => new RateLimitService(
                 $c->get(LoginAttempt::class),
                 (int) config('app.login_lock_attempts', 5),

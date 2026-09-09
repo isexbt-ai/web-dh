@@ -44,7 +44,7 @@ final class HomeController
             $stats = $this->visitService->displayStats((int) config('app.visitor_display_days', 30));
             $cached = str_replace(
                 '<!--VISITOR_COUNT-->',
-                number_format((int) $stats['total_visitors']),
+                number_format((int) $stats['display_total']),
                 $cached
             );
             $response->getBody()->write($cached);
@@ -107,8 +107,8 @@ final class HomeController
             'ads' => $ads,
             'carouselStyle' => $carouselStyle,
             'notices' => $this->noticeModel->getAll(true),
-            'visitorCount' => (int) $stats['total_visitors'],
-            'recentVisitors' => (int) $stats['recent_visitors'],
+            'visitorCount' => (int) $stats['display_total'],
+            'recentVisitors' => (int) $stats['display_recent'],
             'guestbookEnabled' => $this->settings->get('guestbook_enabled', '1') === '1',
         ]);
 

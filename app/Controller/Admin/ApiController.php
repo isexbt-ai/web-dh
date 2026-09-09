@@ -33,6 +33,7 @@ final class ApiController
         'guestbook_title', 'guestbook_subtitle', 'guestbook_image', 'guestbook_notice',
         'umami_enabled', 'umami_script_url', 'umami_website_id',
         'cards_per_row_desktop', 'cards_per_row_tablet', 'cards_per_row_mobile',
+        'visitor_base_offset', 'visitor_daily_increment',
     ];
 
     public function __construct(
