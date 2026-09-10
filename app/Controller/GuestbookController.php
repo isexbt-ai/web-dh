@@ -40,7 +40,6 @@ final class GuestbookController
         $messages = $this->messageModel->getApproved(($page - 1) * $perPage, $perPage);
         $total = $this->messageModel->countApproved();
         $pages = (int) ceil($total / $perPage);
-        $stats = $this->visitService->displayStats((int) config('app.visitor_display_days', 30));
 
         $seo = $this->seo->page(
             $this->settings->get('guestbook_title', '联系我们'),
@@ -58,7 +57,6 @@ final class GuestbookController
                 'image' => $this->settings->get('guestbook_image', ''),
                 'notice' => $this->settings->get('guestbook_notice', '欢迎联系我们！如有任何问题或建议，请填写以下表单，我们会尽快回复您。'),
             ],
-            'visitorCount' => (int) $stats['total_visitors'],
         ]));
     }
 }

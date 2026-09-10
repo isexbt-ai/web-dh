@@ -1,13 +1,12 @@
 <?php
 /**
  * 留言板页内容模板。
- * 数据：messages/page/pages/guestbook(数组)/visitorCount
+ * 数据：messages/page/pages/guestbook(数组)
  */
 $messages = $messages ?? [];
 $page = (int) ($page ?? 1);
 $pages = (int) ($pages ?? 1);
 $gb = $guestbook ?? [];
-$visitorCount = (int) ($visitorCount ?? 0);
 ?>
 <div class="guestbook-container">
     <?php if (!empty($gb['image'])): ?>
@@ -43,8 +42,4 @@ $visitorCount = (int) ($visitorCount ?? 0);
     </section>
 
     <?php /* 留言列表仅管理员可见，前台不展示（管理员在后台「留言管理」查看） */ ?>
-
-    <?php if ($visitorCount > 0): ?>
-    <p class="visitor-count">您是本站的第 <?= number_format($visitorCount) ?> 位访客，欢迎光临本站。</p>
-    <?php endif; ?>
 </div>

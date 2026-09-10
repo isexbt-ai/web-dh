@@ -16,10 +16,14 @@ final class VisitService
     private const DEFAULT_BASE_OFFSET = 88888;
     /** 每天净增默认值。 */
     private const DEFAULT_DAILY_INCREMENT = 137;
+    /** 前台展示数据缓存 key + TTL（与首页整页缓存一致：5 分钟）。 */
+    private const DISPLAY_CACHE_KEY = 'visitor_display_stats';
+    private const DISPLAY_CACHE_TTL = 300;
 
     public function __construct(
         private VisitStat $model,
         private SettingService $settings,
+        private CacheService $cache,
     ) {
     }
 
@@ -34,18 +38,24 @@ final class VisitService
         $this->model->add($page, $clientIp, mb_substr($ua, 0, 255));
     }
 
-    /** 前台访客数展示：真实数 + 人气基数 + 按天增量 + 小幅抖动，看起来人多且每天增长。 */
+    /** 前台访客数展示：真实数 + 人气基数 + 按天增量 + 小幅抖动，看起来人多且每天增长。5 分钟缓存避免每次请求都查 stats 表。 */
     public function displayStats(int $days = 30): array
     {
+        $cached = $this->cache->get(self::DISPLAY_CACHE_KEY);
+        if (is_array($cached)) {
+            return $cached;
+        }
         $realTotal = $this->model->countUniqueTotal();
         $realRecent = $this->model->countUniqueSince($days);
         $boost = $this->popularityBoost();
-        return [
+        $data = [
             'total_visitors' => $realTotal,
             'recent_visitors' => $realRecent,
             'display_total' => $realTotal + $boost,
             'display_recent' => $realRecent + $boost,
         ];
+        $this->cache->set(self::DISPLAY_CACHE_KEY, $data, self::DISPLAY_CACHE_TTL);
+        return $data;
     }
 
     /** 人气加成：基数 + 开站天数 × 日增量 + 当天固定抖动（同一天内数字稳定）。 */
