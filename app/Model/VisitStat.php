@@ -47,6 +47,13 @@ final class VisitStat extends BaseModel
         return (int) $this->fetchColumn('SELECT COUNT(DISTINCT ip) FROM visit_stats');
     }
 
+    /** 最早一次访问日期（YYYY-MM-DD），用于按开站天数计算人气加成。 */
+    public function firstVisitDate(): ?string
+    {
+        $val = $this->fetchColumn('SELECT MIN(visit_date) FROM visit_stats');
+        return is_string($val) && $val !== '' ? $val : null;
+    }
+
     /** 最近 N 天内去重访客数（含今天）。 */
     public function countUniqueSince(int $days): int
     {

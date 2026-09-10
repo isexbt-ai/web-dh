@@ -53,9 +53,9 @@ final class VisitService
     {
         $base = (int) $this->settings->get('visitor_base_offset', (string) self::DEFAULT_BASE_OFFSET);
         $inc = (int) $this->settings->get('visitor_daily_increment', (string) self::DEFAULT_DAILY_INCREMENT);
-        $firstDate = $this->model->fetchColumn('SELECT MIN(visit_date) FROM visit_stats');
+        $firstDate = $this->model->firstVisitDate();
         $daysSinceStart = 0;
-        if (is_string($firstDate) && $firstDate !== '') {
+        if ($firstDate !== null) {
             $ts = strtotime($firstDate);
             if ($ts !== false) {
                 $daysSinceStart = max(0, (int) floor((time() - $ts) / 86400));
