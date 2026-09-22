@@ -48,6 +48,9 @@
         form.querySelectorAll('[name]').forEach(function (field) {
             if (field.type === 'checkbox') {
                 data[field.name] = field.checked ? 1 : 0;
+            } else if (field.type === 'radio') {
+                // 同名 radio 只取 checked 的那个，否则全部 value 会被覆盖、最后一个生效
+                if (field.checked) data[field.name] = field.value;
             } else {
                 data[field.name] = field.value;
             }
@@ -134,6 +137,17 @@
 
     // ==================== 初始化 ====================
     document.addEventListener('DOMContentLoaded', function () {
+        // 主题选择器：change 事件即时切换 .active 视觉（不依赖保存）
+        document.querySelectorAll('.theme-picker input[type="radio"]').forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                var picker = radio.closest('.theme-picker');
+                if (!picker) return;
+                picker.querySelectorAll('.theme-option').forEach(function (opt) { opt.classList.remove('active'); });
+                var opt = radio.closest('.theme-option');
+                if (opt) opt.classList.add('active');
+            });
+        });
+
         // 登录
         var loginForm = document.getElementById('loginForm');
         if (loginForm) {
