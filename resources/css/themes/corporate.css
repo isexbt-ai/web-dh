@@ -1,7 +1,7 @@
 /* ==================== 商务极简 (corporate) ==================== */
 /* 纯白 + 灰阶 + 单一蓝强调色；留白多，圆角稍小，字体更紧 */
 
-:root[data-theme="corporate"] {
+body[data-theme="corporate"] {
     /* 品牌色：Apple 系蓝 */
     --brand-primary: #0066cc;
     --brand-primary-light: #4a90e2;

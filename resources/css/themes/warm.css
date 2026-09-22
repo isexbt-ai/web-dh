@@ -1,7 +1,7 @@
 /* ==================== 暖橙亲和 (warm) ==================== */
 /* 珊瑚橙 + 暖米色背景；气质更亲和 */
 
-:root[data-theme="warm"] {
+body[data-theme="warm"] {
     --brand-primary: #ff6b35;
     --brand-primary-light: #ff8c5a;
     --brand-primary-dark: #e54a1b;

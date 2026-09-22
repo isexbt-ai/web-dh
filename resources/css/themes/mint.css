@@ -1,7 +1,7 @@
 /* ==================== 薄荷清新 (mint) ==================== */
 /* 薄荷绿 + 淡薄荷背景；清爽中性 */
 
-:root[data-theme="mint"] {
+body[data-theme="mint"] {
     --brand-primary: #14b8a6;
     --brand-primary-light: #2dd4bf;
     --brand-primary-dark: #0d9488;

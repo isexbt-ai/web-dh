@@ -4,8 +4,8 @@
     "admin.css": "/assets/css/admin.min.css?v=61011b",
     "main.js": "/assets/js/main.min.js?v=94c1ca",
     "admin.js": "/assets/js/admin.min.js?v=21078c",
-    "theme-corporate": "/assets/css/themes/corporate.min.css?v=5ee8f9",
-    "theme-dark": "/assets/css/themes/dark.min.css?v=5c20bc",
-    "theme-mint": "/assets/css/themes/mint.min.css?v=e58d67",
-    "theme-warm": "/assets/css/themes/warm.min.css?v=1cf731"
+    "theme-corporate": "/assets/css/themes/corporate.min.css?v=49c543",
+    "theme-dark": "/assets/css/themes/dark.min.css?v=2f19b8",
+    "theme-mint": "/assets/css/themes/mint.min.css?v=a989a5",
+    "theme-warm": "/assets/css/themes/warm.min.css?v=a6dc02"
 }
