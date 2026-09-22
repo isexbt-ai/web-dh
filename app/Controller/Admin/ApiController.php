@@ -14,6 +14,7 @@ use App\Model\Message;
 use App\Model\Notice;
 use App\Model\Showcase;
 use App\Service\CacheService;
+use App\Service\PingService;
 use App\Service\SettingService;
 use App\Service\UploadService;
 use PDO;
@@ -29,11 +30,13 @@ final class ApiController
     /** 后台可保存的配置键白名单（与 SettingController 一致） */
     private const CONFIG_KEYS = [
         'site_title', 'site_subtitle', 'site_description', 'site_keywords',
+        'site_theme',
         'card_sort_method', 'guestbook_enabled',
         'guestbook_title', 'guestbook_subtitle', 'guestbook_image', 'guestbook_notice',
         'umami_enabled', 'umami_script_url', 'umami_website_id',
         'cards_per_row_desktop', 'cards_per_row_tablet', 'cards_per_row_mobile',
         'visitor_base_offset', 'visitor_daily_increment',
+        'baidu_push_token', 'indexnow_key',
     ];
 
     public function __construct(
@@ -49,6 +52,7 @@ final class ApiController
         private SettingService $settings,
         private UploadService $upload,
         private CacheService $cache,
+        private PingService $ping,
         private PDO $pdo
     ) {
     }
@@ -165,8 +169,57 @@ final class ApiController
             return $this->json($response, false, '保存失败，请重试');
         }
 
+        // 推送 SEO 索引（仅影响前台内容时；失败不阻断主流程）
+        $this->pingSeoUrls($action, $id);
+
         $this->cache->clear();
         return $this->json($response, true, '保存成功');
+    }
+
+    /**
+     * 把受影响的页面 URL 投到 Baidu / IndexNow。
+     * 仅 card / article / category / showcase / link 触发；config / message 不推。
+     */
+    private function pingSeoUrls(string $action, int $id): void
+    {
+        $urls = [];
+        try {
+            switch ($action) {
+                case 'card':
+                    $urls[] = '/';
+                    if ($id > 0) {
+                        $urls[] = '/card/' . $id . '.html';
+                        $card = $this->card->find($id, true);
+                        if ($card !== null) {
+                            $urls[] = '/category/' . (int) $card['category_id'] . '.html';
+                        }
+                    }
+                    break;
+                case 'article':
+                    $urls[] = '/articles';
+                    if ($id > 0) {
+                        $article = $this->article->find($id, true);
+                        if ($article !== null) {
+                            $urls[] = '/article/' . $id . '-' . (string) $article['slug'] . '.html';
+                        }
+                    }
+                    break;
+                case 'category':
+                    $urls[] = '/';
+                    if ($id > 0) {
+                        $urls[] = '/category/' . $id . '.html';
+                    }
+                    break;
+                case 'showcase':
+                    $urls[] = '/showcase';
+                    break;
+                default:
+                    return;
+            }
+            $this->ping->pingUrls($urls);
+        } catch (\Throwable $e) {
+            error_log('[admin/api/ping] ' . $action . ' failed, msg=' . $e->getMessage());
+        }
     }
 
     public function delete(Request $request, Response $response): Response

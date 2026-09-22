@@ -34,6 +34,11 @@ final class CardController
         $this->incrementClick($id);
 
         $jsonld = [
+            $this->seo->webPageSchema(
+                (string) $card['title'],
+                (string) ($card['detail'] ?? ''),
+                $this->seo->canonical('/card/' . $id . '.html')
+            ),
             $this->seo->breadcrumbSchema([
                 ['name' => '首页', 'url' => $this->seo->canonical('/')],
                 ['name' => (string) $card['title'], 'url' => $this->seo->canonical('/card/' . $id . '.html')],

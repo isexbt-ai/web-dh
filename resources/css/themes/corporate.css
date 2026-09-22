@@ -1,0 +1,45 @@
+/* ==================== 商务极简 (corporate) ==================== */
+/* 纯白 + 灰阶 + 单一蓝强调色；留白多，圆角稍小，字体更紧 */
+
+:root[data-theme="corporate"] {
+    /* 品牌色：Apple 系蓝 */
+    --brand-primary: #0066cc;
+    --brand-primary-light: #4a90e2;
+    --brand-primary-dark: #0052a3;
+    --brand-gradient: linear-gradient(135deg, #0066cc, #4a90e2);
+    --brand-shadow: rgba(0, 102, 204, 0.3);
+    --brand-shadow-light: rgba(0, 102, 204, 0.1);
+    --brand-shadow-medium: rgba(0, 102, 204, 0.2);
+    --brand-bg-light: #f5f5f7;
+    --brand-bg-lighter: rgba(0, 102, 204, 0.04);
+    --brand-glow: linear-gradient(90deg, #0066cc, #4a90e2, #0066cc);
+
+    /* 表面色：纯白 + 极浅灰 */
+    --bg-page: #ffffff;
+    --bg-card: #ffffff;
+    --bg-elevated: #fafafa;
+    --bg-muted: #f5f5f7;
+    --bg-input: #ffffff;
+
+    /* 文本色：Apple 系灰 */
+    --text-primary: #1d1d1f;
+    --text-secondary: #424245;
+    --text-tertiary: #6e6e73;
+    --text-muted: #86868b;
+
+    /* 边框：更浅的灰 */
+    --border: #e5e5e7;
+    --border-strong: #d2d2d7;
+
+    /* 阴影更克制 */
+    --shadow-subtle: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-card: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-card-hover: 0 6px 20px rgba(0,0,0,0.08);
+    --shadow-medium: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-elevated: 0 8px 24px rgba(0,0,0,0.08);
+
+    /* 页脚 */
+    --footer-bg: #ffffff;
+    --footer-text: #86868b;
+    --footer-link: #d2d2d7;
+}

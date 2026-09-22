@@ -27,10 +27,19 @@ final class VisitService
     ) {
     }
 
-    /** 记录一次访问：同一 IP 当天只记一条（明细防刷）。 */
-    public function record(string $page): void
+    /**
+     * 记录一次访问：同一 IP 当天只记一条（明细防刷）。
+     * IP 由中间件传入（避免依赖 Context::ip() 与 SessionMiddleware 顺序耦合），
+     * 其他调用方（管理脚本等）可传空字符串占位。
+     */
+    public function record(string $page, string $clientIp = ''): void
     {
-        $clientIp = Context::ip();
+        if ($clientIp === '') {
+            $clientIp = (string) (Context::ip() ?? '');
+        }
+        if ($clientIp === '') {
+            return;
+        }
         if ($this->model->hasVisitedToday($clientIp)) {
             return;
         }

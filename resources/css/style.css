@@ -1,12 +1,46 @@
-/* ==================== CSS 变量定义 ==================== */
+/* ==================== CSS 变量定义（主题 token） ==================== */
 :root {
+    /* === 品牌色（主题覆盖） === */
     --brand-primary: #e94560;
     --brand-primary-light: #ff6b6b;
+    --brand-primary-dark: #c73e54;
     --brand-gradient: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-light));
     --brand-shadow: rgba(233, 69, 96, 0.4);
     --brand-shadow-light: rgba(233, 69, 96, 0.15);
+    --brand-shadow-medium: rgba(233, 69, 96, 0.3);
     --brand-bg-light: #fff5f5;
     --brand-bg-lighter: rgba(233, 69, 96, 0.06);
+    --brand-glow: linear-gradient(90deg, #e94560, #f9a825, #27ae60, #2d9cdb, #7c4dff, #e94560);
+
+    /* === 表面色（主题覆盖） === */
+    --bg-page: #f5f7fa;
+    --bg-card: #ffffff;
+    --bg-elevated: #fafafa;
+    --bg-muted: #f8f9fa;
+    --bg-input: #fafafa;
+
+    /* === 文本色（主题覆盖） === */
+    --text-primary: #1a1a2e;
+    --text-secondary: #333333;
+    --text-tertiary: #666666;
+    --text-muted: #999999;
+    --text-on-brand: #ffffff;
+
+    /* === 边框色（主题覆盖） === */
+    --border: #f0f0f0;
+    --border-strong: #e8e8e8;
+
+    /* === 阴影 === */
+    --shadow-subtle: 0 1px 4px rgba(0,0,0,0.03);
+    --shadow-card: 0 2px 8px rgba(0,0,0,0.04);
+    --shadow-card-hover: 0 12px 32px rgba(0,0,0,0.12);
+    --shadow-medium: 0 2px 12px rgba(0,0,0,0.08);
+    --shadow-elevated: 0 8px 24px rgba(0,0,0,0.08);
+
+    /* === 页脚 === */
+    --footer-bg: #ffffff;
+    --footer-text: #999999;
+    --footer-link: #ddd;
 }
 
 /* ==================== 基础样式重置 ==================== */
@@ -18,9 +52,9 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background: #f5f7fa;
+    background: var(--bg-page);
     min-height: 100vh;
-    color: #1a1a2e;
+    color: var(--text-primary);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -46,17 +80,17 @@ img {
 
 /* ==================== 区块通用样式 ==================== */
 .section-card {
-    background: #ffffff;
+    background: var(--bg-card);
     border-radius: 12px;
-    border: 1px solid #f0f0f0;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-subtle);
     margin-bottom: 10px;
     overflow: hidden;
     transition: all 0.3s ease;
 }
 
 .section-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    box-shadow: var(--shadow-medium);
     transform: translateY(-1px);
 }
 
@@ -69,7 +103,7 @@ img {
     position: relative;
     border-radius: 12px;
     overflow: hidden;
-    background: #f8f9fa;
+    background: var(--bg-muted);
     width: 100%;
     aspect-ratio: 16/9;
 }
@@ -111,10 +145,10 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-light));
+    background: var(--brand-gradient);
     font-size: 24px;
     font-weight: bold;
-    color: #fff;
+    color: var(--text-on-brand);
     border-radius: 12px;
 }
 
@@ -168,7 +202,7 @@ img {
 }
 .notice-modal-content {
     position: relative;
-    background: #fff;
+    background: var(--bg-card);
     border-radius: 16px;
     width: 90%;
     max-width: 380px;
@@ -190,24 +224,24 @@ img {
     justify-content: space-between;
     align-items: center;
     padding: 16px 20px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--border);
 }
 .notice-modal-header h3 {
     font-size: 16px;
     margin: 0;
-    color: #333;
+    color: var(--text-secondary);
 }
 .notice-modal-close {
     background: none;
     border: none;
     font-size: 24px;
-    color: #999;
+    color: var(--text-muted);
     cursor: pointer;
     padding: 0 4px;
     line-height: 1;
 }
 .notice-modal-close:hover {
-    color: #333;
+    color: var(--text-secondary);
 }
 .notice-modal-body {
     padding: 16px 20px;
@@ -229,19 +263,19 @@ img {
 .notice-modal-item p {
     margin: 0;
     font-size: 13px;
-    color: #666;
+    color: var(--text-tertiary);
     line-height: 1.6;
 }
 .notice-modal-footer {
     padding: 12px 20px;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 .notice-dont-show {
     font-size: 12px;
-    color: #999;
+    color: var(--text-muted);
     cursor: pointer;
     user-select: none;
 }
@@ -250,8 +284,8 @@ img {
     vertical-align: middle;
 }
 .notice-modal-confirm {
-    background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-light));
-    color: #fff;
+    background: var(--brand-gradient);
+    color: var(--text-on-brand);
     border: none;
     padding: 8px 28px;
     border-radius: 20px;
@@ -281,9 +315,9 @@ img {
     flex: 1;
     padding: 8px 0;
     border-radius: 25px;
-    border: 1px solid #e8e8e8;
-    background: #f8f9fa;
-    color: #666666;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-muted);
+    color: var(--text-tertiary);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -300,10 +334,10 @@ img {
 }
 
 .category-tab.active {
-    background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-light));
+    background: var(--brand-gradient);
     border-color: transparent;
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(233, 69, 96, 0.3);
+    color: var(--text-on-brand);
+    box-shadow: 0 2px 8px var(--brand-shadow-medium);
 }
 
 /* ==================== 卡片网格（CSS 变量控制） ==================== */
@@ -321,11 +355,11 @@ img {
 }
 
 .card-item {
-    background: #ffffff;
+    background: var(--bg-card);
     border-radius: 12px;
     overflow: hidden;
-    border: 1px solid #f0f0f0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-card);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     position: relative;
@@ -336,8 +370,8 @@ img {
 
 .card-item:hover {
     transform: translateY(-6px);
-    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
-    border-color: #e8e8e8;
+    box-shadow: var(--shadow-card-hover);
+    border-color: var(--border-strong);
 }
 
 .card-item:active {
@@ -370,22 +404,22 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-light));
+    background: var(--brand-gradient);
     font-size: 16px;
     font-weight: bold;
-    color: #fff;
+    color: var(--text-on-brand);
 }
 
 .card-title {
     padding: 6px 8px;
     font-size: 12px;
-    color: #333333;
+    color: var(--text-secondary);
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    background: #fafafa;
-    border-top: 1px solid #f0f0f0;
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border);
     font-weight: 500;
     transition: all 0.3s ease;
     line-height: 1.3;
@@ -415,13 +449,15 @@ img {
 }
 
 .card-type-badge.detail {
-    background: rgba(233, 69, 96, 0.9);
-    color: #fff;
+    background: var(--brand-shadow-medium), var(--brand-primary);
+    background: var(--brand-primary);
+    opacity: 0.9;
+    color: var(--text-on-brand);
 }
 
 .card-type-badge.custom {
     background: linear-gradient(135deg, #f9a825, #ff9800);
-    color: #fff;
+    color: var(--text-on-brand);
 }
 
 /* ==================== 加载动画 ==================== */
@@ -432,13 +468,13 @@ img {
     align-items: center;
     justify-content: center;
     padding: 60px 0;
-    color: #999999;
+    color: var(--text-muted);
 }
 
 .spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid #f0f0f0;
+    border: 3px solid var(--border);
     border-top-color: var(--brand-primary);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -453,10 +489,10 @@ img {
 .site-footer {
     text-align: center;
     padding: 16px;
-    color: #999999;
+    color: var(--footer-text);
     font-size: 13px;
-    background: #ffffff;
-    border-top: 1px solid #f0f0f0;
+    background: var(--footer-bg);
+    border-top: 1px solid var(--border);
     margin-top: 4px;
 }
 
@@ -464,7 +500,7 @@ img {
     margin-top: 8px;
     font-size: 18px;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-light), #f9a825, #4ecca3, #7c4dff);
+    background: var(--brand-glow);
     background-size: 300% 300%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -485,23 +521,19 @@ img {
         padding: 0;
     }
 
-    /* 卡片网格：桌面端保持 3 列（和移动端一致），不拉到 6 列 */
     .card-grid {
         grid-template-columns: repeat(3, 1fr);
         gap: 14px;
     }
 
-    /* 卡片标题稍微放大 */
     .card-title {
         font-size: 13px;
     }
 
-    /* 分类标题稍微放大 */
     .category-title {
         font-size: 15px;
     }
 
-    /* 广告轮播圆点稍微放大 */
     .slide-dot {
         width: 10px;
         height: 10px;
@@ -511,7 +543,6 @@ img {
         width: 28px;
     }
 
-    /* 悬浮按钮组位置调整 */
     .float-btn-group {
         bottom: 30px;
         right: 30px;
@@ -519,7 +550,7 @@ img {
 
     .card-item:hover {
         transform: translateY(-6px);
-        box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+        box-shadow: var(--shadow-card-hover);
     }
 
     .section-card:hover {
@@ -571,7 +602,7 @@ img {
     grid-column: 1 / -1;
     text-align: center;
     padding: 60px 20px;
-    color: #999999;
+    color: var(--text-muted);
 }
 
 .empty-state svg {
@@ -610,8 +641,8 @@ img {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-light));
-    color: #fff;
+    background: var(--brand-gradient);
+    color: var(--text-on-brand);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -633,7 +664,7 @@ img {
 
 .back-to-top:hover {
     transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 8px 24px rgba(233, 69, 96, 0.5);
+    box-shadow: 0 8px 24px var(--brand-shadow);
 }
 
 .back-to-top svg {
@@ -651,7 +682,7 @@ img {
     align-items: flex-end;
     gap: 12px;
     z-index: 90;
-    pointer-events: none; /* 让按钮自己处理点击 */
+    pointer-events: none;
 }
 
 .float-btn-group > * {
@@ -662,8 +693,8 @@ img {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    color: #fff;
-    background: linear-gradient(135deg, #e94560, #ff6b6b);
+    color: var(--text-on-brand);
+    background: var(--brand-gradient);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -693,20 +724,19 @@ img {
     text-shadow: 0 1px 2px rgba(0,0,0,0.15);
 }
 
-/* 返回顶部按钮 */
 .float-btn#backToTop {
     background: linear-gradient(135deg, #666666, #999999);
     opacity: 0;
     pointer-events: none;
     transform: scale(0.8);
-    display: none; /* 初始隐藏 */
+    display: none;
 }
 
 .float-btn#backToTop.show {
     opacity: 1;
     pointer-events: auto;
     transform: scale(1);
-    display: flex; /* 显示时才用flex */
+    display: flex;
 }
 
 .float-btn#backToTop:hover {
@@ -714,27 +744,24 @@ img {
     box-shadow: 0 6px 20px rgba(0,0,0,0.3);
 }
 
-/* 效果展示按钮 */
-.float-btn[href="showcase.php"] {
+.float-btn[href="/showcase"] {
     background: linear-gradient(135deg, #7c4dff, #b388ff);
 }
 
-.float-btn[href="showcase.php"]:hover {
+.float-btn[href="/showcase"]:hover {
     transform: scale(1.08);
     box-shadow: 0 6px 20px rgba(124, 77, 255, 0.5);
 }
 
-/* 留言板按钮 */
-.float-btn[href="guestbook.php"] {
-    background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-light));
+.float-btn[href="/guestbook"] {
+    background: var(--brand-gradient);
 }
 
-.float-btn[href="guestbook.php"]:hover {
+.float-btn[href="/guestbook"]:hover {
     transform: scale(1.08);
-    box-shadow: 0 6px 20px rgba(233, 69, 96, 0.5);
+    box-shadow: 0 6px 20px var(--brand-shadow);
 }
 
-/* 小屏幕适配 */
 @media (max-width: 480px) {
     .float-btn-group {
         bottom: max(12px, env(safe-area-inset-bottom, 0px));
@@ -762,8 +789,8 @@ img {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: #fff;
-    border-bottom: 1px solid #f0f0f0;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
     padding: 10px 16px;
 }
 .guestbook-back {
@@ -785,23 +812,20 @@ img {
 }
 
 /* ==================== 留言板页面样式 ==================== */
-
-/* 留言列表 */
 .guestbook-list {
     display: flex;
     flex-direction: column;
     gap: 0;
 }
 
-/* 单条留言 */
 .guestbook-item {
     padding: 16px 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--border);
     transition: background 0.2s ease;
 }
 
 .guestbook-item:hover {
-    background: #fafafa;
+    background: var(--bg-elevated);
     margin: 0 -20px;
     padding: 16px 20px;
 }
@@ -810,7 +834,6 @@ img {
     border-bottom: none;
 }
 
-/* 留言头部 */
 .guestbook-item-header {
     display: flex;
     justify-content: space-between;
@@ -826,19 +849,17 @@ img {
 
 .guestbook-item-time {
     font-size: 12px;
-    color: #999;
+    color: var(--text-muted);
 }
 
-/* 留言内容 */
 .guestbook-item-content {
     font-size: 14px;
-    color: #333;
+    color: var(--text-secondary);
     line-height: 1.7;
     word-break: break-all;
     white-space: pre-wrap;
 }
 
-/* 留言表单 */
 .guestbook-form {
     display: flex;
     flex-direction: column;
@@ -849,20 +870,21 @@ img {
 .guestbook-form textarea {
     width: 100%;
     padding: 12px 16px;
-    border: 1px solid #e8e8e8;
+    border: 1px solid var(--border-strong);
     border-radius: 10px;
     font-size: 14px;
     font-family: inherit;
     transition: all 0.3s ease;
-    background: #fafafa;
+    background: var(--bg-input);
+    color: var(--text-primary);
 }
 
 .guestbook-form input:focus,
 .guestbook-form textarea:focus {
     outline: none;
     border-color: var(--brand-primary);
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.1);
+    background: var(--bg-card);
+    box-shadow: 0 0 0 3px var(--brand-shadow-light);
 }
 
 .guestbook-form textarea {
@@ -871,8 +893,8 @@ img {
 }
 
 .guestbook-form button {
-    background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-light));
-    color: #fff;
+    background: var(--brand-gradient);
+    color: var(--text-on-brand);
     border: none;
     padding: 12px 32px;
     border-radius: 25px;
@@ -885,7 +907,7 @@ img {
 
 .guestbook-form button:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(233, 69, 96, 0.3);
+    box-shadow: 0 4px 16px var(--brand-shadow-medium);
 }
 
 .guestbook-form button:disabled {
@@ -893,11 +915,10 @@ img {
     cursor: not-allowed;
 }
 
-/* 分页按钮 */
 .pagination-btn {
-    background: #f8f9fa;
-    border: 1px solid #e8e8e8;
-    color: #666;
+    background: var(--bg-muted);
+    border: 1px solid var(--border-strong);
+    color: var(--text-tertiary);
     padding: 10px 32px;
     border-radius: 25px;
     font-size: 14px;
@@ -911,21 +932,18 @@ img {
     color: var(--brand-primary);
 }
 
-/* 空状态 */
 .guestbook-empty {
     text-align: center;
     padding: 60px 20px;
-    color: #999;
+    color: var(--text-muted);
     font-size: 14px;
 }
 
-/* 新消息高亮动画 */
 @keyframes highlightNew {
-    0% { background: rgba(233, 69, 96, 0.1); }
+    0% { background: var(--brand-bg-lighter); }
     100% { background: transparent; }
 }
 
-/* 响应式 - 手机端悬浮按钮 */
 @media (max-width: 480px) {
     .guestbook-float-btn {
         bottom: 16px;
@@ -942,7 +960,6 @@ img {
     }
 }
 
-/* ==================== 留言板头部图片 ==================== */
 .guestbook-header-image {
     width: 100%;
     max-height: 200px;
@@ -952,11 +969,10 @@ img {
     display: block;
 }
 
-/* ==================== 管理员回复 ==================== */
 .guestbook-reply {
     margin-top: 12px;
     padding: 12px 16px;
-    background: linear-gradient(135deg, var(--brand-bg-light), #fff0f0);
+    background: linear-gradient(135deg, var(--brand-bg-light), var(--brand-bg-lighter));
     border-radius: 10px;
     border-left: 3px solid var(--brand-primary);
 }
@@ -970,7 +986,7 @@ img {
 
 .guestbook-reply-content {
     font-size: 14px;
-    color: #333;
+    color: var(--text-secondary);
     line-height: 1.7;
     word-break: break-all;
     white-space: pre-wrap;
@@ -995,11 +1011,11 @@ img {
     letter-spacing: 0.5px;
 }
 
-/* ===== 首页/页面 visitor-count 炫彩居中（不依赖 .site-footer） ===== */
+/* ===== 首页/页面 visitor-count 炫彩居中 ===== */
 .visitor-count {
     text-align: center;
     padding: 16px 0;
-    background: linear-gradient(90deg, #e94560, #f9a825, #27ae60, #2d9cdb, #7c4dff, #e94560);
+    background: var(--brand-glow);
     background-size: 200% auto;
     -webkit-background-clip: text;
     background-clip: text;

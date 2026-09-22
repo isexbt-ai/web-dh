@@ -1,7 +1,11 @@
 {
-    "style.css": "/assets/css/style.min.css?v=d66b8d",
-    "pages.css": "/assets/css/pages.min.css?v=cf44b6",
-    "admin.css": "/assets/css/admin.min.css?v=eb548d",
+    "style.css": "/assets/css/style.min.css?v=7e9ba5",
+    "pages.css": "/assets/css/pages.min.css?v=5ee364",
+    "admin.css": "/assets/css/admin.min.css?v=61011b",
     "main.js": "/assets/js/main.min.js?v=94c1ca",
-    "admin.js": "/assets/js/admin.min.js?v=b213a9"
+    "admin.js": "/assets/js/admin.min.js?v=b213a9",
+    "theme-corporate": "/assets/css/themes/corporate.min.css?v=5ee8f9",
+    "theme-dark": "/assets/css/themes/dark.min.css?v=5c20bc",
+    "theme-mint": "/assets/css/themes/mint.min.css?v=e58d67",
+    "theme-warm": "/assets/css/themes/warm.min.css?v=1cf731"
 }

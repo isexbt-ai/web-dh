@@ -3,6 +3,22 @@
  * 站点配置（数据：values 数组，key => 当前值）
  */
 $values = $values ?? [];
+$themeChoices = $theme_choices ?? [
+    'default' => '浅红品牌（默认）',
+    'dark' => '暗夜深邃',
+    'corporate' => '商务极简',
+    'warm' => '暖橙亲和',
+    'mint' => '薄荷清新',
+];
+/** 主题缩略色（用于后台预览）。 */
+$themeSwatches = [
+    'default' => ['#e94560', '#f5f7fa', '#ffffff'],
+    'dark' => ['#ff5571', '#0f1419', '#1a1f29'],
+    'corporate' => ['#0066cc', '#ffffff', '#f5f5f7'],
+    'warm' => ['#ff6b35', '#fff8f3', '#ffffff'],
+    'mint' => ['#14b8a6', '#f0fdfa', '#ffffff'],
+];
+$currentTheme = $values['site_theme'] ?? 'default';
 ?>
 <div class="page-header">
     <div><h1>站点配置</h1><p>站点名称/描述/留言板/统计等设置</p></div>
@@ -15,6 +31,23 @@ $values = $values ?? [];
         <div class="form-group"><label>副标题</label><input name="site_subtitle" value="<?= e($values['site_subtitle'] ?? '') ?>" maxlength="100"></div>
         <div class="form-group"><label>站点描述</label><textarea name="site_description" rows="2" maxlength="300"><?= e($values['site_description'] ?? '') ?></textarea></div>
         <div class="form-group"><label>关键词</label><input name="site_keywords" value="<?= e($values['site_keywords'] ?? '') ?>" maxlength="200"></div>
+
+        <div class="section-title">外观主题</div>
+        <p class="form-hint">切换后立即生效（保存时清整页缓存），前台会按所选主题加载对应 CSS。</p>
+        <div class="theme-picker">
+            <?php foreach ($themeChoices as $key => $label): ?>
+            <label class="theme-option<?= $currentTheme === $key ? ' active' : '' ?>">
+                <input type="radio" name="site_theme" value="<?= e($key) ?>" <?= $currentTheme === $key ? 'checked' : '' ?>>
+                <span class="theme-swatch">
+                    <span class="swatch-bg" style="background:<?= e($themeSwatches[$key][1] ?? '#f5f7fa') ?>"></span>
+                    <span class="swatch-card" style="background:<?= e($themeSwatches[$key][2] ?? '#fff') ?>"></span>
+                    <span class="swatch-accent" style="background:<?= e($themeSwatches[$key][0] ?? '#e94560') ?>"></span>
+                </span>
+                <span class="theme-label"><?= e($label) ?></span>
+            </label>
+            <?php endforeach; ?>
+        </div>
+
         <div class="form-group"><label>卡片排序方式</label>
             <select name="card_sort_method">
                 <option value="default" <?= ($values['card_sort_method'] ?? '') === 'default' ? 'selected' : '' ?>>手动排序</option>
@@ -52,6 +85,11 @@ $values = $values ?? [];
             <div class="form-group"><label>人气基数</label><input type="number" min="0" name="visitor_base_offset" value="<?= e($values['visitor_base_offset'] ?? '88888') ?>"></div>
             <div class="form-group"><label>每日净增</label><input type="number" min="0" name="visitor_daily_increment" value="<?= e($values['visitor_daily_increment'] ?? '137') ?>"></div>
         </div>
+
+        <div class="section-title">搜索引擎主动推送（SEO）</div>
+        <p class="form-hint">保存卡片/文章/分类时自动推 URL；token/key 留空则跳过对应渠道。IndexNow 同时覆盖 Bing / Yandex。</p>
+        <div class="form-group"><label>百度推送 token</label><input name="baidu_push_token" value="<?= e($values['baidu_push_token'] ?? '') ?>" placeholder="从 https://ziyuan.baidu.com 站点管理获取"></div>
+        <div class="form-group"><label>IndexNow key</label><input name="indexnow_key" value="<?= e($values['indexnow_key'] ?? '') ?>" placeholder="8-128 位 hex；需把 {key}.txt 放到站点根"></div>
 
         <div class="form-row">
             <div class="form-group"><label>PC 卡片列数</label><input name="cards_per_row_desktop" value="<?= e($values['cards_per_row_desktop'] ?? 'repeat(6,1fr)') ?>" placeholder="repeat(6,1fr)"></div>

@@ -54,6 +54,10 @@ if (!function_exists('asset')) {
             'admin.css' => '/assets/css/admin.css',
             'admin.js' => '/assets/js/admin.js',
             'pages.css' => '/assets/css/pages.css',
+            'theme-dark' => '/assets/css/themes/dark.css',
+            'theme-corporate' => '/assets/css/themes/corporate.css',
+            'theme-warm' => '/assets/css/themes/warm.css',
+            'theme-mint' => '/assets/css/themes/mint.css',
         ];
         return $fallbacks[$key] ?? '/' . $key;
     }

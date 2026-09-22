@@ -71,8 +71,8 @@ final class HomeController
             ];
         }
 
-        // 结构化数据：站点 + 卡片 ItemList
-        $jsonld = [$this->seo->webSiteSchema()];
+        // 结构化数据：站点（含 SearchAction）+ 卡片 ItemList
+        $jsonld = [$this->seo->webSiteWithSearchSchema()];
         $cardItems = [];
         foreach ($categoryCards as $cat) {
             foreach ($cat['cards'] as $card) {

@@ -37,10 +37,20 @@ final class CategoryController
 
         $sortMethod = $this->settings->get('card_sort_method', 'default');
         $cards = $this->cardModel->getByCategory($id, true, $sortMethod);
+        $canonical = $this->seo->canonical('/category/' . $id . '.html');
+        $jsonld = [
+            $this->seo->collectionSchema((string) $category['name'], $canonical),
+            $this->seo->breadcrumbSchema([
+                ['name' => '首页', 'url' => $this->seo->canonical('/')],
+                ['name' => (string) $category['name'], 'url' => $canonical],
+            ]),
+        ];
         $seo = $this->seo->page(
             (string) $category['name'],
             '',
-            '/category/' . $id . '.html'
+            '/category/' . $id . '.html',
+            [],
+            $jsonld
         );
 
         return $this->view->page($response, 'layouts/front', 'front/category', array_merge($seo, [

@@ -10,6 +10,7 @@ $canonical = $canonical ?? '';
 $og = $og ?? [];
 $jsonld = $jsonld ?? [];
 $umami = $umami ?? ['enabled' => false, 'script_url' => '', 'website_id' => ''];
+$activeTheme = $theme ?? 'default';
 ?>
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -17,13 +18,26 @@ $umami = $umami ?? ['enabled' => false, 'script_url' => '', 'website_id' => ''];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle) ?></title>
-    <meta name="description" content="<?= e($pageDesc) ?>">
-    <meta name="theme-color" content="#e94560">
+    <?php
+/** 浏览器地址栏颜色：按主题选用品牌主色，深色主题用页面底色。 */
+$themeColorMap = [
+    'dark' => '#0f1419',
+    'corporate' => '#0066cc',
+    'warm' => '#ff6b35',
+    'mint' => '#14b8a6',
+];
+$themeColor = $themeColorMap[$activeTheme] ?? '#e94560';
+?>
+<meta name="description" content="<?= e($pageDesc) ?>">
+    <meta name="theme-color" content="<?= e($themeColor) ?>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <?php if ($canonical !== ''): ?>
     <link rel="canonical" href="<?= e($canonical) ?>">
     <?php endif; ?>
     <link rel="stylesheet" href="<?= e(asset('style.css')) ?>">
+    <?php if ($activeTheme !== 'default'): ?>
+    <link rel="stylesheet" href="<?= e(asset('theme-' . $activeTheme)) ?>">
+    <?php endif; ?>
     <link rel="stylesheet" href="<?= e(asset('pages.css')) ?>">
     <link rel="manifest" href="/manifest.json">
     <?php foreach ($og as $key => $value): ?>
@@ -36,7 +50,7 @@ $umami = $umami ?? ['enabled' => false, 'script_url' => '', 'website_id' => ''];
     <script defer src="<?= e($umami['script_url']) ?>" data-website-id="<?= e($umami['website_id']) ?>"></script>
     <?php endif; ?>
 </head>
-<body>
+<body<?= $activeTheme !== 'default' ? ' data-theme="' . e($activeTheme) . '"' : '' ?>>
     <?php if (!empty($showTopBar)): ?>
     <header class="top-bar">
         <div class="header-left">

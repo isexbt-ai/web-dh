@@ -71,7 +71,19 @@ final class SeoService
             'og' => $og,
             'jsonld' => $jsonld,
             'umami' => $this->trackingConfig(),
+            'theme' => $this->activeTheme(),
         ];
+    }
+
+    /**
+     * 当前激活主题：默认 default（使用 :root 变量），其它主题需加载对应 CSS。
+     * 校验非法值回退 default。
+     */
+    public function activeTheme(): string
+    {
+        $theme = (string) $this->settings->get('site_theme', 'default');
+        $allowed = ['default', 'dark', 'corporate', 'warm', 'mint'];
+        return in_array($theme, $allowed, true) ? $theme : 'default';
     }
 
     /** umami 统计脚本配置（布局输出用）。 */
@@ -133,5 +145,88 @@ final class SeoService
                 array_keys($crumbs)
             )),
         ];
+    }
+
+    /** WebPage JSON-LD：详情页通用（关联站点 + 标题描述）。 */
+    public function webPageSchema(string $name, string $description, string $url): array
+    {
+        return [
+            '@context' => 'https://schema.org',
+            '@type' => 'WebPage',
+            'name' => $name,
+            'description' => $description,
+            'url' => $url,
+            'isPartOf' => [
+                '@type' => 'WebSite',
+                'name' => $this->siteTitle(),
+                'url' => $this->baseUrl() . '/',
+            ],
+        ];
+    }
+
+    /** Article JSON-LD：文章详情页。 */
+    public function articleSchema(array $article, string $url): array
+    {
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Article',
+            'headline' => (string) ($article['title'] ?? ''),
+            'description' => (string) ($article['summary'] ?? ''),
+            'url' => $url,
+            'datePublished' => (string) ($article['created_at'] ?? ''),
+            'dateModified' => (string) ($article['updated_at'] ?? $article['created_at'] ?? ''),
+            'author' => [
+                '@type' => 'Organization',
+                'name' => $this->siteTitle(),
+            ],
+            'publisher' => [
+                '@type' => 'Organization',
+                'name' => $this->siteTitle(),
+                'logo' => [
+                    '@type' => 'ImageObject',
+                    'url' => $this->baseUrl() . (string) config('seo.og_image', '/assets/images/logo.png'),
+                ],
+            ],
+        ];
+        $image = (string) ($article['cover_image'] ?? '');
+        if ($image !== '') {
+            $schema['image'] = preg_match('/^https?:/i', $image) ? $image : $this->baseUrl() . '/' . ltrim($image, '/');
+        }
+        if (!empty($article['keywords'])) {
+            $schema['keywords'] = (string) $article['keywords'];
+        }
+        return $schema;
+    }
+
+    /** CollectionPage JSON-LD：分类聚合页。 */
+    public function collectionSchema(string $name, string $url, string $description = ''): array
+    {
+        return [
+            '@context' => 'https://schema.org',
+            '@type' => 'CollectionPage',
+            'name' => $name,
+            'description' => $description,
+            'url' => $url,
+            'isPartOf' => [
+                '@type' => 'WebSite',
+                'name' => $this->siteTitle(),
+                'url' => $this->baseUrl() . '/',
+            ],
+        ];
+    }
+
+    /** WebSite 带 SearchAction：首页用，鼓励搜索引擎出站内搜索框。 */
+    public function webSiteWithSearchSchema(): array
+    {
+        $schema = $this->webSiteSchema();
+        $schema['potentialAction'] = [
+            '@type' => 'SearchAction',
+            'target' => [
+                '@type' => 'EntryPoint',
+                'urlTemplate' => $this->baseUrl() . '/search?q={search_term_string}',
+            ],
+            'query-input' => 'required name=search_term_string',
+        ];
+        return $schema;
     }
 }

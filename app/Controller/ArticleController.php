@@ -75,11 +75,13 @@ final class ArticleController
         }
 
         $url = '/article/' . $id . '-' . (string) $article['slug'] . '.html';
+        $canonical = $this->seo->canonical($url);
         $jsonld = [
+            $this->seo->articleSchema($article, $canonical),
             $this->seo->breadcrumbSchema([
                 ['name' => '首页', 'url' => $this->seo->canonical('/')],
                 ['name' => '文章资讯', 'url' => $this->seo->canonical('/articles')],
-                ['name' => (string) $article['title'], 'url' => $this->seo->canonical($url)],
+                ['name' => (string) $article['title'], 'url' => $canonical],
             ]),
         ];
 

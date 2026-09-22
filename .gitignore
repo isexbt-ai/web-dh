@@ -12,3 +12,4 @@
 /logs/
 /data/cache_*.json
 /data/countries.json
+data/*.sqlite

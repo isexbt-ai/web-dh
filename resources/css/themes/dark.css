@@ -1,0 +1,45 @@
+/* ==================== 暗夜深邃 (dark) ==================== */
+/* 深色背景 + 浅色文字 + 品牌红保持一致；阴影改用边框替代 */
+
+:root[data-theme="dark"] {
+    /* 品牌色保持（红在深色上仍鲜明） */
+    --brand-primary: #ff5571;
+    --brand-primary-light: #ff7a8a;
+    --brand-primary-dark: #e94560;
+    --brand-shadow: rgba(255, 85, 113, 0.35);
+    --brand-shadow-light: rgba(255, 85, 113, 0.12);
+    --brand-shadow-medium: rgba(255, 85, 113, 0.25);
+    --brand-bg-light: rgba(255, 85, 113, 0.08);
+    --brand-bg-lighter: rgba(255, 85, 113, 0.05);
+    --brand-glow: linear-gradient(90deg, #ff5571, #ff7a8a, #ff5571);
+    --brand-gradient: linear-gradient(135deg, #ff5571, #ff7a8a);
+
+    /* 表面色（深蓝灰） */
+    --bg-page: #0f1419;
+    --bg-card: #1a1f29;
+    --bg-elevated: #232a36;
+    --bg-muted: #1a1f29;
+    --bg-input: #0f1419;
+
+    /* 文本色 */
+    --text-primary: #e6e9ef;
+    --text-secondary: #c5cad4;
+    --text-tertiary: #8e93a0;
+    --text-muted: #6b7180;
+
+    /* 边框 */
+    --border: #2a3140;
+    --border-strong: #364050;
+
+    /* 阴影改为边框式层级（深色下阴影不明显） */
+    --shadow-subtle: 0 0 0 1px var(--border);
+    --shadow-card: 0 0 0 1px var(--border);
+    --shadow-card-hover: 0 0 0 1px var(--border-strong), 0 8px 24px rgba(0,0,0,0.4);
+    --shadow-medium: 0 0 0 1px var(--border);
+    --shadow-elevated: 0 8px 24px rgba(0,0,0,0.5);
+
+    /* 页脚 */
+    --footer-bg: #1a1f29;
+    --footer-text: #6b7180;
+    --footer-link: #364050;
+}

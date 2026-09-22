@@ -9,8 +9,10 @@ use App\Model\LoginAttempt;
 use App\Model\Setting;
 use App\Model\VisitStat;
 use App\Service\CacheService;
+use App\Service\PingService;
 use App\Service\RateLimitService;
 use App\Service\R2Service;
+use App\Service\SeoService;
 use App\Service\SettingService;
 use App\Service\UploadService;
 use App\Service\View;
@@ -68,6 +70,10 @@ final class Container
                 (int) config('app.upload_max_size', 50 * 1024 * 1024)
             ),
             R2Service::class => fn () => new R2Service((array) config('storage.r2', [])),
+            PingService::class => fn (ContainerInterface $c) => new PingService(
+                $c->get(SettingService::class),
+                $c->get(SeoService::class),
+            ),
         ]);
 
         return $builder->build();
