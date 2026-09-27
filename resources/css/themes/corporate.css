@@ -1,45 +1,147 @@
-/* ==================== 商务极简 (corporate) ==================== */
-/* 纯白 + 灰阶 + 单一蓝强调色；留白多，圆角稍小，字体更紧 */
+/* ============================================================
+   主题：商务列表（corporate）
+   风格：纯白 + 单列横向列表（图标在右、标题在左）+ 细分隔线
+   排版：最紧凑，一屏能看到最多链接，像书签管理器
+   ============================================================ */
 
 body[data-theme="corporate"] {
-    /* 品牌色：Apple 系蓝 */
-    --brand-primary: #0066cc;
-    --brand-primary-light: #4a90e2;
-    --brand-primary-dark: #0052a3;
-    --brand-gradient: linear-gradient(135deg, #0066cc, #4a90e2);
-    --brand-shadow: rgba(0, 102, 204, 0.3);
-    --brand-shadow-light: rgba(0, 102, 204, 0.1);
-    --brand-shadow-medium: rgba(0, 102, 204, 0.2);
-    --brand-bg-light: #f5f5f7;
-    --brand-bg-lighter: rgba(0, 102, 204, 0.04);
-    --brand-glow: linear-gradient(90deg, #0066cc, #4a90e2, #0066cc);
+    /* === 品牌色：克制的企业蓝 === */
+    --brand-primary: #2563eb;
+    --brand-primary-light: #3b82f6;
+    --brand-primary-dark: #1d4ed8;
+    --brand-gradient: linear-gradient(135deg, #2563eb, #3b82f6);
+    --brand-shadow: rgba(37, 99, 235, 0.25);
+    --brand-shadow-light: rgba(37, 99, 235, 0.08);
+    --brand-shadow-medium: rgba(37, 99, 235, 0.18);
+    --brand-bg-light: #eff6ff;
+    --brand-bg-lighter: rgba(37, 99, 235, 0.04);
+    --brand-glow: linear-gradient(90deg, #2563eb, #3b82f6, #2563eb);
 
-    /* 表面色：纯白 + 极浅灰 */
-    --bg-page: #ffffff;
+    /* === 表面色：纯白，弱化区块 === */
+    --bg-page: #f8fafc;
     --bg-card: #ffffff;
-    --bg-elevated: #fafafa;
-    --bg-muted: #f5f5f7;
+    --bg-elevated: #f8fafc;
+    --bg-muted: #f1f5f9;
     --bg-input: #ffffff;
 
-    /* 文本色：Apple 系灰 */
-    --text-primary: #1d1d1f;
-    --text-secondary: #424245;
-    --text-tertiary: #6e6e73;
-    --text-muted: #86868b;
+    /* === 文本色 === */
+    --text-primary: #0f172a;
+    --text-secondary: #1e293b;
+    --text-tertiary: #475569;
+    --text-muted: #94a3b8;
+    --text-on-brand: #ffffff;
 
-    /* 边框：更浅的灰 */
-    --border: #e5e5e7;
-    --border-strong: #d2d2d7;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
 
-    /* 阴影更克制 */
-    --shadow-subtle: 0 1px 2px rgba(0,0,0,0.04);
-    --shadow-card: 0 1px 3px rgba(0,0,0,0.06);
-    --shadow-card-hover: 0 6px 20px rgba(0,0,0,0.08);
-    --shadow-medium: 0 2px 8px rgba(0,0,0,0.06);
-    --shadow-elevated: 0 8px 24px rgba(0,0,0,0.08);
+    --shadow-subtle: 0 1px 2px rgba(15, 23, 42, 0.04);
+    --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.05);
+    --shadow-card-hover: 0 4px 16px rgba(15, 23, 42, 0.1);
+    --shadow-medium: 0 2px 8px rgba(15, 23, 42, 0.06);
+    --shadow-elevated: 0 8px 24px rgba(15, 23, 42, 0.1);
 
-    /* 页脚 */
     --footer-bg: #ffffff;
-    --footer-text: #86868b;
-    --footer-link: #d2d2d7;
+    --footer-text: #94a3b8;
+    --footer-link: #cbd5e1;
+
+    /* === 布局：单列横向列表 === */
+    --page-width: 760px;
+    --section-spacing: 20px;
+    --section-radius: 8px;
+    --section-border: 1px solid var(--border);
+    --section-bg: var(--bg-card);
+
+    --grid-columns: 1fr;
+    --grid-columns-tablet: 1fr;
+    --grid-columns-mobile: 1fr;
+    --grid-gap: 1px;
+
+    --card-radius: 0;
+    --card-border: none;
+    --card-shadow: none;
+    --card-transform-hover: none;
+    --card-img-hover-scale: 1;
+    --card-title-size: 14px;
+    --card-title-weight: 500;
+    --card-title-bg: transparent;
+    --card-title-bg-hover: transparent;
+    --card-title-color-hover: var(--brand-primary);
+    --card-title-border: none;
+    --card-title-align: left;
+    --card-min-height: 56px;
+    --list-thumb-size: 40px;
+
+    --title-size: 13px;
+    --title-weight: 600;
+    --title-margin-bottom: 8px;
+    --title-color: #64748b;
+    --title-transform: none;
+
+    --badge-radius: 4px;
+    --badge-font-size: 10px;
+}
+
+/* 标题：纯文字 + 大写字距，弱化为分组标签 */
+body[data-theme="corporate"] .category-title {
+    padding: 0 0 0 10px;
+    border-left: 3px solid var(--brand-primary);
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+/* 列表模式：横向排列，缩略图在右 */
+body[data-theme="corporate"] .card-item {
+    flex-direction: row;
+    align-items: center;
+    padding: 8px 12px;
+    min-height: 56px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+}
+
+body[data-theme="corporate"] .card-item:last-child {
+    border-bottom: none;
+}
+
+body[data-theme="corporate"] .card-image {
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    order: 2;
+    border-radius: 6px;
+}
+
+body[data-theme="corporate"] .card-title {
+    order: 1;
+    flex: 1;
+    text-align: left;
+    background: transparent;
+    border-top: none;
+    padding: 0 12px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+body[data-theme="corporate"] .card-item:hover {
+    background: var(--brand-bg-lighter);
+    transform: none;
+    box-shadow: none;
+}
+
+body[data-theme="corporate"] .card-item:hover .card-title {
+    background: transparent;
+    color: var(--brand-primary);
+}
+
+body[data-theme="corporate"] .card-type-badge {
+    order: 3;
+    position: static;
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
+/* 列表模式取消 aspect-ratio，改用固定高度 */
+body[data-theme="corporate"] .card-item {
+    aspect-ratio: auto;
 }

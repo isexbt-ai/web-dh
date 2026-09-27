@@ -82,7 +82,7 @@ final class SeoService
     public function activeTheme(): string
     {
         $theme = (string) $this->settings->get('site_theme', 'default');
-        $allowed = ['default', 'dark', 'corporate', 'warm', 'mint'];
+        $allowed = ['default', 'dark', 'corporate', 'warm', 'mint', 'minimal'];
         return in_array($theme, $allowed, true) ? $theme : 'default';
     }
 

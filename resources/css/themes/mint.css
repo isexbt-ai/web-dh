@@ -1,39 +1,108 @@
-/* ==================== 薄荷清新 (mint) ==================== */
-/* 薄荷绿 + 淡薄荷背景；清爽中性 */
+/* ============================================================
+   主题：薄荷紧凑（mint）
+   风格：淡薄荷底 + 高密度小卡网格 + 极细分隔 + 下划线标题
+   排版：一屏塞最多卡片，适合数量多的导航站
+   ============================================================ */
 
 body[data-theme="mint"] {
-    --brand-primary: #14b8a6;
-    --brand-primary-light: #2dd4bf;
-    --brand-primary-dark: #0d9488;
-    --brand-gradient: linear-gradient(135deg, #14b8a6, #2dd4bf);
-    --brand-shadow: rgba(20, 184, 166, 0.35);
-    --brand-shadow-light: rgba(20, 184, 166, 0.12);
-    --brand-shadow-medium: rgba(20, 184, 166, 0.25);
-    --brand-bg-light: #ecfdf5;
-    --brand-bg-lighter: rgba(20, 184, 166, 0.05);
-    --brand-glow: linear-gradient(90deg, #14b8a6, #2dd4bf, #14b8a6);
+    /* === 品牌色：薄荷绿 === */
+    --brand-primary: #0d9488;
+    --brand-primary-light: #14b8a6;
+    --brand-primary-dark: #0f766e;
+    --brand-gradient: linear-gradient(135deg, #0d9488, #14b8a6);
+    --brand-shadow: rgba(13, 148, 136, 0.28);
+    --brand-shadow-light: rgba(13, 148, 136, 0.1);
+    --brand-shadow-medium: rgba(13, 148, 136, 0.18);
+    --brand-bg-light: #f0fdfa;
+    --brand-bg-lighter: rgba(13, 148, 136, 0.05);
+    --brand-glow: linear-gradient(90deg, #0d9488, #2dd4bf, #0d9488);
 
-    --bg-page: #f0fdfa;
+    /* === 表面色 === */
+    --bg-page: #f6fefd;
     --bg-card: #ffffff;
-    --bg-elevated: #f5fefa;
-    --bg-muted: #e6f9f3;
-    --bg-input: #f5fefa;
+    --bg-elevated: #f0fdfa;
+    --bg-muted: #ecfdf5;
+    --bg-input: #f6fefd;
 
-    --text-primary: #0f3a35;
-    --text-secondary: #1a4f49;
-    --text-tertiary: #4a6b66;
-    --text-muted: #7a8b87;
+    /* === 文本色 === */
+    --text-primary: #0f2e2b;
+    --text-secondary: #164e49;
+    --text-tertiary: #3f6b66;
+    --text-muted: #7d9a96;
+    --text-on-brand: #ffffff;
 
-    --border: #d1f0e8;
-    --border-strong: #b8e3d6;
+    --border: #d6f0ea;
+    --border-strong: #b5e2d8;
 
-    --shadow-subtle: 0 1px 4px rgba(20, 184, 166, 0.05);
-    --shadow-card: 0 2px 8px rgba(20, 184, 166, 0.06);
-    --shadow-card-hover: 0 12px 32px rgba(20, 184, 166, 0.14);
-    --shadow-medium: 0 2px 12px rgba(20, 184, 166, 0.08);
-    --shadow-elevated: 0 8px 24px rgba(20, 184, 166, 0.1);
+    --shadow-subtle: 0 1px 2px rgba(13, 148, 136, 0.04);
+    --shadow-card: 0 1px 3px rgba(13, 148, 136, 0.06);
+    --shadow-card-hover: 0 8px 20px rgba(13, 148, 136, 0.14);
+    --shadow-medium: 0 2px 8px rgba(13, 148, 136, 0.07);
+    --shadow-elevated: 0 8px 24px rgba(13, 148, 136, 0.1);
 
     --footer-bg: #ffffff;
-    --footer-text: #7a8b87;
-    --footer-link: #b8e3d6;
+    --footer-text: #7d9a96;
+    --footer-link: #b5e2d8;
+
+    /* === 布局：高密度 6 列小卡 === */
+    --page-width: 1000px;
+    --section-spacing: 16px;
+    --section-radius: 10px;
+    --section-border: 1px solid var(--border);
+    --section-bg: var(--bg-card);
+
+    --grid-columns: repeat(6, 1fr);
+    --grid-columns-tablet: repeat(5, 1fr);
+    --grid-columns-mobile: repeat(4, 1fr);
+    --grid-gap: 8px;
+
+    --card-radius: 8px;
+    --card-border: 1px solid var(--border);
+    --card-shadow: 0 1px 2px rgba(13, 148, 136, 0.05);
+    --card-transform-hover: translateY(-3px);
+    --card-img-hover-scale: 1.05;
+    --card-title-padding: 5px 4px;
+    --card-title-size: 11px;
+    --card-title-weight: 500;
+    --card-title-bg: transparent;
+
+    --title-size: 14px;
+    --title-weight: 700;
+    --title-margin-bottom: 10px;
+    --title-color: #0f2e2b;
+    --title-transform: none;
+
+    --badge-radius: 4px;
+    --badge-font-size: 9px;
+}
+
+/* 下划线标题：小巧、紧凑 */
+body[data-theme="mint"] .category-title {
+    padding: 0 0 6px 0;
+    border-bottom: 2px solid var(--brand-primary);
+    display: inline-block;
+}
+
+/* 区块收紧内边距，挤出更多卡片空间 */
+body[data-theme="mint"] .section-card {
+    padding: 10px;
+}
+
+body[data-theme="mint"] .card-item {
+    overflow: hidden;
+}
+
+body[data-theme="mint"] .card-title {
+    background: transparent;
+    border-top: 1px solid var(--border);
+}
+
+body[data-theme="mint"] .card-item:hover .card-title {
+    background: var(--brand-bg-light);
+}
+
+body[data-theme="mint"] .card-type-badge {
+    top: 3px;
+    right: 3px;
+    padding: 1px 4px;
 }

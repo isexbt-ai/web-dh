@@ -28,11 +28,12 @@ final class SettingController
 
     /** 可选主题清单（key => 显示名）。 */
     public const THEME_CHOICES = [
-        'default' => '浅红品牌（默认）',
-        'dark' => '暗夜深邃',
-        'corporate' => '商务极简',
-        'warm' => '暖橙亲和',
-        'mint' => '薄荷清新',
+        'default' => '经典网格（默认）',
+        'dark' => '暗夜影院',
+        'corporate' => '商务列表',
+        'warm' => '暖阳杂志',
+        'mint' => '薄荷紧凑',
+        'minimal' => '极简线条',
     ];
 
     public function __construct(private View $view, private SettingService $settings)

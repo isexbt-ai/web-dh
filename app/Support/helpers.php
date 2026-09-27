@@ -58,6 +58,7 @@ if (!function_exists('asset')) {
             'theme-corporate' => '/assets/css/themes/corporate.css',
             'theme-warm' => '/assets/css/themes/warm.css',
             'theme-mint' => '/assets/css/themes/mint.css',
+            'theme-minimal' => '/assets/css/themes/minimal.css',
         ];
         return $fallbacks[$key] ?? '/' . $key;
     }

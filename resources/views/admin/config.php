@@ -4,19 +4,21 @@
  */
 $values = $values ?? [];
 $themeChoices = $theme_choices ?? [
-    'default' => '浅红品牌（默认）',
-    'dark' => '暗夜深邃',
-    'corporate' => '商务极简',
-    'warm' => '暖橙亲和',
-    'mint' => '薄荷清新',
+    'default' => '经典网格（默认）',
+    'dark' => '暗夜影院',
+    'corporate' => '商务列表',
+    'warm' => '暖阳杂志',
+    'mint' => '薄荷紧凑',
+    'minimal' => '极简线条',
 ];
-/** 主题缩略色（用于后台预览）。 */
-$themeSwatches = [
-    'default' => ['#e94560', '#f5f7fa', '#ffffff'],
-    'dark' => ['#ff5571', '#0f1419', '#1a1f29'],
-    'corporate' => ['#0066cc', '#ffffff', '#f5f5f7'],
-    'warm' => ['#ff6b35', '#fff8f3', '#ffffff'],
-    'mint' => ['#14b8a6', '#f0fdfa', '#ffffff'],
+/** 主题缩略预览：[主色, 页面底色, 卡片底色, 卡片圆角, 列数, 排列方式]。 */
+$themePreview = [
+    'default'  => ['#e94560', '#f5f7fa', '#ffffff', 4, 3, 'grid'],
+    'dark'     => ['#ff5571', '#0d1117', '#161b22', 5, 5, 'grid'],
+    'corporate'=> ['#2563eb', '#f8fafc', '#ffffff', 0, 1, 'list'],
+    'warm'     => ['#f97316', '#fdf6f0', '#ffffff', 6, 4, 'grid'],
+    'mint'     => ['#0d9488', '#f6fefd', '#ffffff', 3, 6, 'grid'],
+    'minimal'  => ['#111111', '#ffffff', '#ffffff', 0, 3, 'grid'],
 ];
 $currentTheme = $values['site_theme'] ?? 'default';
 ?>
@@ -33,17 +35,40 @@ $currentTheme = $values['site_theme'] ?? 'default';
         <div class="form-group"><label>关键词</label><input name="site_keywords" value="<?= e($values['site_keywords'] ?? '') ?>" maxlength="200"></div>
 
         <div class="section-title">外观主题</div>
-        <p class="form-hint">切换后立即生效（保存时清整页缓存），前台会按所选主题加载对应 CSS。</p>
+        <p class="form-hint">每套主题包含<strong>配色 + 排版</strong>（列数、卡片方向、圆角、标题样式都不同）。保存后立即生效。</p>
         <div class="theme-picker">
             <?php foreach ($themeChoices as $key => $label): ?>
+            <?php
+            $pv = $themePreview[$key] ?? ['#e94560', '#f5f7fa', '#ffffff', 4, 3, 'grid'];
+            [$accent, $pageBg, $cardBg, $radius, $cols, $mode] = $pv;
+            ?>
             <label class="theme-option<?= $currentTheme === $key ? ' active' : '' ?>">
                 <input type="radio" name="site_theme" value="<?= e($key) ?>" <?= $currentTheme === $key ? 'checked' : '' ?>>
-                <span class="theme-swatch">
-                    <span class="swatch-bg" style="background:<?= e($themeSwatches[$key][1] ?? '#f5f7fa') ?>"></span>
-                    <span class="swatch-card" style="background:<?= e($themeSwatches[$key][2] ?? '#fff') ?>"></span>
-                    <span class="swatch-accent" style="background:<?= e($themeSwatches[$key][0] ?? '#e94560') ?>"></span>
+                <span class="theme-swatch" style="background:<?= e($pageBg) ?>">
+                    <?php if ($mode === 'list'): ?>
+                        <span class="pv-list">
+                            <?php for ($i = 0; $i < 4; $i++): ?>
+                            <span class="pv-row">
+                                <span class="pv-bar" style="background:<?= e($accent) ?>"></span>
+                                <span class="pv-line"></span>
+                            </span>
+                            <?php endfor; ?>
+                        </span>
+                    <?php else: ?>
+                        <span class="pv-grid" style="grid-template-columns:repeat(<?= (int) $cols ?>,1fr)">
+                            <?php
+                            $cells = min(15, $cols * 3);
+                            for ($i = 0; $i < $cells; $i++):
+                                $isAccent = ($i % 7 === 0);
+                            ?>
+                            <span class="pv-cell<?= $isAccent ? ' accent' : '' ?>"
+                                  style="background:<?= $isAccent ? e($accent) : e($cardBg) ?>;border-radius:<?= (int) $radius ?>px"></span>
+                            <?php endfor; ?>
+                        </span>
+                    <?php endif; ?>
                 </span>
                 <span class="theme-label"><?= e($label) ?></span>
+                <span class="theme-meta"><?= $mode === 'list' ? '单列横排' : $cols . ' 列网格' ?></span>
             </label>
             <?php endforeach; ?>
         </div>
