@@ -74,7 +74,10 @@ body[data-theme="dark"] {
 /* 左侧竖条标题（深色下更利落） */
 body[data-theme="dark"] .category-title {
     padding: 4px 0 4px 14px;
+    border: none;
     border-left: 4px solid var(--brand-primary);
+    border-radius: 0;
+    background: transparent;
     display: inline-block;
 }
 

@@ -1044,41 +1044,47 @@ img {
     margin-bottom: var(--section-spacing);
 }
 
+/* 基础样式 = 徽章样式（不依赖 data-title-style 属性，保证默认就有样式） */
 .category-title {
     font-size: var(--title-size);
     font-weight: var(--title-weight);
     color: var(--title-color);
     margin: 0 0 var(--title-margin-bottom) 0;
-    line-height: 1.4;
-    letter-spacing: 0.5px;
-}
-
-/* 样式 1：徽章（默认）——带边框和浅底色的小标签 */
-body[data-title-style="badge"] .category-title {
     padding: var(--title-padding);
     border: var(--title-border);
     border-radius: var(--title-radius);
     background: var(--title-bg);
+    line-height: 1.4;
+    letter-spacing: 0.5px;
     display: inline-block;
 }
 
-/* 样式 2：下划线——文字加粗 + 底部粗线，无背景 */
+/* 可选变体：body[data-title-style="X"] 时生效（当前无主题使用，留作扩展） */
+
+/* 下划线——文字加粗 + 底部粗线，无背景 */
 body[data-title-style="underline"] .category-title {
     padding: 0 0 8px 0;
+    border: none;
     border-bottom: 3px solid var(--brand-primary);
-    display: inline-block;
+    border-radius: 0;
+    background: transparent;
 }
 
-/* 样式 3：左侧竖条——极简，竖线 + 文字 */
+/* 左侧竖条——极简，竖线 + 文字 */
 body[data-title-style="bar"] .category-title {
     padding: 4px 0 4px 12px;
+    border: none;
     border-left: 4px solid var(--brand-primary);
-    display: inline-block;
+    border-radius: 0;
+    background: transparent;
 }
 
-/* 样式 4：纯文字——最大字重，无任何装饰 */
+/* 纯文字——无任何装饰 */
 body[data-title-style="plain"] .category-title {
     padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
     display: block;
     text-transform: uppercase;
     letter-spacing: 2px;

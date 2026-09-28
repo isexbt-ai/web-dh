@@ -83,6 +83,9 @@ body[data-theme="warm"] {
 /* 纯文字标题 + 下方短横线（杂志分栏感） */
 body[data-theme="warm"] .category-title {
     padding: 0 0 10px 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
     display: inline-block;
     position: relative;
 }

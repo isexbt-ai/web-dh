@@ -84,8 +84,11 @@ body[data-theme="minimal"] {
 /* 纯文字标题 + 上方细分隔线 */
 body[data-theme="minimal"] .category-title {
     padding: 0 0 8px 0;
-    display: block;
+    border: none;
     border-bottom: 1px solid var(--text-primary);
+    border-radius: 0;
+    background: transparent;
+    display: block;
     letter-spacing: 3px;
     text-transform: uppercase;
 }

@@ -79,7 +79,10 @@ body[data-theme="mint"] {
 /* 下划线标题：小巧、紧凑 */
 body[data-theme="mint"] .category-title {
     padding: 0 0 6px 0;
+    border: none;
     border-bottom: 2px solid var(--brand-primary);
+    border-radius: 0;
+    background: transparent;
     display: inline-block;
 }
 

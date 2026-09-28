@@ -85,7 +85,8 @@ final class HomeController
 
         $stats = $this->visitService->displayStats((int) config('app.visitor_display_days', 30));
 
-        // 轮播容器比例：按第一张广告图尺寸自适应（避免固定 16:9 cover 裁剪显示不全）
+        // 轮播容器高度：按第一张广告图比例换算，但夹在 140~320px 之间。
+        // 纯 aspect-ratio 在宽版布局下会算出过高容器（3:1 的图在 1100px 宽处 = 366px 高）撑爆页面。
         $ads = $this->adModel->getAll(true);
         $carouselStyle = 'height: 180px;';
         if (isset($ads[0]['image']) && is_string($ads[0]['image']) && str_starts_with($ads[0]['image'], 'uploads/')) {
@@ -93,7 +94,11 @@ final class HomeController
             if (is_file($imgPath)) {
                 $size = @getimagesize($imgPath);
                 if (is_array($size) && ($size[0] ?? 0) > 0 && ($size[1] ?? 0) > 0) {
-                    $carouselStyle = 'aspect-ratio: ' . (int) $size[0] . '/' . (int) $size[1] . ';';
+                    // 比例限制在 2.2:1 ~ 4:1，超出则夹紧，避免过扁或过高
+                    $ratio = (float) $size[0] / (float) $size[1];
+                    $ratio = max(2.2, min(4.0, $ratio));
+                    // CSS 用 aspect-ratio，宽度由容器决定；限高用 max-height 兜底
+                    $carouselStyle = 'aspect-ratio: ' . round($ratio, 2) . '; max-height: 320px;';
                 }
             }
         }

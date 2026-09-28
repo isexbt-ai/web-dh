@@ -1,12 +1,12 @@
 {
-    "style.css": "/assets/css/style.min.css?v=c6e7cc",
+    "style.css": "/assets/css/style.min.css?v=ebe3af",
     "pages.css": "/assets/css/pages.min.css?v=5ee364",
     "admin.css": "/assets/css/admin.min.css?v=821736",
     "main.js": "/assets/js/main.min.js?v=94c1ca",
     "admin.js": "/assets/js/admin.min.js?v=21078c",
-    "theme-corporate": "/assets/css/themes/corporate.min.css?v=73038b",
-    "theme-dark": "/assets/css/themes/dark.min.css?v=3b573f",
-    "theme-minimal": "/assets/css/themes/minimal.min.css?v=782a56",
-    "theme-mint": "/assets/css/themes/mint.min.css?v=81684b",
-    "theme-warm": "/assets/css/themes/warm.min.css?v=a94874"
+    "theme-corporate": "/assets/css/themes/corporate.min.css?v=78c5c2",
+    "theme-dark": "/assets/css/themes/dark.min.css?v=947213",
+    "theme-minimal": "/assets/css/themes/minimal.min.css?v=747cf4",
+    "theme-mint": "/assets/css/themes/mint.min.css?v=23b976",
+    "theme-warm": "/assets/css/themes/warm.min.css?v=731b5b"
 }

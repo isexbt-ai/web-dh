@@ -84,7 +84,10 @@ body[data-theme="corporate"] {
 /* 标题：纯文字 + 大写字距，弱化为分组标签 */
 body[data-theme="corporate"] .category-title {
     padding: 0 0 0 10px;
+    border: none;
     border-left: 3px solid var(--brand-primary);
+    border-radius: 0;
+    background: transparent;
     display: inline-block;
     text-transform: uppercase;
     letter-spacing: 1.5px;
