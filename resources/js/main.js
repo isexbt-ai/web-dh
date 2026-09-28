@@ -219,8 +219,145 @@
         });
     }
 
+    // ==================== 侧边栏分类切换 ====================
+    function initSideNav() {
+        var sideNav = document.getElementById('sideNav');
+        var sideMask = document.getElementById('sideMask');
+        var burger = document.getElementById('mainBurger');
+        if (!sideNav) return;
+
+        var panels = Array.prototype.slice.call(document.querySelectorAll('.category-block'));
+        var slideSection = document.getElementById('slideSection');
+        var titleEl = document.getElementById('mainCatTitle');
+        var metaEl = document.getElementById('mainCatMeta');
+        var catButtons = Array.prototype.slice.call(sideNav.querySelectorAll('.side-cat'));
+
+        function closeDrawer() {
+            sideNav.classList.remove('open');
+            if (sideMask) sideMask.classList.remove('open');
+        }
+
+        function selectCategory(catId, label, count) {
+            catButtons.forEach(function (b) {
+                b.classList.toggle('active', b.getAttribute('data-cat') === catId);
+            });
+            panels.forEach(function (p) {
+                var match = catId === 'all' || p.getAttribute('data-cat') === catId;
+                p.hidden = !match;
+            });
+            if (slideSection) slideSection.hidden = catId !== 'all';
+            if (titleEl) titleEl.textContent = label;
+            if (metaEl) metaEl.textContent = '共 ' + count + ' 个链接';
+            closeDrawer();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        sideNav.addEventListener('click', function (e) {
+            var btn = e.target.closest ? e.target.closest('.side-cat') : null;
+            if (!btn) return;
+            var catId = btn.getAttribute('data-cat');
+            var nameEl = btn.querySelector('.side-cat-name');
+            var countEl = btn.querySelector('.side-cat-count');
+            selectCategory(
+                catId,
+                nameEl ? nameEl.textContent : '',
+                countEl ? parseInt(countEl.textContent, 10) || 0 : 0
+            );
+        });
+
+        if (burger) {
+            burger.addEventListener('click', function () {
+                var open = sideNav.classList.toggle('open');
+                if (sideMask) sideMask.classList.toggle('open', open);
+            });
+        }
+        if (sideMask) {
+            sideMask.addEventListener('click', closeDrawer);
+        }
+        // 桌面端误点遮罩或窗口放大时复位
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 900) closeDrawer();
+        });
+    }
+
+    // ==================== 搜索覆盖层 ====================
+    function initSearchOverlay() {
+        var overlay = document.getElementById('searchOverlay');
+        var input = document.getElementById('searchInput');
+        var closeBtn = document.getElementById('searchClose');
+        var metaEl = document.getElementById('searchMeta');
+        var sideSearchBtn = document.getElementById('sideSearchBtn');
+        var mainSearchBtn = document.getElementById('mainSearchBtn');
+        if (!overlay || !input) return;
+
+        var panels = Array.prototype.slice.call(document.querySelectorAll('.category-block'));
+        var allCatBtn = document.querySelector('.side-cat[data-cat="all"]');
+
+        function open() {
+            overlay.hidden = false;
+            input.value = '';
+            if (metaEl) metaEl.textContent = '';
+            resetPanels();
+            input.focus();
+        }
+
+        function close() {
+            overlay.hidden = true;
+            resetPanels();
+            if (allCatBtn) allCatBtn.click();
+        }
+
+        function resetPanels() {
+            panels.forEach(function (p) { p.hidden = false; });
+        }
+
+        function doSearch(keyword) {
+            var kw = keyword.trim().toLowerCase();
+            if (kw === '') {
+                resetPanels();
+                if (metaEl) metaEl.textContent = '';
+                return;
+            }
+            var hits = 0;
+            panels.forEach(function (panel) {
+                var items = panel.querySelectorAll('.card-item');
+                var panelHit = 0;
+                Array.prototype.forEach.call(items, function (item) {
+                    var titleEl = item.querySelector('.card-title');
+                    var title = titleEl ? titleEl.textContent : '';
+                    var match = title.toLowerCase().indexOf(kw) !== -1;
+                    item.hidden = !match;
+                    if (match) { panelHit++; hits++; }
+                });
+                panel.hidden = panelHit === 0;
+            });
+            if (metaEl) {
+                metaEl.textContent = hits > 0
+                    ? '找到 ' + hits + ' 个匹配「' + keyword.trim() + '」的链接'
+                    : '没有找到匹配「' + keyword.trim() + '」的链接';
+            }
+        }
+
+        if (sideSearchBtn) sideSearchBtn.addEventListener('click', open);
+        if (mainSearchBtn) mainSearchBtn.addEventListener('click', open);
+        if (closeBtn) closeBtn.addEventListener('click', close);
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) close();
+        });
+        input.addEventListener('input', function () { doSearch(input.value); });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !overlay.hidden) close();
+            if ((e.key === '/' || (e.key === 'k' && (e.metaKey || e.ctrlKey))) && overlay.hidden) {
+                e.preventDefault();
+                open();
+            }
+        });
+    }
+
     // ==================== 初始化 ====================
     document.addEventListener('DOMContentLoaded', function () {
+        initSideNav();
+        initSearchOverlay();
         initSlideCarousel();
         initCardDelegate();
         initBackToTop();

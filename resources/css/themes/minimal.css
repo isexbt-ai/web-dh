@@ -47,6 +47,9 @@ body[data-theme="minimal"] {
 
     /* === 布局：3 列中等卡，1px 细线分隔 === */
     --page-width: 560px;
+    --side-width: 170px;
+    --layout-width: 800px;
+    --layout-gap: 20px;
     --section-spacing: 0;
     --section-radius: 0;
     --section-border: none;

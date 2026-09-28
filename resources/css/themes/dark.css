@@ -48,6 +48,9 @@ body[data-theme="dark"] {
 
     /* === 布局：宽版 5 列大卡 === */
     --page-width: 1180px;
+    --side-width: 200px;
+    --layout-width: 1340px;
+    --layout-gap: 24px;
     --section-spacing: 28px;
     --section-radius: 16px;
     --section-border: 1px solid var(--border);
