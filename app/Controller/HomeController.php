@@ -115,6 +115,7 @@ final class HomeController
             'visitorCount' => (int) $stats['display_total'],
             'recentVisitors' => (int) $stats['display_recent'],
             'guestbookEnabled' => $this->settings->get('guestbook_enabled', '1') === '1',
+            'sideLayout' => true,
         ]);
 
         $data['content'] = $this->view->partial('front/home', $data);
