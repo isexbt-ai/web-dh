@@ -29,7 +29,7 @@ $article = $article ?? [];
         </div>
 
         <?php if (!empty($article['cover_image'])): ?>
-        <img src="<?= e($article['cover_image']) ?>" alt="<?= e($article['title']) ?>" class="article-detail-cover" loading="lazy">
+        <img src="<?= e(image_url((string) $article['cover_image'])) ?>" alt="<?= e($article['title']) ?>" class="article-detail-cover" loading="lazy">
         <?php endif; ?>
 
         <div class="article-detail-body">

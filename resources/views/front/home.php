@@ -87,7 +87,7 @@ foreach ($categoryCards as $c) {
                     <div class="slide-item<?= $i === 0 ? ' active' : '' ?>">
                         <?php if (!empty($ad['image'])): ?>
                         <a href="<?= e($ad['link'] ?? '#') ?>" target="_blank" rel="noopener">
-                            <img src="<?= e($ad['image']) ?>" alt="<?= e($ad['title']) ?>" <?= $i === 0 ? '' : 'loading="lazy"' ?>>
+                            <img src="<?= e(image_url((string) $ad['image'])) ?>" alt="<?= e($ad['title']) ?>" <?= $i === 0 ? '' : 'loading="lazy"' ?>>
                         </a>
                         <?php endif; ?>
                     </div>

@@ -11,7 +11,7 @@ $gb = $guestbook ?? [];
 <div class="guestbook-container">
     <?php if (!empty($gb['image'])): ?>
     <div class="guestbook-header-image">
-        <img src="<?= e($gb['image']) ?>" alt="<?= e($gb['title']) ?>" loading="lazy">
+        <img src="<?= e(image_url((string) $gb['image'])) ?>" alt="<?= e($gb['title']) ?>" loading="lazy">
     </div>
     <?php endif; ?>
 

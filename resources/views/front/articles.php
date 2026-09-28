@@ -23,7 +23,7 @@ $pages = (int) ($pages ?? 1);
         <a class="article-item" href="/article/<?= (int) $a['id'] ?>-<?= e($a['slug'] ?? 'item') ?>.html">
             <div class="article-cover">
                 <?php if (!empty($a['cover_image'])): ?>
-                <img src="<?= e($a['cover_image']) ?>" alt="<?= e($a['title']) ?>" loading="lazy">
+                <img src="<?= e(image_url((string) $a['cover_image'])) ?>" alt="<?= e($a['title']) ?>" loading="lazy">
                 <?php else: ?>
                 <div class="article-cover-placeholder">文章</div>
                 <?php endif; ?>

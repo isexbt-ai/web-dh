@@ -62,9 +62,10 @@ final class ShowcaseController
     /** 图片地址解析：已迁移 R2 的走 imgbed_url，否则用本地 image。 */
     private function withImage(array $item): array
     {
-        $item['image_url'] = (int) ($item['imgbed_status'] ?? 0) === 1 && !empty($item['imgbed_url'])
+        $raw = (int) ($item['imgbed_status'] ?? 0) === 1 && !empty($item['imgbed_url'])
             ? (string) $item['imgbed_url']
             : (string) ($item['image'] ?? '');
+        $item['image_url'] = image_url($raw);
         return $item;
     }
 }
