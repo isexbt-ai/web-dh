@@ -46,9 +46,6 @@ body[data-theme="warm"] {
 
     /* === 布局：宽版 4 列大卡，无区块底板 === */
     --page-width: 1080px;
-    --side-width: 210px;
-    --layout-width: 1280px;
-    --layout-gap: 28px;
     --section-spacing: 36px;
     --section-radius: 0;
     --section-border: none;

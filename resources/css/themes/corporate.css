@@ -46,9 +46,6 @@ body[data-theme="corporate"] {
 
     /* === 布局：单列横向列表 === */
     --page-width: 760px;
-    --side-width: 180px;
-    --layout-width: 900px;
-    --layout-gap: 20px;
     --section-spacing: 20px;
     --section-radius: 8px;
     --section-border: 1px solid var(--border);

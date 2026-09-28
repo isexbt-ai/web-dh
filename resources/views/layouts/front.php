@@ -11,7 +11,6 @@ $og = $og ?? [];
 $jsonld = $jsonld ?? [];
 $umami = $umami ?? ['enabled' => false, 'script_url' => '', 'website_id' => ''];
 $activeTheme = $theme ?? 'default';
-$sideLayout = $sideLayout ?? false;
 ?>
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -51,7 +50,7 @@ $themeColor = $themeColorMap[$activeTheme] ?? '#e94560';
     <script defer src="<?= e($umami['script_url']) ?>" data-website-id="<?= e($umami['website_id']) ?>"></script>
     <?php endif; ?>
 </head>
-<body<?= $activeTheme !== 'default' ? ' data-theme="' . e($activeTheme) . '"' : '' ?><?= !empty($sideLayout) ? ' class="has-side-layout"' : '' ?>>
+<body<?= $activeTheme !== 'default' ? ' data-theme="' . e($activeTheme) . '"' : '' ?>>
     <?php if (!empty($showTopBar)): ?>
     <header class="top-bar">
         <div class="header-left">
