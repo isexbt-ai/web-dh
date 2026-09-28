@@ -9,6 +9,9 @@ return [
 
     // 上传
     'upload_max_size' => 50 * 1024 * 1024,
+    // 视频上传上限（受 PHP upload_max_filesize / post_max_size 约束，
+    // 需在 php.ini 或 .user.ini 同步调大，否则大文件会被 PHP 先截断）
+    'video_upload_max_size' => 200 * 1024 * 1024,
     'thumbnail_width' => 300,
     'thumbnail_height' => 300,
 

@@ -43,7 +43,7 @@ final class Showcase extends BaseModel
         return $this->insert(
             'showcase',
             $data,
-            ['title', 'image', 'media_type', 'gallery_id', 'sort_order', 'is_active']
+            ['title', 'image', 'media_type', 'video_url', 'poster_url', 'gallery_id', 'sort_order', 'is_active']
         );
     }
 
@@ -53,7 +53,7 @@ final class Showcase extends BaseModel
             'showcase',
             $id,
             $data,
-            ['title', 'image', 'media_type', 'gallery_id', 'sort_order', 'is_active']
+            ['title', 'image', 'media_type', 'video_url', 'poster_url', 'gallery_id', 'sort_order', 'is_active']
         );
     }
 
@@ -62,9 +62,9 @@ final class Showcase extends BaseModel
         return $this->execute('DELETE FROM showcase WHERE id = ?', [$id]);
     }
 
-    /** 取单条记录图片路径（删除前校验用）。 */
+    /** 取单条记录媒体路径（删除前校验用）。 */
     public function imageOf(int $id): ?array
     {
-        return $this->fetchOne('SELECT image FROM showcase WHERE id = ?', [$id]);
+        return $this->fetchOne('SELECT image, video_url, poster_url FROM showcase WHERE id = ?', [$id]);
     }
 }

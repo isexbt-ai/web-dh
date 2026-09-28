@@ -124,7 +124,7 @@ foreach ($categoryCards as $c) {
     </main>
 </div>
 
-<!-- 搜索覆盖层（全屏） -->
+<!-- 搜索覆盖层（全屏）：结果直接在层内渲染并可点击 -->
 <div class="search-overlay" id="searchOverlay" hidden>
     <div class="search-panel">
         <div class="search-bar">
@@ -135,7 +135,8 @@ foreach ($categoryCards as $c) {
             </button>
         </div>
         <p class="search-meta" id="searchMeta"></p>
-        <p class="search-hint">按 ESC 关闭</p>
+        <div class="search-results" id="searchResults"></div>
+        <p class="search-hint" id="searchHint">按 ESC 关闭 · ↑↓ 选择 · Enter 打开</p>
     </div>
 </div>
 

@@ -119,6 +119,8 @@ final class Migrations
             title TEXT NOT NULL,
             image TEXT,
             media_type TEXT DEFAULT 'image',
+            video_url TEXT DEFAULT '',
+            poster_url TEXT DEFAULT '',
             imgbed_url TEXT DEFAULT '',
             imgbed_status INTEGER DEFAULT 0,
             imgbed_filename TEXT DEFAULT '',
@@ -189,6 +191,8 @@ final class Migrations
             ['messages', 'replied_at', 'TIMESTAMP'],
             ['showcase', 'media_type', "TEXT DEFAULT 'image'"],
             ['showcase', 'gallery_id', 'INTEGER DEFAULT 1'],
+            ['showcase', 'video_url', "TEXT DEFAULT ''"],
+            ['showcase', 'poster_url', "TEXT DEFAULT ''"],
         ];
         foreach ($checks as [$table, $column, $def]) {
             try {

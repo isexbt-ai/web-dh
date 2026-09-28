@@ -59,13 +59,20 @@ final class ShowcaseController
         ]));
     }
 
-    /** 图片地址解析：已迁移 R2 的走 imgbed_url，否则用本地 image。 */
+    /**
+     * 媒体地址解析：
+     * - image_url：缩略图/封面（已迁移 R2 的走 imgbed_url，否则本地 image）
+     * - video_url：视频文件（仅 media_type=video 有值）
+     * - poster_url：视频封面（可空，灯箱用 video 首帧兜底）
+     */
     private function withImage(array $item): array
     {
         $raw = (int) ($item['imgbed_status'] ?? 0) === 1 && !empty($item['imgbed_url'])
             ? (string) $item['imgbed_url']
             : (string) ($item['image'] ?? '');
         $item['image_url'] = image_url($raw);
+        $item['video_src'] = image_url((string) ($item['video_url'] ?? ''));
+        $item['poster_src'] = image_url((string) ($item['poster_url'] ?? ''));
         return $item;
     }
 }

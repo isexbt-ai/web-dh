@@ -1,7 +1,8 @@
 <?php
 /**
- * 效果展示页内容模板。
- * 数据：showcases/galleries/currentGalleryId
+ * 效果展示页内容模板（灯箱版）。
+ * 数据：showcases（每项含 image_url/video_src/poster_src/media_type/title）/
+ *      galleries/currentGalleryId
  */
 $showcases = $showcases ?? [];
 $galleries = $galleries ?? [];
@@ -10,7 +11,7 @@ $currentGalleryId = (int) ($currentGalleryId ?? 0);
 <div class="showcase-container">
     <div class="showcase-header">
         <h1>效果展示</h1>
-        <p>真实效果一览</p>
+        <p>点击任意项查看大图 / 播放视频</p>
     </div>
 
     <?php if ($galleries !== []): ?>
@@ -28,37 +29,73 @@ $currentGalleryId = (int) ($currentGalleryId ?? 0);
             <p>暂无展示内容</p>
         </div>
         <?php else: ?>
-            <?php foreach ($showcases as $index => $item): ?>
+            <?php foreach ($showcases as $item): ?>
             <?php
-            $imageUrl = (string) ($item['image_url'] ?? '');
-            $mediaType = (string) ($item['media_type'] ?? 'image');
-            $isVideo = $mediaType === 'video';
+            $thumb = (string) ($item['poster_src'] ?? '');
+            if ($thumb === '') {
+                $thumb = (string) ($item['image_url'] ?? '');
+            }
+            $videoSrc = (string) ($item['video_src'] ?? '');
+            $isVideo = ($item['media_type'] ?? 'image') === 'video' && $videoSrc !== '';
             ?>
-            <div class="showcase-item"
-                 data-index="<?= $index ?>"
-                 data-title="<?= e($item['title']) ?>"
-                 data-src="<?= e($imageUrl) ?>"
-                 data-media-type="<?= $isVideo ? 'video' : 'image' ?>">
-                <div class="showcase-image-wrapper">
+            <figure class="showcase-item"
+                    data-title="<?= e($item['title']) ?>"
+                    data-media-type="<?= $isVideo ? 'video' : 'image' ?>"
+                    data-src="<?= e($isVideo ? $videoSrc : (string) ($item['image_url'] ?? '')) ?>"
+                    data-poster="<?= e($thumb) ?>"
+                    data-width="<?= (int) ($item['image_width'] ?? 0) ?>">
+                <div class="showcase-thumb">
                     <?php if ($isVideo): ?>
-                    <span class="showcase-badge video">视频</span>
+                    <video src="<?= e($videoSrc) ?>"
+                           <?= $thumb !== '' ? 'poster="' . e($thumb) . '"' : '' ?>
+                           preload="metadata" muted playsinline
+                           aria-label="<?= e($item['title']) ?>"></video>
+                    <span class="showcase-play" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    </span>
+                    <?php else: ?>
+                    <img src="<?= e($thumb) ?>" alt="<?= e($item['title']) ?>" loading="lazy">
                     <?php endif; ?>
-                    <img src="<?= e($imageUrl) ?>" alt="<?= e($item['title']) ?>" loading="lazy">
                 </div>
-                <div class="showcase-item-title"><?= e($item['title']) ?></div>
-            </div>
+                <figcaption class="showcase-item-title"><?= e($item['title']) ?></figcaption>
+            </figure>
             <?php endforeach; ?>
         <?php endif; ?>
     </div>
 
-    <div class="showcase-modal" id="showcaseModal" hidden>
-        <div class="showcase-modal-content">
-            <span class="showcase-modal-close" id="modalClose">&times;</span>
-            <span class="showcase-modal-counter" id="modalCounter"></span>
-            <div id="modalMediaContainer"></div>
-            <span class="showcase-modal-nav prev" id="modalPrev">&#8249;</span>
-            <span class="showcase-modal-nav next" id="modalNext">&#8250;</span>
-            <span class="showcase-modal-title" id="modalTitle"></span>
+    <!-- 灯箱：图片支持缩放/拖拽/全屏，视频用原生 controls 完整播放 -->
+    <div class="lbx" id="showcaseLightbox" hidden role="dialog" aria-modal="true" aria-label="媒体查看器">
+        <div class="lbx-bar">
+            <span class="lbx-title" id="lbxTitle"></span>
+            <span class="lbx-counter" id="lbxCounter"></span>
+            <button class="lbx-icon-btn" id="lbxFullscreen" type="button" title="全屏" aria-label="全屏">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+            </button>
+            <button class="lbx-icon-btn" id="lbxClose" type="button" title="关闭 (Esc)" aria-label="关闭">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+            </button>
+        </div>
+
+        <div class="lbx-stage" id="lbxStage">
+            <button class="lbx-nav prev" id="lbxPrev" type="button" aria-label="上一张">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+
+            <div class="lbx-viewport" id="lbxViewport">
+                <div class="lbx-media" id="lbxMedia"></div>
+            </div>
+
+            <button class="lbx-nav next" id="lbxNext" type="button" aria-label="下一张">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+        </div>
+
+        <div class="lbx-tools" id="lbxTools">
+            <button class="lbx-tool" id="lbxZoomOut" type="button" title="缩小 (-)">−</button>
+            <span class="lbx-zoom" id="lbxZoomLabel">100%</span>
+            <button class="lbx-tool" id="lbxZoomIn" type="button" title="放大 (+)">+</button>
+            <button class="lbx-tool wide" id="lbxActual" type="button" title="原始大小 (0)">1:1</button>
+            <button class="lbx-tool wide" id="lbxFit" type="button" title="适应窗口">适应</button>
         </div>
     </div>
 </div>

@@ -114,9 +114,13 @@ final class ApiController
                     break;
 
                 case 'showcase':
-                    $data = $this->clean($body, ['title' => 'string', 'image' => 'string', 'media_type' => 'string', 'gallery_id' => 'int', 'sort_order' => 'int', 'is_active' => 'bool']);
+                    $data = $this->clean($body, ['title' => 'string', 'image' => 'string', 'media_type' => 'string', 'video_url' => 'string', 'poster_url' => 'string', 'gallery_id' => 'int', 'sort_order' => 'int', 'is_active' => 'bool']);
                     if (trim((string) $data['title']) === '') {
                         return $this->json($response, false, '展示标题不能为空');
+                    }
+                    $data['media_type'] = in_array($data['media_type'], ['image', 'video'], true) ? $data['media_type'] : 'image';
+                    if ($data['media_type'] === 'video' && trim((string) $data['video_url']) === '') {
+                        return $this->json($response, false, '视频类型必须上传视频文件');
                     }
                     $id > 0 ? $this->showcase->update($id, $data) : $this->showcase->create($data);
                     break;
@@ -255,6 +259,8 @@ final class ApiController
                     $row = $this->showcase->imageOf($id);
                     $this->showcase->delete($id);
                     $this->deleteImage($row['image'] ?? null);
+                    $this->deleteImage($row['video_url'] ?? null);
+                    $this->deleteImage($row['poster_url'] ?? null);
                     break;
                 case 'gallery':
                     $this->gallery->delete($id);
@@ -280,19 +286,29 @@ final class ApiController
     public function upload(Request $request, Response $response): Response
     {
         $type = trim((string) ($request->getQueryParams()['type'] ?? 'cards'));
+        $kind = (string) ($request->getQueryParams()['kind'] ?? 'image');
         $files = $request->getUploadedFiles();
-        $file = $files['image'] ?? null;
+        $file = $files['image'] ?? $files['video'] ?? null;
 
-        if ($file === null || $file->getError() !== UPLOAD_ERR_OK) {
-            return $this->json($response, false, '请选择图片文件');
+        if ($file === null) {
+            return $this->json($response, false, $kind === 'video' ? '请选择视频文件' : '请选择图片文件');
         }
 
-        $result = $this->upload->image([
+        $payload = [
             'name' => $file->getClientFilename(),
             'tmp_name' => $file->getFilePath(),
             'size' => $file->getSize(),
             'error' => $file->getError(),
-        ], $type);
+        ];
+
+        if ($kind === 'video') {
+            $result = $this->upload->video($payload, $type === 'cards' ? 'showcase' : $type);
+        } else {
+            if ($file->getError() !== UPLOAD_ERR_OK) {
+                return $this->json($response, false, '请选择图片文件');
+            }
+            $result = $this->upload->image($payload, $type);
+        }
 
         if (!$result['ok']) {
             return $this->json($response, false, $result['message']);
