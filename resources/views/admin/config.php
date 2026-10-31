@@ -83,16 +83,17 @@ $currentTheme = $values['site_theme'] ?? 'default';
         <div class="section-title">页面背景</div>
         <p class="form-hint">整页背景图（铺满全屏）。建议使用 1920px 以内的图片，遮罩浓度越大文字越清晰。</p>
         <div class="form-group">
-            <label>背景图片</label>
+            <label for="siteBgImage">背景图片</label>
             <div class="image-upload-row">
                 <input name="site_bg_image" id="siteBgImage" placeholder="/uploads/background/xxx.jpg 或 http(s)://...">
-                <label class="btn btn-sm btn-secondary" style="cursor:pointer;">上传<input type="file" id="siteBgImageFile" accept="image/*" hidden></label>
+                <label class="btn btn-sm btn-secondary" for="siteBgImageFile">上传</label>
+                <input type="file" id="siteBgImageFile" accept="image/*" hidden>
                 <button type="button" class="btn btn-sm btn-secondary" id="siteBgImageClear">清除</button>
             </div>
             <div class="image-preview" id="siteBgImagePreview"></div>
         </div>
-        <div class="form-group"><label>背景遮罩浓度（0-100）</label>
-            <input type="number" name="site_bg_overlay" min="0" max="100" value="<?= e($values['site_bg_overlay'] ?? '35') ?>">
+        <div class="form-group"><label for="siteBgOverlay">背景遮罩浓度（0-100）</label>
+            <input type="number" id="siteBgOverlay" name="site_bg_overlay" min="0" max="100" value="<?= e($values['site_bg_overlay'] ?? '35') ?>">
         </div>
 
         <div class="section-title">留言板</div>

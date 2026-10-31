@@ -127,11 +127,20 @@
         var fd = new FormData();
         fd.append('image', file);
         fd.append('csrf_token', getCsrfToken());
+        var res;
         try {
-            var res = await fetch('/admin/api/upload?type=' + encodeURIComponent(type), { method: 'POST', body: fd });
+            res = await fetch('/admin/api/upload?type=' + encodeURIComponent(type), { method: 'POST', body: fd });
+        } catch (err) {
+            return { success: false, message: '网络错误，上传失败' };
+        }
+        // 会话失效时端点返回 302 登录页（HTML），需先判断状态再解析 JSON
+        if (res.redirected || res.status === 401 || res.status === 403) {
+            return { success: false, message: '登录已失效，请重新登录后上传' };
+        }
+        try {
             return await res.json();
         } catch (err) {
-            return { success: false, message: '上传失败' };
+            return { success: false, message: '上传失败（HTTP ' + res.status + '）' };
         }
     }
 

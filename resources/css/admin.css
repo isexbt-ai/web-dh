@@ -404,9 +404,15 @@ body {
     gap: 10px;
 }
 
-.image-upload-row input {
+.image-upload-row input[type="text"],
+.image-upload-row input:not([type]) {
     flex: 1;
     min-width: 0;
+}
+
+.image-upload-row label[for] {
+    cursor: pointer;
+    flex-shrink: 0;
 }
 
 /* ==================== 表格操作列 ==================== */

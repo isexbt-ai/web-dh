@@ -210,25 +210,38 @@ body.has-wide-layout .page-wrapper {
     padding: 12px 24px;
 }
 
+/* 站点名 + 副标题：副标题过长时截断，避免撑开头部挤走搜索与分类导航 */
 .home-logo {
+    display: flex;
+    align-items: baseline;
+    min-width: 0;
     font-size: 18px;
     font-weight: 700;
     color: var(--text-primary);
     white-space: nowrap;
 }
 
+.home-logo-name {
+    flex-shrink: 0;
+}
+
 .home-logo-sub {
+    min-width: 0;
     margin-left: 8px;
     font-size: 13px;
     font-weight: 400;
     color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .home-search-btn {
     display: flex;
     align-items: center;
     gap: 8px;
-    flex: 1;
+    flex: 1 1 180px;
+    min-width: 120px;
     max-width: 320px;
     padding: 7px 14px;
     border: 1px solid var(--border-strong);
@@ -254,6 +267,7 @@ body.has-wide-layout .page-wrapper {
 
 .home-nav {
     display: flex;
+    flex-shrink: 0;
     gap: 8px;
     margin-left: auto;
 }
@@ -1049,6 +1063,18 @@ body.has-site-bg {
         font-size: 13px;
     }
 
+    .home-header-inner,
+    .site-bar-inner {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .home-search-btn {
+        order: 3;
+        flex-basis: 100%;
+        max-width: none;
+    }
+
     .site-bar-inner {
         padding: 10px 12px;
     }
@@ -1059,11 +1085,17 @@ body.has-site-bg {
 }
 
 /* ==================== 响应式设计 - 手机端 ==================== */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
+    /* 窄屏：副标题过长会挤掉搜索与导航，直接隐藏 */
+    .home-logo-sub {
+        display: none;
+    }
+
     /* 窄屏：搜索框换行到独立一行 */
     .home-header-inner,
     .site-bar-inner {
         flex-wrap: wrap;
+        gap: 10px;
     }
 
     .home-search-btn {
@@ -1072,15 +1104,47 @@ body.has-site-bg {
         max-width: none;
     }
 
+    /* 窄屏：导航独占一行并横向滚动，避免把页面撑宽 */
+    .home-nav {
+        order: 2;
+        width: 100%;
+        margin-left: 0;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .home-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* 窄屏：分类导航横向滚动，不换行占高 */
+    .home-cats {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .home-cats::-webkit-scrollbar {
+        display: none;
+    }
+
+    .home-cats button {
+        flex-shrink: 0;
+    }
+}
+
+@media (max-width: 480px) {
     .home-logo {
         font-size: 16px;
+        max-width: 100%;
     }
 
     .card-grid {
         grid-template-columns: var(--grid-columns-mobile, var(--grid-columns));
         gap: var(--grid-gap);
     }
-
 
     .ad-placeholder {
         font-size: 18px;
