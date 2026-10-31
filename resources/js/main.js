@@ -90,7 +90,7 @@
         window.addEventListener('scroll', function () {
             if (ticking) return;
             requestAnimationFrame(function () {
-                btn.classList.toggle('show', window.scrollY > 300);
+                btn.classList.toggle('visible', window.scrollY > 300);
                 ticking = false;
             });
             ticking = true;
@@ -431,68 +431,33 @@
         });
     }
 
-    // ==================== 侧边栏分类切换 ====================
-    function initSideNav() {
-        var sideNav = document.getElementById('sideNav');
-        var sideMask = document.getElementById('sideMask');
-        var burger = document.getElementById('mainBurger');
-        if (!sideNav) return;
+    // ==================== 顶部分类切换 ====================
+    function initHomeCats() {
+        var nav = document.getElementById('homeCats');
+        if (!nav) return;
 
         var panels = Array.prototype.slice.call(document.querySelectorAll('.category-block'));
-        var slideSection = document.getElementById('slideSection');
-        var titleEl = document.getElementById('mainCatTitle');
-        var metaEl = document.getElementById('mainCatMeta');
-        var catButtons = Array.prototype.slice.call(sideNav.querySelectorAll('.side-cat'));
+        var buttons = Array.prototype.slice.call(nav.querySelectorAll('button[data-cat]'));
 
-        function closeDrawer() {
-            sideNav.classList.remove('open');
-            if (sideMask) sideMask.classList.remove('open');
-        }
-
-        function selectCategory(catId, label, count) {
-            catButtons.forEach(function (b) {
+        function selectCategory(catId) {
+            buttons.forEach(function (b) {
                 b.classList.toggle('active', b.getAttribute('data-cat') === catId);
             });
             panels.forEach(function (p) {
                 var match = catId === 'all' || p.getAttribute('data-cat') === catId;
                 p.hidden = !match;
             });
-            if (slideSection) slideSection.hidden = catId !== 'all';
-            if (titleEl) titleEl.textContent = label;
-            if (metaEl) metaEl.textContent = '共 ' + count + ' 个链接';
-            closeDrawer();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        sideNav.addEventListener('click', function (e) {
-            var btn = e.target.closest ? e.target.closest('.side-cat') : null;
+        nav.addEventListener('click', function (e) {
+            var btn = e.target.closest ? e.target.closest('button[data-cat]') : null;
             if (!btn) return;
-            var catId = btn.getAttribute('data-cat');
-            var nameEl = btn.querySelector('.side-cat-name');
-            var countEl = btn.querySelector('.side-cat-count');
-            selectCategory(
-                catId,
-                nameEl ? nameEl.textContent : '',
-                countEl ? parseInt(countEl.textContent, 10) || 0 : 0
-            );
-        });
-
-        if (burger) {
-            burger.addEventListener('click', function () {
-                var open = sideNav.classList.toggle('open');
-                if (sideMask) sideMask.classList.toggle('open', open);
-            });
-        }
-        if (sideMask) {
-            sideMask.addEventListener('click', closeDrawer);
-        }
-        // 桌面端误点遮罩或窗口放大时复位
-        window.addEventListener('resize', function () {
-            if (window.innerWidth > 900) closeDrawer();
+            selectCategory(btn.getAttribute('data-cat'));
         });
     }
 
-    // ==================== 搜索覆盖层 ====================
+    // ==================== 搜索覆盖层（全站搜索：链接 + 文章） ====================
     function initSearchOverlay() {
         var overlay = document.getElementById('searchOverlay');
         var input = document.getElementById('searchInput');
@@ -500,32 +465,13 @@
         var metaEl = document.getElementById('searchMeta');
         var resultsEl = document.getElementById('searchResults');
         var hintEl = document.getElementById('searchHint');
-        var sideSearchBtn = document.getElementById('sideSearchBtn');
-        var mainSearchBtn = document.getElementById('mainSearchBtn');
+        var homeSearchBtn = document.getElementById('homeSearchBtn');
         if (!overlay || !input || !resultsEl) return;
 
-        // 建立索引：所有卡片 + 所属分类名，供跨分类搜索
-        var index = [];
-        Array.prototype.forEach.call(document.querySelectorAll('.category-block'), function (panel) {
-            var catNameEl = panel.querySelector('.category-title');
-            var catName = catNameEl ? catNameEl.textContent.trim() : '';
-            Array.prototype.forEach.call(panel.querySelectorAll('.card-item'), function (item) {
-                var titleEl = item.querySelector('.card-title');
-                var imgEl = item.querySelector('.card-image img');
-                var type = item.getAttribute('data-card-type') || 'link';
-                index.push({
-                    id: item.getAttribute('data-card-id') || '',
-                    type: type,
-                    link: item.getAttribute('data-link') || '#',
-                    title: titleEl ? titleEl.textContent.trim() : '',
-                    category: catName,
-                    thumb: imgEl ? imgEl.getAttribute('src') || '' : ''
-                });
-            });
-        });
-
-        var current = [];   // 当前匹配结果
+        var current = [];   // 当前匹配结果（统一结构：type 为 card / article）
         var activeIdx = -1; // 键盘高亮下标
+        var seq = 0;        // 请求序号，用于丢弃过期响应
+        var timer = null;   // 防抖定时器
 
         function open() {
             overlay.hidden = false;
@@ -534,7 +480,7 @@
             activeIdx = -1;
             if (metaEl) metaEl.textContent = '';
             resultsEl.innerHTML = '';
-            if (hintEl) hintEl.textContent = '输入关键词开始搜索 · ESC 关闭';
+            if (hintEl) hintEl.textContent = '输入关键词搜索全站内容 · ESC 关闭';
             input.focus();
         }
 
@@ -546,58 +492,103 @@
             resultsEl.innerHTML = '';
         }
 
+        /** 请求服务端全站搜索；防抖 250ms，序号防竞态。 */
         function doSearch(keyword) {
-            var kw = keyword.trim().toLowerCase();
+            var kw = keyword.trim();
             activeIdx = -1;
             if (kw === '') {
                 current = [];
                 resultsEl.innerHTML = '';
                 if (metaEl) metaEl.textContent = '';
-                if (hintEl) hintEl.textContent = '输入关键词开始搜索 · ESC 关闭';
+                if (hintEl) hintEl.textContent = '输入关键词搜索全站内容 · ESC 关闭';
                 return;
             }
-            current = index.filter(function (it) {
-                return it.title.toLowerCase().indexOf(kw) !== -1
-                    || it.category.toLowerCase().indexOf(kw) !== -1;
-            });
-
-            if (metaEl) {
-                metaEl.textContent = current.length > 0
-                    ? '找到 ' + current.length + ' 个匹配「' + keyword.trim() + '」的链接'
-                    : '没有找到匹配「' + keyword.trim() + '」的链接';
-            }
-            if (hintEl) {
-                hintEl.textContent = current.length > 0
-                    ? '↑↓ 选择 · Enter 打开 · ESC 关闭'
-                    : '换个关键词试试';
-            }
-            renderResults(keyword.trim());
+            var mySeq = ++seq;
+            if (hintEl) hintEl.textContent = '搜索中…';
+            fetch('/api/search?q=' + encodeURIComponent(kw), {
+                headers: { 'Accept': 'application/json' }
+            })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (mySeq !== seq) return; // 已有更新的请求，丢弃本次结果
+                    if (!data || !data.ok) throw new Error('search failed');
+                    render(data, kw);
+                })
+                .catch(function () {
+                    if (mySeq !== seq) return;
+                    current = [];
+                    resultsEl.innerHTML = '<p class="search-empty">搜索失败，请稍后再试</p>';
+                    if (metaEl) metaEl.textContent = '';
+                    if (hintEl) hintEl.textContent = '换个关键词试试';
+                });
         }
 
-        function renderResults(keyword) {
-            if (current.length === 0) {
-                resultsEl.innerHTML = '<p class="search-empty">没有匹配的链接</p>';
+        /** 渲染结果：链接在前、文章在后，各自分组标题。 */
+        function render(data, keyword) {
+            var cards = data.cards || [];
+            var articles = data.articles || [];
+            current = [];
+            var html = '';
+
+            if (cards.length) {
+                html += '<p class="search-group">链接 · ' + cards.length + '</p>';
+                html += cards.map(function (c) {
+                    current.push({ type: 'card', id: c.id, link: c.link, cardType: c.card_type });
+                    var thumb = c.image
+                        ? '<img src="' + attr(c.image) + '" alt="" loading="lazy" width="36" height="36">'
+                        : '<span class="sr-thumb">' + attr((c.title || '?').charAt(0)) + '</span>';
+                    return '<a href="#" class="sr-item" data-idx="' + (current.length - 1) + '">'
+                        + '<span class="sr-thumb-wrap">' + thumb + '</span>'
+                        + '<span class="sr-body">'
+                        + '<span class="sr-title">' + highlight(c.title, keyword) + '</span>'
+                        + '<span class="sr-cat">' + highlight(c.category || '未分类', keyword) + '</span>'
+                        + '</span></a>';
+                }).join('');
+            }
+
+            if (articles.length) {
+                html += '<p class="search-group">文章 · ' + articles.length + '</p>';
+                html += articles.map(function (a) {
+                    current.push({ type: 'article', url: a.url });
+                    var thumb = a.image
+                        ? '<img src="' + attr(a.image) + '" alt="" loading="lazy" width="36" height="36">'
+                        : '<span class="sr-thumb sr-thumb-text">文</span>';
+                    return '<a href="#" class="sr-item" data-idx="' + (current.length - 1) + '">'
+                        + '<span class="sr-thumb-wrap">' + thumb + '</span>'
+                        + '<span class="sr-body">'
+                        + '<span class="sr-title">' + highlight(a.title, keyword) + '</span>'
+                        + '<span class="sr-cat">文章 · ' + attr(String(a.created_at || '').substring(0, 10)) + '</span>'
+                        + '</span></a>';
+                }).join('');
+            }
+
+            if (!current.length) {
+                resultsEl.innerHTML = '<p class="search-empty">没有匹配「' + attr(keyword) + '」的内容</p>';
+                if (metaEl) metaEl.textContent = '没有找到匹配内容';
+                if (hintEl) hintEl.textContent = '换个关键词试试';
                 return;
             }
-            var html = current.map(function (it, i) {
-                var thumb = it.thumb
-                    ? '<img src="' + it.thumb + '" alt="" loading="lazy" width="36" height="36">'
-                    : '<span class="sr-thumb">' + (it.title || '?').charAt(0) + '</span>';
-                return '<a href="#" class="sr-item" data-idx="' + i + '">'
-                    + '<span class="sr-thumb-wrap">' + thumb + '</span>'
-                    + '<span class="sr-body">'
-                    + '<span class="sr-title">' + highlight(it.title, keyword) + '</span>'
-                    + '<span class="sr-cat">' + highlight(it.category, keyword) + '</span>'
-                    + '</span></a>';
-            }).join('');
+
             resultsEl.innerHTML = html;
+            if (metaEl) {
+                metaEl.textContent = '找到 ' + current.length + ' 条匹配「' + keyword + '」的内容';
+            }
+            if (hintEl) {
+                hintEl.textContent = '↑↓ 选择 · Enter 打开 · ESC 关闭';
+            }
+        }
+
+        /** 属性值转义（用于拼 HTML 属性，避免引号截断）。 */
+        function attr(text) {
+            var s = text === undefined || text === null ? '' : String(text);
+            return s.replace(/[&<>"']/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[c];
+            });
         }
 
         /** 转义 HTML 后高亮关键词（先转义再插标签，避免 XSS）。 */
         function highlight(text, keyword) {
-            var safe = text.replace(/[&<>"']/g, function (c) {
-                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-            });
+            var safe = attr(text);
             if (!keyword) return safe;
             var kwSafe = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             return safe.replace(new RegExp(kwSafe, 'gi'), function (m) {
@@ -605,9 +596,13 @@
             });
         }
 
-        /** 打开某个结果：detail 跳详情，link 开新窗口；同时上报点击。 */
+        /** 打开某个结果：文章跳详情页，卡片按类型跳转；同时上报点击。 */
         function openResult(item) {
             if (!item) return;
+            if (item.type === 'article') {
+                window.location.href = item.url;
+                return;
+            }
             if (item.id) {
                 fetch('/api/click', {
                     method: 'POST',
@@ -615,7 +610,7 @@
                     body: JSON.stringify({ card_id: item.id })
                 }).catch(function () {});
             }
-            if (item.type === 'detail') {
+            if (item.cardType === 'detail') {
                 window.location.href = '/card/' + item.id + '.html';
                 return;
             }
@@ -631,15 +626,14 @@
             var items = resultsEl.querySelectorAll('.sr-item');
             if (items.length === 0) return;
             activeIdx = (i + items.length) % items.length;
-            Array.prototype.forEach.call(items, function (el, n) {
+            Array.prototype.slice.call(items).forEach(function (el, n) {
                 el.classList.toggle('active', n === activeIdx);
             });
             var el = items[activeIdx];
             if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' });
         }
 
-        if (sideSearchBtn) sideSearchBtn.addEventListener('click', open);
-        if (mainSearchBtn) mainSearchBtn.addEventListener('click', open);
+        if (homeSearchBtn) homeSearchBtn.addEventListener('click', open);
         if (closeBtn) closeBtn.addEventListener('click', close);
         overlay.addEventListener('click', function (e) {
             if (e.target === overlay) { close(); return; }
@@ -649,7 +643,11 @@
                 openResult(current[parseInt(item.getAttribute('data-idx'), 10)]);
             }
         });
-        input.addEventListener('input', function () { doSearch(input.value); });
+        input.addEventListener('input', function () {
+            var v = input.value;
+            clearTimeout(timer);
+            timer = setTimeout(function () { doSearch(v); }, 250);
+        });
         document.addEventListener('keydown', function (e) {
             if (overlay.hidden) {
                 if (e.key === '/' || (e.key === 'k' && (e.metaKey || e.ctrlKey))) {
@@ -676,7 +674,7 @@
 
     // ==================== 初始化 ====================
     document.addEventListener('DOMContentLoaded', function () {
-        initSideNav();
+        initHomeCats();
         initSearchOverlay();
         initSlideCarousel();
         initCardDelegate();

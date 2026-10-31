@@ -300,6 +300,41 @@
         initImageUpload('editCoverFile', 'cover_image', 'articles');
         initImageUpload('editImageFile', 'image', 'showcase');
 
+        // 站点配置：页面背景图上传 / 预览 / 清除
+        var bgField = document.getElementById('siteBgImage');
+        var bgFile = document.getElementById('siteBgImageFile');
+        var bgPreview = document.getElementById('siteBgImagePreview');
+        var bgClear = document.getElementById('siteBgImageClear');
+        if (bgField && bgFile) {
+            var renderBgPreview = function () {
+                if (!bgPreview) return;
+                bgPreview.innerHTML = bgField.value
+                    ? '<img src="' + bgField.value.replace(/"/g, '&quot;') + '" alt="">'
+                    : '';
+            };
+            renderBgPreview();
+            bgFile.addEventListener('change', function () {
+                var file = bgFile.files[0];
+                if (!file) return;
+                uploadImage(file, 'background').then(function (result) {
+                    if (result.success) {
+                        bgField.value = result.url || result.path || '';
+                        renderBgPreview();
+                        showToast('上传成功，记得保存配置');
+                    } else {
+                        showToast(result.message || '上传失败', 'error');
+                    }
+                });
+            });
+            bgField.addEventListener('input', renderBgPreview);
+            if (bgClear) {
+                bgClear.addEventListener('click', function () {
+                    bgField.value = '';
+                    renderBgPreview();
+                });
+            }
+        }
+
         // Modal 关闭
         document.querySelectorAll('.modal-overlay').forEach(function (modal) {
             modal.addEventListener('click', function (e) {

@@ -45,10 +45,8 @@ body[data-theme="mint"] {
     --footer-link: #b5e2d8;
 
     /* === 布局：高密度 6 列小卡 === */
+    --home-layout-width: 1200px;
     --page-width: 1000px;
-    --side-width: 190px;
-    --layout-width: 1200px;
-    --layout-gap: 20px;
     --section-spacing: 16px;
     --section-radius: 10px;
     --section-border: 1px solid var(--border);

@@ -90,4 +90,25 @@ final class Article extends BaseModel
     {
         return $this->fetchAll('SELECT id, slug, title, created_at FROM articles WHERE is_active = 1 ORDER BY created_at DESC');
     }
+
+    /**
+     * 全站搜索：匹配标题、摘要、关键词与正文。
+     * 关键词参数绑定，% 与 _ 转义为字面量（避免通配符注入）。
+     */
+    public function search(string $keyword, int $limit = 10): array
+    {
+        $like = '%' . $this->escapeLike($keyword) . '%';
+        return $this->fetchAll(
+            "SELECT id, title, slug, summary, cover_image, keywords, created_at
+             FROM articles
+             WHERE is_active = 1
+               AND (title LIKE ? ESCAPE '\\'
+                    OR summary LIKE ? ESCAPE '\\'
+                    OR keywords LIKE ? ESCAPE '\\'
+                    OR content LIKE ? ESCAPE '\\')
+             ORDER BY created_at DESC
+             LIMIT ?",
+            [$like, $like, $like, $like, $limit]
+        );
+    }
 }

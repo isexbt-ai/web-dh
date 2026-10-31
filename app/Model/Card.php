@@ -115,4 +115,26 @@ final class Card extends BaseModel
     {
         return $this->fetchOne('SELECT image FROM cards WHERE id = ?', [$id]);
     }
+
+    /**
+     * 全站搜索：匹配卡片标题、描述与所属分类名。
+     * 关键词参数绑定，% 与 _ 转义为字面量（避免通配符注入）。
+     */
+    public function search(string $keyword, int $limit = 20): array
+    {
+        $like = '%' . $this->escapeLike($keyword) . '%';
+        return $this->fetchAll(
+            "SELECT c.id, c.title, c.link, c.detail, c.card_type, c.image, c.badge_text,
+                    cat.name AS category_name
+             FROM cards c
+             LEFT JOIN categories cat ON c.category_id = cat.id
+             WHERE c.is_active = 1
+               AND (c.title LIKE ? ESCAPE '\\'
+                    OR c.detail LIKE ? ESCAPE '\\'
+                    OR cat.name LIKE ? ESCAPE '\\')
+             ORDER BY c.sort_order ASC, c.id ASC
+             LIMIT ?",
+            [$like, $like, $like, $limit]
+        );
+    }
 }

@@ -1,7 +1,8 @@
 <?php
 /**
  * 前台主布局。
- * 数据：title/description/canonical/og(数组)/jsonld(数组)/content/siteTitle/showTopBar
+ * 数据：title/description/canonical/og(数组)/jsonld(数组)/content/siteTitle/
+ *       wideLayout/bgImage/bgOverlay
  */
 $siteTitle = $siteTitle ?? (string) config('seo.site_title');
 $pageTitle = $title ?? $siteTitle;
@@ -11,7 +12,9 @@ $og = $og ?? [];
 $jsonld = $jsonld ?? [];
 $umami = $umami ?? ['enabled' => false, 'script_url' => '', 'website_id' => ''];
 $activeTheme = $theme ?? 'default';
-$sideLayout = $sideLayout ?? false;
+$wideLayout = $wideLayout ?? false;
+$bgImage = $bgImage ?? '';
+$bgOverlay = $bgOverlay ?? '35';
 ?>
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -51,18 +54,35 @@ $themeColor = $themeColorMap[$activeTheme] ?? '#e94560';
     <script defer src="<?= e($umami['script_url']) ?>" data-website-id="<?= e($umami['website_id']) ?>"></script>
     <?php endif; ?>
 </head>
-<body<?= $activeTheme !== 'default' ? ' data-theme="' . e($activeTheme) . '"' : '' ?><?= !empty($sideLayout) ? ' class="has-side-layout"' : '' ?>>
-    <?php if (!empty($showTopBar)): ?>
-    <header class="top-bar">
-        <div class="header-left">
-            <a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:#333;font-size:14px;font-weight:500;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#e94560" stroke-width="2" style="width:20px;height:20px;">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-                <span>返回首页</span>
-            </a>
+<?php
+/** 背景图：仅当配置了合法地址时才启用 body 背景层。 */
+$bgCss = bg_image_css((string) $bgImage);
+$bodyStyle = '';
+$bodyClasses = [];
+if (!empty($wideLayout)) {
+    $bodyClasses[] = 'has-wide-layout';
+}
+if ($bgCss !== '') {
+    $bodyClasses[] = 'has-site-bg';
+    $bodyStyle = '--site-bg-image:' . $bgCss . ';--site-bg-overlay:' . (max(0, min(100, (int) $bgOverlay)) / 100);
+}
+?>
+<body<?= $activeTheme !== 'default' ? ' data-theme="' . e($activeTheme) . '"' : '' ?><?= $bodyClasses !== [] ? ' class="' . e(implode(' ', $bodyClasses)) . '"' : '' ?><?= $bodyStyle !== '' ? ' style="' . e($bodyStyle) . '"' : '' ?>>
+    <?php if (empty($wideLayout)): ?>
+    <!-- 子页面顶栏：站点名 + 全站搜索 + 导航（首页使用自带的 home-header） -->
+    <header class="site-bar">
+        <div class="site-bar-inner">
+            <a class="site-bar-logo" href="/"><?= e($siteTitle) ?></a>
+            <button class="home-search-btn" id="homeSearchBtn" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+                <span>搜索全站…</span>
+            </button>
+            <nav class="home-nav">
+                <a href="/showcase" class="home-nav-btn">效果展示</a>
+                <a href="/articles" class="home-nav-btn">精选文章</a>
+                <a href="/guestbook" class="home-nav-btn">留言板</a>
+            </nav>
         </div>
-        <div class="header-right" style="font-size:14px;color:#999;"><?= e($siteTitle) ?></div>
     </header>
     <?php endif; ?>
 
@@ -76,6 +96,22 @@ $themeColor = $themeColorMap[$activeTheme] ?? '#e94560';
             <a href="/guestbook" style="color:#ddd;text-decoration:none;margin:0 10px;">留言板</a>
         </p>
     </footer>
+
+    <!-- 搜索覆盖层（全站搜索：链接 + 文章），全站页面通用 -->
+    <div class="search-overlay" id="searchOverlay" hidden>
+        <div class="search-panel">
+            <div class="search-bar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+                <input type="search" id="searchInput" placeholder="搜索全站链接与文章..." autocomplete="off" maxlength="50">
+                <button class="search-close" id="searchClose" type="button" aria-label="关闭">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+                </button>
+            </div>
+            <p class="search-meta" id="searchMeta"></p>
+            <div class="search-results" id="searchResults"></div>
+            <p class="search-hint" id="searchHint">按 ESC 关闭 · ↑↓ 选择 · Enter 打开</p>
+        </div>
+    </div>
 
     <script src="<?= e(asset('main.js')) ?>" defer></script>
     <script>

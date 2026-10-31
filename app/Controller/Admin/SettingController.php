@@ -18,6 +18,7 @@ final class SettingController
     private const CONFIG_KEYS = [
         'site_title', 'site_subtitle', 'site_description', 'site_keywords',
         'site_theme',
+        'site_bg_image', 'site_bg_overlay',
         'card_sort_method', 'guestbook_enabled',
         'guestbook_title', 'guestbook_subtitle', 'guestbook_image', 'guestbook_notice',
         'umami_enabled', 'umami_script_url', 'umami_website_id',
@@ -62,6 +63,7 @@ final class SettingController
             'site_description' => (string) config('seo.site_description', ''),
             'site_keywords' => (string) config('seo.site_keywords', ''),
             'site_theme' => 'default',
+            'site_bg_overlay' => '35',
             'card_sort_method' => 'default',
             'guestbook_enabled', 'umami_enabled' => '1',
             'visitor_base_offset' => '88888',

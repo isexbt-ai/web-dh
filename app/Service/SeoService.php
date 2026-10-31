@@ -72,6 +72,8 @@ final class SeoService
             'jsonld' => $jsonld,
             'umami' => $this->trackingConfig(),
             'theme' => $this->activeTheme(),
+            'bgImage' => $this->settings->get('site_bg_image', ''),
+            'bgOverlay' => $this->settings->get('site_bg_overlay', '35'),
         ];
     }
 

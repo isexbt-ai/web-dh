@@ -397,6 +397,18 @@ body {
     margin-top: 12px;
 }
 
+/* 上传行：路径输入 + 上传按钮 + 清除按钮 */
+.image-upload-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.image-upload-row input {
+    flex: 1;
+    min-width: 0;
+}
+
 /* ==================== 表格操作列 ==================== */
 .table-actions {
     display: flex;

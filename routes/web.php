@@ -72,6 +72,7 @@ return function (App $app): void {
 
     // ===== 公开 API =====
     $app->get('/api/cards', [ApiController::class, 'cards']);
+    $app->get('/api/search', [ApiController::class, 'search']);
     $app->post('/api/click', [ApiController::class, 'click']);
     $app->map(['GET', 'POST'], '/api/messages', [ApiController::class, 'messages']);
 

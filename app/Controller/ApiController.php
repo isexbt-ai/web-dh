@@ -6,18 +6,20 @@ namespace App\Controller;
 
 use App\Model\Card;
 use App\Model\Message;
+use App\Service\SearchService;
 use App\Service\SettingService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
- * 公开 API：切换分类拉卡片 / 点击计数 / 留言列表与提交（含 IP 防刷）。
+ * 公开 API：切换分类拉卡片 / 点击计数 / 全站搜索 / 留言列表与提交（含 IP 防刷）。
  */
 final class ApiController
 {
     public function __construct(
         private Card $cardModel,
         private Message $messageModel,
+        private SearchService $search,
         private SettingService $settings
     ) {
     }
@@ -68,6 +70,15 @@ final class ApiController
             return $this->submitMessage($request, $response);
         }
         return $this->listMessages($request, $response);
+    }
+
+    /**
+     * 全站搜索：跨卡片与文章检索，供前台搜索面板使用。
+     */
+    public function search(Request $request, Response $response): Response
+    {
+        $keyword = trim((string) ($request->getQueryParams()['q'] ?? ''));
+        return $this->json($response, ['ok' => true] + $this->search->search($keyword));
     }
 
     private function listMessages(Request $request, Response $response): Response

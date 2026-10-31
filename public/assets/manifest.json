@@ -1,12 +1,12 @@
 {
-    "style.css": "/assets/css/style.min.css?v=c55a37",
+    "style.css": "/assets/css/style.min.css?v=2f7ccb",
     "pages.css": "/assets/css/pages.min.css?v=415b6f",
-    "admin.css": "/assets/css/admin.min.css?v=821736",
-    "main.js": "/assets/js/main.min.js?v=a83b64",
-    "admin.js": "/assets/js/admin.min.js?v=21078c",
-    "theme-corporate": "/assets/css/themes/corporate.min.css?v=eb4908",
-    "theme-dark": "/assets/css/themes/dark.min.css?v=7197c5",
-    "theme-minimal": "/assets/css/themes/minimal.min.css?v=27c475",
-    "theme-mint": "/assets/css/themes/mint.min.css?v=6300f0",
-    "theme-warm": "/assets/css/themes/warm.min.css?v=e7d6a4"
+    "admin.css": "/assets/css/admin.min.css?v=29107b",
+    "main.js": "/assets/js/main.min.js?v=1bb76b",
+    "admin.js": "/assets/js/admin.min.js?v=5c1b15",
+    "theme-corporate": "/assets/css/themes/corporate.min.css?v=6bdea0",
+    "theme-dark": "/assets/css/themes/dark.min.css?v=2256d8",
+    "theme-minimal": "/assets/css/themes/minimal.min.css?v=734bc4",
+    "theme-mint": "/assets/css/themes/mint.min.css?v=34f0dd",
+    "theme-warm": "/assets/css/themes/warm.min.css?v=92aa7a"
 }

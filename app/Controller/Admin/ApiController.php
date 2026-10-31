@@ -31,6 +31,7 @@ final class ApiController
     private const CONFIG_KEYS = [
         'site_title', 'site_subtitle', 'site_description', 'site_keywords',
         'site_theme',
+        'site_bg_image', 'site_bg_overlay',
         'card_sort_method', 'guestbook_enabled',
         'guestbook_title', 'guestbook_subtitle', 'guestbook_image', 'guestbook_notice',
         'umami_enabled', 'umami_script_url', 'umami_website_id',
@@ -38,6 +39,9 @@ final class ApiController
         'visitor_base_offset', 'visitor_daily_increment',
         'baidu_push_token', 'indexnow_key',
     ];
+
+    /** 允许的上传子目录白名单（防止 type 参数穿越到 uploads 之外） */
+    private const UPLOAD_SUBDIRS = ['cards', 'articles', 'showcase', 'ads', 'background'];
 
     public function __construct(
         private Ad $ad,
@@ -287,6 +291,9 @@ final class ApiController
     {
         $type = trim((string) ($request->getQueryParams()['type'] ?? 'cards'));
         $kind = (string) ($request->getQueryParams()['kind'] ?? 'image');
+        if (!in_array($type, self::UPLOAD_SUBDIRS, true)) {
+            return $this->json($response, false, '不支持的上传目录');
+        }
         $files = $request->getUploadedFiles();
         $file = $files['image'] ?? $files['video'] ?? null;
 
@@ -302,7 +309,8 @@ final class ApiController
         ];
 
         if ($kind === 'video') {
-            $result = $this->upload->video($payload, $type === 'cards' ? 'showcase' : $type);
+            // 视频仅用于效果展示，统一落到 showcase 目录
+            $result = $this->upload->video($payload, 'showcase');
         } else {
             if ($file->getError() !== UPLOAD_ERR_OK) {
                 return $this->json($response, false, '请选择图片文件');

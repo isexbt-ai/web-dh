@@ -84,4 +84,13 @@ abstract class BaseModel
     {
         return (int) $this->_pdo->lastInsertId();
     }
+
+    /**
+     * 转义 LIKE 通配符：把 % _ 与转义符本身变成字面量，
+     * 配合 SQL 的 ESCAPE '\' 使用，避免用户输入被当作通配符。
+     */
+    protected function escapeLike(string $value): string
+    {
+        return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
+    }
 }

@@ -116,3 +116,28 @@ if (!function_exists('image_url')) {
         return preg_match('/^(https?:|data:|blob:|\/)/i', $path) ? $path : '/' . ltrim($path, '/');
     }
 }
+
+if (!function_exists('bg_image_css')) {
+    /**
+     * 背景图地址转 CSS url() 值：仅允许 http(s) 绝对地址、绝对路径、
+     * uploads 相对路径（自动补前导斜杠，避免子页面相对解析错误），
+     * 其余一律拒绝；并剔除会破坏 CSS 解析的字符。
+     * 返回空串表示不设置背景图。
+     */
+    function bg_image_css(string $path): string
+    {
+        $path = trim($path);
+        if ($path === '') {
+            return '';
+        }
+        if (stripos($path, 'uploads/') === 0) {
+            $path = '/' . $path;
+        }
+        // 仅允许 http(s) 绝对地址或以单个 / 开头的站内绝对路径（拒绝协议相对地址 //host）
+        if (!preg_match('#^(https?://|/(?!/))#i', $path)) {
+            return '';
+        }
+        $path = str_replace(['"', "'", '(', ')', '\\', "\n", "\r", "\t", ' '], '', $path);
+        return $path === '' ? '' : 'url("' . $path . '")';
+    }
+}
