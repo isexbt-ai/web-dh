@@ -47,6 +47,8 @@ final class AuthController
         if ($this->rateLimit->isLoginLocked($ip)) {
             return $this->json($response, false, '尝试次数过多，请 15 分钟后再试');
         }
+        // 顺带清理过期锁定记录（1% 概率），避免 login_attempts 表膨胀
+        $this->rateLimit->cleanupExpired();
 
         $user = $this->adminUser->findByUsername($username);
         if ($user === null || !password_verify($password, (string) $user['password'])) {

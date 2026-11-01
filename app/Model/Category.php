@@ -24,11 +24,6 @@ final class Category extends BaseModel
         return $this->fetchOne('SELECT * FROM categories WHERE id = ?', [$id]);
     }
 
-    public function countCards(int $categoryId): int
-    {
-        return (int) $this->fetchColumn('SELECT COUNT(*) FROM cards WHERE category_id = ?', [$categoryId]);
-    }
-
     public function create(string $name, int $sortOrder, int $isActive): int
     {
         $this->execute('INSERT INTO categories (name, sort_order, is_active) VALUES (?, ?, ?)', [$name, $sortOrder, $isActive]);

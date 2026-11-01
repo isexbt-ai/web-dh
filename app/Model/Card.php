@@ -57,11 +57,6 @@ final class Card extends BaseModel
         return $this->fetchOne($sql, [$id]);
     }
 
-    public function getHot(int $limit = 10): array
-    {
-        return $this->fetchAll('SELECT * FROM cards WHERE is_active = 1 ORDER BY click_count DESC LIMIT ?', [$limit]);
-    }
-
     public function incrementClick(int $id): bool
     {
         return $this->execute('UPDATE cards SET click_count = click_count + 1 WHERE id = ?', [$id]);
@@ -70,11 +65,6 @@ final class Card extends BaseModel
     public function count(): int
     {
         return (int) $this->fetchColumn('SELECT COUNT(*) FROM cards');
-    }
-
-    public function countByCategory(int $categoryId): int
-    {
-        return (int) $this->fetchColumn('SELECT COUNT(*) FROM cards WHERE category_id = ?', [$categoryId]);
     }
 
     public function create(array $data): int

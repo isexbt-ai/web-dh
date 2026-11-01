@@ -21,7 +21,7 @@ $items = $items ?? [];
                 <td><?= e($it['title']) ?></td>
                 <td><?= $it['image'] !== '' ? '<img src="' . e($it['image']) . '" style="height:36px;border-radius:6px;" alt="">' : '<span class="form-hint">无</span>' ?></td>
                 <td><?= (int) $it['sort_order'] ?></td>
-                <td><?= (int) $it['is_active'] === 1 ? '<span class="toggle-text on">启用</span>' : '<span class="toggle-text">停用</span>' ?></td>
+                <?= $__view->partial('partials/admin/status-cell', ['row' => $it]) ?>
                 <td class="table-actions">
                     <button type="button" class="btn btn-sm btn-edit"
                         data-id="<?= (int) $it['id'] ?>"

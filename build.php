@@ -13,8 +13,16 @@ require __DIR__ . '/vendor/autoload.php';
 use MatthiasMullie\Minify;
 
 // 基础资源
+// style.css 由多个源文件按顺序拼接后压缩为单个产物（manifest key 与产物路径保持不变）
+$styleParts = [
+    __DIR__ . '/resources/css/base.css',
+    __DIR__ . '/resources/css/home.css',
+    __DIR__ . '/resources/css/search.css',
+    __DIR__ . '/resources/css/components.css',
+];
+
 $assets = [
-    'style.css' => [__DIR__ . '/resources/css/style.css', __DIR__ . '/public/assets/css/style.min.css', 'css'],
+    'style.css' => [$styleParts, __DIR__ . '/public/assets/css/style.min.css', 'css'],
     'pages.css' => [__DIR__ . '/resources/css/pages.css', __DIR__ . '/public/assets/css/pages.min.css', 'css'],
     'admin.css' => [__DIR__ . '/resources/css/admin.css', __DIR__ . '/public/assets/css/admin.min.css', 'css'],
     'main.js' => [__DIR__ . '/resources/js/main.js', __DIR__ . '/public/assets/js/main.min.js', 'js'],
@@ -37,12 +45,31 @@ $manifest = [];
 $failed = false;
 
 foreach ($assets as $key => [$src, $dst, $type]) {
-    if (!is_file($src)) {
-        echo "❌ 源文件不存在: {$src}\n";
+    // 源可以是单个文件，也可以是按顺序拼接的多个文件（CSS 分片）
+    $sources = is_array($src) ? $src : [$src];
+    $missing = false;
+    foreach ($sources as $one) {
+        if (!is_file($one)) {
+            echo "❌ 源文件不存在: {$one}\n";
+            $missing = true;
+        }
+    }
+    if ($missing) {
         $failed = true;
         continue;
     }
-    $minifier = $type === 'css' ? new Minify\CSS($src) : new Minify\JS($src);
+    if (count($sources) === 1) {
+        $minifier = $type === 'css' ? new Minify\CSS($sources[0]) : new Minify\JS($sources[0]);
+    } else {
+        // 多片段拼接：先各自压缩再合并，保证产物与合并前等价
+        $chunks = [];
+        foreach ($sources as $one) {
+            $m = $type === 'css' ? new Minify\CSS($one) : new Minify\JS($one);
+            $chunks[] = $m->minify();
+        }
+        $minifier = $type === 'css' ? new Minify\CSS() : new Minify\JS();
+        $minifier->add((string) implode("\n", $chunks));
+    }
     $minified = $minifier->minify();
 
     if (!is_dir(dirname($dst))) {

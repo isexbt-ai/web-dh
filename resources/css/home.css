@@ -1,0 +1,254 @@
+/* ==================== 首页布局（顶部导航） ==================== */
+/* .home-shell 通栏（承载吸顶头部），.home-container 居中限宽 */
+.home-shell {
+    width: 100%;
+}
+
+.home-container {
+    max-width: var(--home-layout-width);
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* ---------- 顶部展示区（广告轮播） ---------- */
+.home-banner {
+    padding: 20px 0 0;
+}
+
+.home-banner .slide-carousel {
+    height: var(--home-banner-height);
+    aspect-ratio: auto;
+    border-radius: 16px;
+}
+
+.home-banner .slide-item img {
+    border-radius: 16px;
+}
+
+.home-banner .slide-dots {
+    left: auto;
+    right: 16px;
+    transform: none;
+}
+
+/* ---------- 子页面顶栏（首页之外的页面） ---------- */
+.site-bar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+}
+
+.site-bar-inner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 12px 16px;
+}
+
+.site-bar-logo {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ---------- 吸顶头部 ---------- */
+.home-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+}
+
+.home-header-inner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    max-width: var(--home-layout-width);
+    margin: 0 auto;
+    padding: 12px 24px;
+}
+
+/* 站点名 + 副标题：副标题过长时截断，避免撑开头部挤走搜索与分类导航 */
+.home-logo {
+    display: flex;
+    align-items: baseline;
+    min-width: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.home-logo-name {
+    flex-shrink: 0;
+}
+
+.home-logo-sub {
+    min-width: 0;
+    margin-left: 8px;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.home-search-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 180px;
+    min-width: 120px;
+    max-width: 320px;
+    padding: 7px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    background: var(--bg-muted);
+    color: var(--text-muted);
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.home-search-btn:hover {
+    border-color: var(--brand-primary);
+    color: var(--brand-primary);
+}
+
+.home-search-btn svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.home-nav {
+    display: flex;
+    flex-shrink: 0;
+    gap: 8px;
+    margin-left: auto;
+}
+
+/* 入口按钮：描边 + 主色文字，hover 反白填充 */
+.home-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 13.5px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.home-nav-btn:hover {
+    border-color: var(--brand-primary);
+    color: var(--brand-primary);
+    background: var(--brand-bg-lighter);
+}
+
+/* 主入口（留言板）：实心主色，最显眼 */
+.home-nav-btn-primary {
+    border-color: var(--brand-primary);
+    background: var(--brand-primary);
+    color: var(--text-on-brand);
+}
+
+.home-nav-btn-primary:hover {
+    background: var(--brand-primary-dark);
+    border-color: var(--brand-primary-dark);
+    color: var(--text-on-brand);
+}
+
+/* ---------- 分类导航 ---------- */
+.home-cats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-width: var(--home-layout-width);
+    margin: 0 auto;
+    padding: 0 24px 10px;
+}
+
+.home-cats button {
+    padding: 6px 12px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-tertiary);
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.home-cats button:hover {
+    background: var(--bg-muted);
+    color: var(--text-primary);
+}
+
+.home-cats button.active {
+    background: var(--brand-primary);
+    color: var(--text-on-brand);
+    font-weight: 600;
+}
+
+.home-cat-count {
+    margin-left: 5px;
+    font-size: 11px;
+    opacity: 0.65;
+}
+
+/* ---------- 主内容区 ---------- */
+.home-main {
+    padding: 18px 0 60px;
+}
+
+/* 分类切换：默认全部显示，选中单个时只显示对应区块 */
+.category-block[hidden] {
+    display: none;
+}
+
+.home-main .category-block {
+    margin-bottom: var(--home-section-spacing);
+}
+
+.cat-panels .category-block {
+    animation: panelFade 0.25s ease;
+}
+
+@keyframes panelFade {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==================== 整页背景图 ==================== */
+/* 后台「站点配置 → 页面背景」设置；--site-bg-image / --site-bg-overlay 由布局注入 */
+body.has-site-bg {
+    background-image:
+        linear-gradient(rgba(0, 0, 0, var(--site-bg-overlay, 0.35)), rgba(0, 0, 0, var(--site-bg-overlay, 0.35))),
+        var(--site-bg-image, none);
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+@media (max-width: 768px) {
+    /* 移动端 fixed 背景会明显拖慢滚动，改为随页面滚动 */
+    body.has-site-bg {
+        background-attachment: scroll;
+    }
+}

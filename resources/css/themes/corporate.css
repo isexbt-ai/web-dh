@@ -42,7 +42,6 @@ body[data-theme="corporate"] {
 
     --footer-bg: #ffffff;
     --footer-text: #94a3b8;
-    --footer-link: #cbd5e1;
 
     /* === 布局：单列横向列表 === */
     --home-layout-width: 900px;

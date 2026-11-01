@@ -42,7 +42,6 @@ body[data-theme="mint"] {
 
     --footer-bg: #ffffff;
     --footer-text: #7d9a96;
-    --footer-link: #b5e2d8;
 
     /* === 布局：高密度 6 列小卡 === */
     --home-layout-width: 1200px;

@@ -48,8 +48,10 @@ if (!function_exists('asset')) {
         }
 
         // 未构建：回退到未压缩源路径（P1 阶段可用）
+        // 注：style.css 已拆分为 base/home/search/components 四个分片，
+        //     manifest 缺失时回退到 base.css（仅基础层，保证可读）
         static $fallbacks = [
-            'style.css' => '/assets/css/style.css',
+            'style.css' => '/assets/css/base.css',
             'main.js' => '/assets/js/main.js',
             'admin.css' => '/assets/css/admin.css',
             'admin.js' => '/assets/js/admin.js',

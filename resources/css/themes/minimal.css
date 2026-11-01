@@ -43,7 +43,6 @@ body[data-theme="minimal"] {
 
     --footer-bg: #ffffff;
     --footer-text: #999999;
-    --footer-link: #cccccc;
 
     /* === 布局：3 列中等卡，1px 细线分隔 === */
     --home-layout-width: 1000px;

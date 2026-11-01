@@ -43,6 +43,42 @@ final class UploadService
     }
 
     /**
+     * 校验上传图片的扩展名与真实 MIME 是否一致。
+     *
+     * 单独抽出以便独立测试（image() 内部同样调用，逻辑唯一）。
+     *
+     * @param string $fileName 客户端文件名（取扩展名）
+     * @param string $tmpPath 临时文件路径（读内容判断 MIME）
+     * @return string|null 错误信息；null 表示校验通过
+     */
+    public function validateImage(string $fileName, string $tmpPath): ?string
+    {
+        $ext = strtolower((string) pathinfo($fileName, PATHINFO_EXTENSION));
+        if (!in_array($ext, $this->allowedExtensions, true)) {
+            return '不支持的图片格式';
+        }
+
+        $mime = (new \finfo(FILEINFO_MIME_TYPE))->file($tmpPath);
+        if ($mime === false || (self::IMAGE_MIME_MAP[$ext] ?? null) !== $mime) {
+            return '文件内容与格式不符';
+        }
+        return null;
+    }
+
+    /**
+     * 校验上传文件大小是否超过上限。
+     *
+     * @param int $size 字节数
+     * @param int $maxSize 上限字节数；0 表示用服务默认上限
+     * @return string|null 错误信息；null 表示通过
+     */
+    public function validateSize(int $size, int $maxSize = 0): ?string
+    {
+        $limit = $maxSize > 0 ? $maxSize : $this->maxSize;
+        return $size > $limit ? '文件大小超出限制' : null;
+    }
+
+    /**
      * 保存上传图片到 uploads/{$subdir}。
      *
      * @param array{name?: string, tmp_name?: string, size?: int, error?: int} $file $_FILES 单项
@@ -58,20 +94,18 @@ final class UploadService
         if (!isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
             return $fail('上传失败，请重试');
         }
-        if ((int) ($file['size'] ?? 0) > $this->maxSize) {
-            return $fail('文件大小超出限制');
+
+        $sizeError = $this->validateSize((int) ($file['size'] ?? 0));
+        if ($sizeError !== null) {
+            return $fail($sizeError);
+        }
+
+        $error = $this->validateImage((string) ($file['name'] ?? ''), (string) $file['tmp_name']);
+        if ($error !== null) {
+            return $fail($error);
         }
 
         $ext = strtolower((string) pathinfo((string) ($file['name'] ?? ''), PATHINFO_EXTENSION));
-        if (!in_array($ext, $this->allowedExtensions, true)) {
-            return $fail('不支持的图片格式');
-        }
-
-        $mime = (new \finfo(FILEINFO_MIME_TYPE))->file($file['tmp_name']);
-        if ($mime === false || (self::IMAGE_MIME_MAP[$ext] ?? null) !== $mime) {
-            return $fail('文件内容与格式不符');
-        }
-
         return $this->persist($file, $subdir, $ext);
     }
 

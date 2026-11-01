@@ -14,12 +14,6 @@ final class AdminUser extends BaseModel
         return $this->fetchOne('SELECT * FROM admin_users WHERE username = ?', [$username]);
     }
 
-    public function roleOf(string $username): ?string
-    {
-        $role = $this->fetchColumn('SELECT role FROM admin_users WHERE username = ?', [$username]);
-        return $role === false || $role === null ? null : (string) $role;
-    }
-
     public function updatePassword(string $username, string $passwordHash): bool
     {
         return $this->execute('UPDATE admin_users SET password = ? WHERE username = ?', [$passwordHash, $username]);

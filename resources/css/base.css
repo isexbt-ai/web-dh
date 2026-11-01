@@ -1,0 +1,132 @@
+/* ==================== CSS 变量定义（主题 token） ==================== */
+:root {
+    /* === 品牌色（主题覆盖） === */
+    --brand-primary: #e94560;
+    --brand-primary-light: #ff6b6b;
+    --brand-primary-dark: #c73e54;
+    --brand-gradient: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-light));
+    --brand-shadow: rgba(233, 69, 96, 0.4);
+    --brand-shadow-light: rgba(233, 69, 96, 0.15);
+    --brand-shadow-medium: rgba(233, 69, 96, 0.3);
+    --brand-bg-light: #fff5f5;
+    --brand-bg-lighter: rgba(233, 69, 96, 0.06);
+    --brand-glow: linear-gradient(90deg, #e94560, #f9a825, #27ae60, #2d9cdb, #7c4dff, #e94560);
+
+    /* === 表面色（主题覆盖） === */
+    --bg-page: #f5f7fa;
+    --bg-card: #ffffff;
+    --bg-elevated: #fafafa;
+    --bg-muted: #f8f9fa;
+    --bg-input: #fafafa;
+
+    /* === 文本色（主题覆盖） === */
+    --text-primary: #1a1a2e;
+    --text-secondary: #333333;
+    --text-tertiary: #666666;
+    --text-muted: #999999;
+    --text-on-brand: #ffffff;
+
+    /* === 边框色（主题覆盖） === */
+    --border: #f0f0f0;
+    --border-strong: #e8e8e8;
+
+    /* === 阴影 === */
+    --shadow-subtle: 0 1px 4px rgba(0,0,0,0.03);
+    --shadow-card: 0 2px 8px rgba(0,0,0,0.04);
+    --shadow-card-hover: 0 12px 32px rgba(0,0,0,0.12);
+    --shadow-medium: 0 2px 12px rgba(0,0,0,0.08);
+    --shadow-elevated: 0 8px 24px rgba(0,0,0,0.08);
+
+    /* === 页脚 === */
+    --footer-bg: #ffffff;
+    --footer-text: #999999;
+
+    /* === 布局（主题覆盖，控制整体排版风格） === */
+    --page-width: 520px;                 /* 子页容器宽度 */
+    --home-layout-width: 1080px;         /* 首页居中容器宽度 */
+    --home-banner-height: 200px;         /* 顶部展示区高度 */
+    --home-section-spacing: 32px;        /* 首页分类区块间距 */
+    --section-spacing: 10px;             /* 分类区块间距 */
+    --section-padding: 16px;             /* 区块内边距 */
+    --section-radius: 12px;              /* 区块圆角 */
+    --section-border: 1px solid var(--border);
+    --section-shadow: var(--shadow-subtle);
+    --section-bg: var(--bg-card);
+    --section-hover: none;               /* 区块悬停效果 */
+
+    --grid-columns: repeat(4, 1fr);     /* 卡片列数 */
+    --grid-gap: 14px;
+    --card-radius: 12px;
+    --card-border: 1px solid var(--border);
+    --card-shadow: var(--shadow-card);
+    --card-shadow-hover: var(--shadow-card-hover);
+    --card-transform-hover: translateY(-6px);
+    --card-img-hover-scale: 1.08;        /* 图片悬停缩放 */
+    --card-title-bg: var(--bg-elevated);
+    --card-title-bg-hover: var(--brand-bg-light);
+    --card-title-color-hover: var(--brand-primary);
+    --card-title-padding: 6px 8px;
+    --card-title-size: 13px;
+    --card-title-weight: 500;
+    --card-title-border: 1px solid var(--border);
+    --card-title-align: center;
+    --card-image-fit: cover;             /* cover | contain */
+    --card-aspect: 1;                    /* 卡片宽高比，0 = 不限制 */
+    --card-min-height: 0;
+
+    --title-style: badge;                /* badge | underline | bar | plain */
+    --title-size: 15px;
+    --title-weight: 700;
+    --title-radius: 6px;
+    --title-padding: 6px 14px;
+    --title-margin-bottom: 12px;
+    --title-border: 2px solid var(--brand-primary);
+    --title-bg: var(--brand-bg-lighter);
+    --title-color: var(--brand-primary);
+    --title-transform: none;
+
+    --badge-display: block;              /* 卡片角标位置 */
+    --badge-radius: 10px;
+    --badge-font-size: 10px;
+}
+
+/* ==================== 基础样式重置 ==================== */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg-page);
+    min-height: 100vh;
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ==================== 页面容器 ==================== */
+/* body.has-wide-layout 时（首页）放开宽度，由 .home-shell 控制 */
+.page-wrapper {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+body.has-wide-layout .page-wrapper {
+    max-width: none;
+    padding: 0;
+}

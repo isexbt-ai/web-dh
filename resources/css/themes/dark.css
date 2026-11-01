@@ -44,7 +44,6 @@ body[data-theme="dark"] {
 
     --footer-bg: #161b22;
     --footer-text: #6e7681;
-    --footer-link: #3a424f;
 
     /* === 布局：宽版 5 列大卡 === */
     --home-layout-width: 1200px;

@@ -1,12 +1,12 @@
 {
-    "style.css": "/assets/css/style.min.css?v=0e6f7e",
-    "pages.css": "/assets/css/pages.min.css?v=415b6f",
-    "admin.css": "/assets/css/admin.min.css?v=1d2436",
+    "style.css": "/assets/css/style.min.css?v=4b5e0d",
+    "pages.css": "/assets/css/pages.min.css?v=23ff72",
+    "admin.css": "/assets/css/admin.min.css?v=301917",
     "main.js": "/assets/js/main.min.js?v=1bb76b",
     "admin.js": "/assets/js/admin.min.js?v=4465d0",
-    "theme-corporate": "/assets/css/themes/corporate.min.css?v=6bdea0",
-    "theme-dark": "/assets/css/themes/dark.min.css?v=2256d8",
-    "theme-minimal": "/assets/css/themes/minimal.min.css?v=734bc4",
-    "theme-mint": "/assets/css/themes/mint.min.css?v=34f0dd",
-    "theme-warm": "/assets/css/themes/warm.min.css?v=92aa7a"
+    "theme-corporate": "/assets/css/themes/corporate.min.css?v=faadce",
+    "theme-dark": "/assets/css/themes/dark.min.css?v=79dc4b",
+    "theme-minimal": "/assets/css/themes/minimal.min.css?v=2feca0",
+    "theme-mint": "/assets/css/themes/mint.min.css?v=89a04e",
+    "theme-warm": "/assets/css/themes/warm.min.css?v=69b95c"
 }

@@ -52,9 +52,15 @@ final class RateLimitService
         $this->model->deleteByIp($ip);
     }
 
-    /** 定期清理过期锁定记录。 */
-    public function cleanup(): void
+    /**
+     * 清理过期锁定记录（超过 1 小时的旧数据）。
+     * 登录时顺带清理，避免 login_attempts 表无限膨胀；1% 概率触发即可。
+     */
+    public function cleanupExpired(int $percentChance = 1): void
     {
+        if ($percentChance <= 0 || random_int(1, 100) > $percentChance) {
+            return;
+        }
         $this->model->cleanupExpired();
     }
 }

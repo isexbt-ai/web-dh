@@ -42,7 +42,6 @@ body[data-theme="warm"] {
 
     --footer-bg: #ffffff;
     --footer-text: #a08d7d;
-    --footer-link: #e2cdb8;
 
     /* === 布局：宽版 4 列大卡，无区块底板 === */
     --home-layout-width: 1080px;

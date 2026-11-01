@@ -36,15 +36,6 @@ final class Article extends BaseModel
         return $this->fetchOne($sql, [$id]);
     }
 
-    public function findBySlug(string $slug, bool $activeOnly = true): ?array
-    {
-        $sql = 'SELECT * FROM articles WHERE slug = ?';
-        if ($activeOnly) {
-            $sql .= ' AND is_active = 1';
-        }
-        return $this->fetchOne($sql, [$slug]);
-    }
-
     public function count(): int
     {
         return (int) $this->fetchColumn('SELECT COUNT(*) FROM articles');

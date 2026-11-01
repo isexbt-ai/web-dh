@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小鹿导航</title>
+<style>
+  :root {
+    --bg: #fbfbfd;
+    --card: #ffffff;
+    --text: #1d1d1f;
+    --sub: #86868b;
+    --line: #e8e8ed;
+    --accent: #0071e3;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.6 -apple-system, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* ========== 顶部展示区（Banner / 广告位） ========== */
+  .banner { max-width: 1080px; margin: 0 auto; padding: 24px 24px 0; }
+  .bwrap { position: relative; }
+  .bslides {
+    position: relative; height: 200px; border-radius: 18px; overflow: hidden;
+    background: #eeeef1; box-shadow: var(--shadow);
+  }
+  .bslide {
+    position: absolute; inset: 0; display: block; text-decoration: none; color: #fff;
+    opacity: 0; transition: opacity .45s ease; overflow: hidden;
+  }
+  .bslide.on { opacity: 1; }
+  .bslide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .bslide.solid { display: flex; align-items: center; padding: 0 44px; }
+  .btext {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 26px 30px;
+    background: linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,0));
+    color: #fff;
+  }
+  .bslide.solid .btext { position: static; padding: 0; background: none; color: inherit; }
+  .btag {
+    display: inline-block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 20px; background: rgba(255,255,255,.22);
+    border: 1px solid rgba(255,255,255,.35); margin-bottom: 9px;
+  }
+  .btitle { display: block; font-size: 25px; font-weight: 600; letter-spacing: -.01em; }
+  .bslide.solid .btitle { font-size: 34px; }
+  .bdesc { display: block; font-size: 14px; opacity: .9; margin-top: 5px; }
+  .bnav { position: absolute; right: 16px; bottom: 14px; z-index: 5; display: flex; gap: 6px; }
+  .bnav button {
+    width: 8px; height: 8px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+    background: rgba(255,255,255,.5); transition: background .2s, width .2s;
+  }
+  .bnav button.on { background: #fff; width: 20px; border-radius: 5px; }
+  .bman { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
+  .bhint { color: var(--sub); font-size: 12.5px; margin-left: auto; }
+
+  header {
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(251,251,253,.82);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar {
+    max-width: 1080px; margin: 0 auto; padding: 14px 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .logo { font-size: 19px; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; }
+  .logo span { color: var(--sub); font-weight: 400; font-size: 13px; margin-left: 8px; }
+  .search {
+    flex: 1; max-width: 420px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 8px 14px; font-size: 14px; color: var(--text); outline: none;
+  }
+  .search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,113,227,.12); }
+  .btn {
+    border: 1px solid var(--line); background: var(--card); color: var(--text);
+    border-radius: 10px; padding: 8px 14px; font-size: 14px; cursor: pointer; white-space: nowrap;
+  }
+  .btn:hover { border-color: #c9c9ce; }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #0077ed; border-color: #0077ed; }
+
+  nav.cats { max-width: 1080px; margin: 0 auto; padding: 12px 24px 0; display: flex; gap: 8px; flex-wrap: wrap; }
+  nav.cats button {
+    border: 0; background: transparent; color: var(--sub);
+    font-size: 14px; padding: 6px 12px; border-radius: 8px; cursor: pointer;
+  }
+  nav.cats button:hover { background: #eeeef1; color: var(--text); }
+  nav.cats button.on { background: var(--text); color: #fff; }
+
+  main { max-width: 1080px; margin: 0 auto; padding: 32px 24px 80px; }
+  section.group { margin-bottom: 44px; }
+  section.group h2 {
+    font-size: 13px; font-weight: 600; color: var(--sub);
+    letter-spacing: .06em; text-transform: uppercase; margin: 0 0 14px;
+  }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 8px;
+    transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+    cursor: pointer; position: relative;
+  }
+  .card:hover { transform: translateY(-2px); border-color: #d0d0d6; box-shadow: 0 2px 4px rgba(0,0,0,.05), 0 12px 32px rgba(0,0,0,.09); }
+  .ico {
+    width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center;
+    background: #f0f0f3; font-size: 15px; font-weight: 600; color: var(--sub);
+  }
+  .nm { font-size: 15px; font-weight: 500; }
+  .ds { font-size: 13px; color: var(--sub); line-height: 1.5; }
+  .url { font-size: 12px; color: #b0b0b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .del {
+    position: absolute; top: 10px; right: 10px; border: 0; background: transparent;
+    color: #c7c7cc; cursor: pointer; font-size: 15px; line-height: 1; padding: 4px; border-radius: 6px;
+    opacity: 0; transition: opacity .15s;
+  }
+  .card:hover .del { opacity: 1; }
+  .del:hover { color: #d33; background: #fee; }
+  .empty { color: var(--sub); font-size: 14px; padding: 24px 0; }
+
+  /* ========== 意见建议 ========== */
+  .dlg textarea {
+    width: 100%; min-height: 110px; padding: 9px 12px; font-size: 14px; font-family: inherit;
+    border: 1px solid var(--line); border-radius: 9px; margin-bottom: 14px;
+    background: var(--card); color: var(--text); resize: vertical;
+  }
+  .dlg textarea:focus { outline: none; border-color: var(--accent); }
+  .fb-list { max-height: 220px; overflow-y: auto; margin-bottom: 16px; }
+  .fb-item {
+    border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;
+    background: #fafafc; font-size: 13.5px;
+  }
+  .fb-item .fb-time { font-size: 11.5px; color: #b0b0b8; margin-top: 6px; display: flex; align-items: center; gap: 8px; }
+  .fb-item .fb-time .sp { flex: 1; }
+  .fb-item .fb-time button {
+    border: 0; background: transparent; color: #c7c7cc; cursor: pointer; font-size: 12px; padding: 2px 5px; border-radius: 5px;
+  }
+  .fb-item .fb-time button:hover { color: #d33; background: #fee; }
+  .fb-empty { color: var(--sub); font-size: 13px; padding: 8px 0 12px; }
+
+  /* ========== 效果展示（图片画廊） ========== */
+  .gal { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .gal-item {
+    border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--card);
+    position: relative; cursor: zoom-in;
+  }
+  .gal-item .thumb { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; background: #eeeef1; }
+  .gal-item .cap { padding: 8px 10px 10px; font-size: 12.5px; color: var(--text); }
+  .gal-item .cap small { display: block; color: var(--sub); font-size: 11.5px; margin-top: 2px; }
+  .gal-item .rm {
+    position: absolute; top: 8px; right: 8px; border: 0; border-radius: 50%;
+    width: 22px; height: 22px; line-height: 1; background: rgba(0,0,0,.5); color: #fff;
+    cursor: pointer; opacity: 0; transition: opacity .15s;
+  }
+  .gal-item:hover .rm { opacity: 1; }
+  .gal-item .rm:hover { background: rgba(0,0,0,.75); }
+  .gal-empty {
+    grid-column: 1 / -1; color: var(--sub); font-size: 13.5px; text-align: center; padding: 30px 0;
+  }
+  .lightbox {
+    position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,.88);
+    display: none; align-items: center; justify-content: center; flex-direction: column; gap: 14px; padding: 32px;
+  }
+  .lightbox.on { display: flex; }
+  .lightbox img { max-width: 100%; max-height: 78vh; border-radius: 10px; background: #222; }
+  .lightbox .lb-cap { color: #e8e8ec; font-size: 14px; text-align: center; max-width: 640px; }
+  .lightbox .lb-cap small { display: block; color: #9a9aa2; font-size: 12.5px; margin-top: 4px; }
+  .lightbox .lb-close {
+    position: absolute; top: 20px; right: 24px; border: 0; background: rgba(255,255,255,.14);
+    color: #fff; width: 36px; height: 36px; border-radius: 50%; font-size: 18px; cursor: pointer; line-height: 1;
+  }
+  .lightbox .lb-close:hover { background: rgba(255,255,255,.28); }
+
+  dialog {
+    border: 0; border-radius: 16px; padding: 0; width: min(440px, 92vw);
+    box-shadow: 0 20px 60px rgba(0,0,0,.2);
+  }
+  dialog::backdrop { background: rgba(0,0,0,.32); backdrop-filter: blur(2px); }
+  .dlg { padding: 24px; }
+  .dlg h3 { margin: 0 0 18px; font-size: 18px; }
+  label { display: block; font-size: 13px; color: var(--sub); margin: 0 0 6px; }
+  .dlg input, .dlg select {
+    width: 100%; padding: 9px 12px; font-size: 14px; border: 1px solid var(--line);
+    border-radius: 9px; margin-bottom: 14px; font-family: inherit; background: var(--card); color: var(--text);
+  }
+  .dlg input:focus, .dlg select:focus { outline: none; border-color: var(--accent); }
+  .dlg .row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
+  @media (max-width: 640px) {
+    .bar { flex-wrap: wrap; }
+    .search { order: 3; flex-basis: 100%; max-width: none; }
+    .banner { padding: 16px 24px 0; }
+    .bslides { height: 150px; border-radius: 14px; }
+    .bslide.solid { padding: 0 24px; }
+    .bslide.solid .btitle { font-size: 24px; }
+    .btitle { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+<!-- 顶部展示区 -->
+<div class="banner">
+  <div class="bwrap">
+    <div class="bslides" id="bslides"></div>
+    <div class="bnav" id="bnav"></div>
+  </div>
+  <div class="bman">
+    <button class="btn" id="badd">+ 添加展示位</button>
+    <button class="btn" id="bman">管理展示位</button>
+    <span class="bhint" id="bhint"></span>
+  </div>
+</div>
+
+<header>
+  <div class="bar">
+    <div class="logo">小鹿导航<span>个人导航站</span></div>
+    <input id="q" class="search" placeholder="搜索站点…">
+    <button class="btn" id="showcase">效果展示</button>
+    <button class="btn" id="feedback">意见建议</button>
+    <button class="btn" id="manage">管理分类</button>
+    <button class="btn btn-primary" id="add">+ 添加</button>
+  </div>
+  <nav class="cats" id="cats"></nav>
+</header>
+
+<main id="main"></main>
+
+<dialog id="dlg">
+  <form method="dialog" class="dlg" id="form">
+    <h3 id="dlgTitle">添加站点</h3>
+    <label for="f_name">名称</label>
+    <input id="f_name" required maxlength="40">
+    <label for="f_url">网址</label>
+    <input id="f_url" type="url" required placeholder="https://">
+    <label for="f_desc">描述（可选）</label>
+    <input id="f_desc" maxlength="60">
+    <label for="f_cat">分类</label>
+    <select id="f_cat"></select>
+    <label for="f_newcat">或新建分类</label>
+    <input id="f_newcat" maxlength="20" placeholder="留空则不新建">
+    <div class="row">
+      <button class="btn" value="cancel">取消</button>
+      <button class="btn btn-primary" value="ok">保存</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="cdlg">
+  <form method="dialog" class="dlg" id="cform">
+    <h3>分类管理</h3>
+    <div id="clist" style="margin-bottom:16px"></div>
+    <label for="c_add">新增分类</label>
+    <input id="c_add" maxlength="20">
+    <div class="row">
+      <button class="btn" value="cancel">关闭</button>
+      <button class="btn btn-primary" value="ok">添加</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="bdlg">
+  <form method="dialog" class="dlg" id="bform">
+    <h3 id="bttl">添加展示位</h3>
+    <label for="b_title">标题</label>
+    <input id="b_title" maxlength="40">
+    <label for="b_desc">副标题 / 说明</label>
+    <input id="b_desc" maxlength="80">
+    <label for="b_tag">标签（如 推荐 / 广告）</label>
+    <input id="b_tag" maxlength="10">
+    <label for="b_img">图片地址（留空则用纯色块）</label>
+    <input id="b_img" placeholder="https://... 或本地路径">
+    <label for="b_url">跳转链接（留空则不可点）</label>
+    <input id="b_url" type="url" placeholder="https://">
+    <label for="b_color">底色（无图时生效）</label>
+    <input id="b_color" type="color" value="#0071e3" style="height:40px;padding:4px">
+    <div class="row">
+      <button class="btn" value="cancel">取消</button>
+      <button class="btn btn-primary" value="ok">保存</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="bmdlg">
+  <div class="dlg">
+    <h3>展示位管理</h3>
+    <div id="blist" style="margin-bottom:16px"></div>
+    <div class="row">
+      <button class="btn" id="bclose">关闭</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="gdlg">
+  <div class="dlg">
+    <h3>效果展示</h3>
+    <div class="gal" id="gal"></div>
+    <div class="row">
+      <button class="btn" id="gadd">+ 添加图片</button>
+      <button class="btn" id="gclose">关闭</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="gadddlg">
+  <form method="dialog" class="dlg" id="gaddform">
+    <h3>添加展示图片</h3>
+    <label for="g_img">图片地址</label>
+    <input id="g_img" required placeholder="https://... 或本地路径">
+    <label for="g_title">标题（可选）</label>
+    <input id="g_title" maxlength="40">
+    <label for="g_desc">说明（可选）</label>
+    <input id="g_desc" maxlength="60">
+    <div class="row">
+      <button class="btn" value="cancel">取消</button>
+      <button class="btn btn-primary" value="ok">添加</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lbclose" title="关闭">×</button>
+  <img id="lbimg" alt="">
+  <div class="lb-cap"><span id="lbtitle"></span><small id="lbdesc"></small></div>
+</div>
+
+<dialog id="fbdlg">
+  <form method="dialog" class="dlg" id="fbform">
+    <h3>意见建议</h3>
+    <label for="fb_content">你的建议</label>
+    <textarea id="fb_content" required maxlength="500" placeholder="写下你的想法…"></textarea>
+    <label for="fb_contact">联系方式（可选）</label>
+    <input id="fb_contact" maxlength="60" placeholder="邮箱 / 微信等，便于回复">
+    <div class="row">
+      <button class="btn" id="fbview" type="button">查看已提交</button>
+      <span style="flex:1"></span>
+      <button class="btn" value="cancel">取消</button>
+      <button class="btn btn-primary" value="ok">提交</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="fbmdlg">
+  <div class="dlg">
+    <h3>已提交的建议</h3>
+    <div class="fb-list" id="fblist"></div>
+    <div class="row">
+      <button class="btn" id="fbexport">导出 JSON</button>
+      <button class="btn" id="fbclose">关闭</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+const KEY = 'xiaolu.nav.a';
+const DEFAULT_CATS = ['常用', '开发', '工具', '阅读', '影音'];
+/* 顶部展示位默认示例：一条纯色块 + 一条带图（内联 SVG，不依赖外部资源） */
+const BANNER_IMG = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400">'
+  + '<rect width="1200" height="400" fill="#1f2937"/>'
+  + '<circle cx="980" cy="110" r="150" fill="#2b3648"/>'
+  + '<circle cx="1110" cy="310" r="110" fill="#374a5f"/>'
+  + '</svg>');
+const DEFAULT_BANNERS = [
+  { id: 'b1', title: '今日焦点', desc: '把常用的站点放到这里，随时一眼看到', tag: '推荐', img: '', url: '', color: '#0071e3' },
+  { id: 'b2', title: '小鹿书签', desc: '顶部展示位支持多张图片轮播，也可放纯色广告条', tag: '广告', img: BANNER_IMG, url: '', color: '#2f3a4a' }
+];
+const DEFAULT_LINKS = [
+  { id: '1',  name: 'GitHub',      url: 'https://github.com',  cat: '开发', desc: '代码托管' },
+  { id: '2',  name: 'Claude Code', url: 'https://claude.ai',   cat: '开发', desc: 'AI 编程助手' },
+  { id: '3',  name: 'MDN',         url: 'https://developer.mozilla.org', cat: '开发', desc: 'Web 文档' },
+  { id: '4',  name: 'ChatGPT',     url: 'https://chat.openai.com', cat: '常用', desc: '对话助手' },
+  { id: '5',  name: 'Gmail',       url: 'https://mail.google.com', cat: '常用', desc: '邮箱' },
+  { id: '6',  name: 'Figma',       url: 'https://figma.com',   cat: '工具', desc: '设计协作' },
+  { id: '7',  name: 'Excalidraw',  url: 'https://excalidraw.com', cat: '工具', desc: '手绘白板' },
+  { id: '8',  name: 'Hacker News', url: 'https://news.ycombinator.com', cat: '阅读', desc: '技术资讯' },
+  { id: '9',  name: '少数派',       url: 'https://sspai.com',  cat: '阅读', desc: '数字生活' },
+  { id: '10', name: 'Netflix',     url: 'https://netflix.com', cat: '影音', desc: '影视' }
+];
+
+let activeCat = '全部';
+let keyword = '';
+
+/* 效果展示默认图片：内联 SVG 缩略图，不依赖外部资源 */
+function svgThumb(base, accent, label) {
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480">'
+    + '<rect width="640" height="480" fill="' + base + '"/>'
+    + '<rect x="48" y="48" width="544" height="300" rx="14" fill="' + accent + '"/>'
+    + '<rect x="48" y="372" width="300" height="18" rx="9" fill="' + accent + '" opacity="0.55"/>'
+    + '<rect x="48" y="404" width="180" height="14" rx="7" fill="' + accent + '" opacity="0.35"/>'
+    + '<text x="320" y="214" font-family="Helvetica,Arial,sans-serif" font-size="40" fill="#fff" text-anchor="middle">' + label + '</text>'
+    + '</svg>');
+}
+const DEFAULT_GALLERY = [
+  { id: 'g1', img: svgThumb('#eef1f5', '#c7d2de', 'Home'), title: '首页总览', desc: '展示区与分类卡片布局' },
+  { id: 'g2', img: svgThumb('#f2f0eb', '#d8cfc0', 'List'), title: '列表视图', desc: '紧凑列表模式' },
+  { id: 'g3', img: svgThumb('#eef3f0', '#c2d8cb', 'Dark'), title: '深色模式', desc: '暗色主题下的展示效果' }
+];
+const DEFAULT_FEEDBACK = [];
+
+/* 依赖上面的默认常量，须在常量声明之后再初始化 state */
+const state = load();
+
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) {
+      const d = JSON.parse(raw);
+      // 兼容旧数据：没有 banners / gallery / feedbacks 字段时补齐默认值
+      if (!d.banners) d.banners = DEFAULT_BANNERS.map(b => ({ ...b }));
+      if (!d.gallery) d.gallery = DEFAULT_GALLERY.map(g => ({ ...g }));
+      if (!d.feedbacks) d.feedbacks = [];
+      return d;
+    }
+  } catch (e) { /* 数据损坏则用默认值 */ }
+  return {
+    cats: [...DEFAULT_CATS],
+    links: [...DEFAULT_LINKS],
+    banners: DEFAULT_BANNERS.map(b => ({ ...b })),
+    gallery: DEFAULT_GALLERY.map(g => ({ ...g })),
+    feedbacks: []
+  };
+}
+function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+
+/* ---------------- 顶部展示区 ---------------- */
+let bIdx = 0;
+let bTimer = null;
+
+function renderBanner() {
+  const box = document.getElementById('bslides');
+  const nav = document.getElementById('bnav');
+  const list = state.banners || [];
+  box.innerHTML = '';
+  nav.innerHTML = '';
+  document.getElementById('bhint').textContent =
+    list.length ? `共 ${list.length} 个展示位，每 5 秒轮播` : '暂无展示位';
+  if (!list.length) {
+    const e = document.createElement('div');
+    e.style.cssText = 'position:absolute;inset:0;display:grid;place-items:center;color:#a0a0a8;font-size:14px';
+    e.textContent = '添加一个顶部展示位';
+    box.appendChild(e);
+    return;
+  }
+  list.forEach((b, i) => {
+    const a = document.createElement('a');
+    a.className = 'bslide' + (b.img ? '' : ' solid') + (i === bIdx ? ' on' : '');
+    if (b.img) {
+      const img = document.createElement('img');
+      img.src = b.img; img.alt = b.title || '';
+      img.onerror = () => {
+        a.classList.add('solid');
+        a.style.background = b.color || '#0071e3';
+        img.remove();
+      };
+      a.appendChild(img);
+    } else {
+      a.style.background = b.color || '#0071e3';
+    }
+    const t = document.createElement('div');
+    t.className = 'btext';
+    t.innerHTML = '<span class="btag"></span><span class="btitle"></span><span class="bdesc"></span>';
+    t.querySelector('.btag').textContent = b.tag || '';
+    t.querySelector('.btag').style.display = b.tag ? '' : 'none';
+    t.querySelector('.btitle').textContent = b.title || '';
+    t.querySelector('.bdesc').textContent = b.desc || '';
+    t.querySelector('.bdesc').style.display = b.desc ? '' : 'none';
+    a.appendChild(t);
+    if (b.url) { a.href = b.url; a.target = '_blank'; a.rel = 'noopener'; }
+    else { a.href = 'javascript:void 0'; }
+    box.appendChild(a);
+
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    if (i === bIdx) dot.className = 'on';
+    dot.onclick = () => { bIdx = i; renderBanner(); restartTimer(); };
+    nav.appendChild(dot);
+  });
+}
+
+function restartTimer() {
+  if (bTimer) clearInterval(bTimer);
+  if ((state.banners || []).length > 1) {
+    bTimer = setInterval(() => {
+      bIdx = (bIdx + 1) % state.banners.length;
+      renderBanner();
+    }, 5000);
+  }
+}
+/* 鼠标悬停暂停轮播 */
+document.getElementById('bslides').addEventListener('mouseenter', () => {
+  if (bTimer) clearInterval(bTimer);
+});
+document.getElementById('bslides').addEventListener('mouseleave', restartTimer);
+
+/* 展示位编辑弹窗 */
+const bdlg = document.getElementById('bdlg');
+let bEditing = null;
+function openBannerDlg(id) {
+  bEditing = id || null;
+  const b = id ? state.banners.find(x => x.id === id) : null;
+  document.getElementById('bttl').textContent = b ? '编辑展示位' : '添加展示位';
+  document.getElementById('b_title').value = b ? (b.title || '') : '';
+  document.getElementById('b_desc').value = b ? (b.desc || '') : '';
+  document.getElementById('b_tag').value = b ? (b.tag || '') : '';
+  document.getElementById('b_img').value = b ? (b.img || '') : '';
+  document.getElementById('b_url').value = b ? (b.url || '') : '';
+  document.getElementById('b_color').value = b ? (b.color || '#0071e3') : '#0071e3';
+  bdlg.showModal();
+}
+document.getElementById('bform').addEventListener('submit', (e) => {
+  if (e.submitter && e.submitter.value === 'cancel') return;
+  e.preventDefault();
+  const o = {
+    id: bEditing || String(Date.now()),
+    title: document.getElementById('b_title').value.trim(),
+    desc: document.getElementById('b_desc').value.trim(),
+    tag: document.getElementById('b_tag').value.trim(),
+    img: document.getElementById('b_img').value.trim(),
+    url: document.getElementById('b_url').value.trim(),
+    color: document.getElementById('b_color').value
+  };
+  if (bEditing) Object.assign(state.banners.find(x => x.id === bEditing), o);
+  else state.banners.push(o);
+  save(); bdlg.close(); bIdx = 0; renderBanner(); restartTimer();
+});
+document.getElementById('badd').onclick = () => openBannerDlg(null);
+
+/* 展示位管理：列表 + 编辑 / 删除 */
+const bmdlg = document.getElementById('bmdlg');
+function refreshBannerList() {
+  const list = document.getElementById('blist');
+  list.innerHTML = '';
+  const items = state.banners || [];
+  if (!items.length) {
+    const e = document.createElement('p');
+    e.style.cssText = 'color:var(--sub);font-size:13px;margin:0 0 12px';
+    e.textContent = '暂无展示位。';
+    list.appendChild(e);
+  }
+  items.forEach(b => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:14px';
+    const sw = document.createElement('span');
+    sw.style.cssText = 'width:14px;height:14px;border-radius:4px;flex:none;background:'
+      + (b.color || '#0071e3') + ';background-size:cover;background-position:center';
+    if (b.img) sw.style.backgroundImage = 'url("' + b.img + '")';
+    const n = document.createElement('span');
+    n.style.flex = '1'; n.textContent = b.title || '(未命名)';
+    if (b.tag) {
+      const t = document.createElement('span');
+      t.style.cssText = 'font-size:12px;color:var(--sub);border:1px solid var(--line);border-radius:20px;padding:1px 8px';
+      t.textContent = b.tag;
+      n.appendChild(document.createTextNode(' '), t);
+    }
+    const ed = document.createElement('button');
+    ed.className = 'btn'; ed.type = 'button'; ed.textContent = '编辑';
+    ed.onclick = () => { bmdlg.close(); openBannerDlg(b.id); };
+    const rm = document.createElement('button');
+    rm.className = 'btn'; rm.type = 'button'; rm.textContent = '删除';
+    rm.onclick = () => {
+      state.banners = state.banners.filter(x => x.id !== b.id);
+      save(); bIdx = 0; renderBanner(); restartTimer(); refreshBannerList();
+    };
+    row.append(sw, n, ed, rm);
+    list.appendChild(row);
+  });
+}
+document.getElementById('bman').onclick = () => { refreshBannerList(); bmdlg.showModal(); };
+document.getElementById('bclose').onclick = () => bmdlg.close();
+
+function hostOf(url) {
+  try { return new URL(url).hostname.replace(/^www\./, ''); } catch (e) { return url; }
+}
+function initial(name) { return (name || '?').trim().slice(0, 1).toUpperCase(); }
+
+function renderCats() {
+  const el = document.getElementById('cats');
+  const all = ['全部', ...state.cats];
+  el.innerHTML = '';
+  all.forEach(c => {
+    const b = document.createElement('button');
+    b.textContent = c;
+    if (c === activeCat) b.className = 'on';
+    b.onclick = () => { activeCat = c; renderCats(); renderMain(); };
+    el.appendChild(b);
+  });
+}
+
+function renderMain() {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  const kw = keyword.trim().toLowerCase();
+  const matched = state.links.filter(l => {
+    const inCat = activeCat === '全部' || l.cat === activeCat;
+    const inKw = !kw || (l.name + ' ' + l.desc + ' ' + l.url).toLowerCase().includes(kw);
+    return inCat && inKw;
+  });
+  if (!matched.length) {
+    const p = document.createElement('p');
+    p.className = 'empty';
+    p.textContent = '没有匹配的站点。';
+    main.appendChild(p);
+    return;
+  }
+  const groups = {};
+  matched.forEach(l => (groups[l.cat] = groups[l.cat] || []).push(l));
+  state.cats.forEach(cat => {
+    if (!groups[cat]) return;
+    const sec = document.createElement('section');
+    sec.className = 'group';
+    const h = document.createElement('h2');
+    h.textContent = cat;
+    const grid = document.createElement('div');
+    grid.className = 'cards';
+    groups[cat].forEach(l => grid.appendChild(card(l)));
+    sec.appendChild(h); sec.appendChild(grid);
+    main.appendChild(sec);
+  });
+}
+
+function card(l) {
+  const el = document.createElement('a');
+  el.className = 'card';
+  el.href = l.url; el.target = '_blank'; el.rel = 'noopener';
+  const ico = document.createElement('div');
+  ico.className = 'ico'; ico.textContent = initial(l.name);
+  const nm = document.createElement('div'); nm.className = 'nm'; nm.textContent = l.name;
+  const ds = document.createElement('div'); ds.className = 'ds'; ds.textContent = l.desc || '';
+  const u = document.createElement('div'); u.className = 'url'; u.textContent = hostOf(l.url);
+  el.append(ico, nm, ds, u);
+  const del = document.createElement('button');
+  del.className = 'del'; del.type = 'button'; del.title = '删除'; del.textContent = '×';
+  del.onclick = (e) => {
+    e.preventDefault(); e.stopPropagation();
+    state.links = state.links.filter(x => x.id !== l.id);
+    save(); renderMain();
+  };
+  el.appendChild(del);
+  return el;
+}
+
+/* --- 添加 / 编辑 --- */
+const dlg = document.getElementById('dlg');
+let editingId = null;
+
+function fillCatSelect(select, cats) {
+  select.innerHTML = '';
+  cats.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c; o.textContent = c;
+    select.appendChild(o);
+  });
+}
+
+function openAdd() {
+  editingId = null;
+  document.getElementById('dlgTitle').textContent = '添加站点';
+  ['f_name', 'f_url', 'f_desc', 'f_newcat'].forEach(id => document.getElementById(id).value = '');
+  fillCatSelect(document.getElementById('f_cat'), state.cats);
+  dlg.showModal();
+}
+function openEdit(id) {
+  editingId = id;
+  const l = state.links.find(x => x.id === id);
+  document.getElementById('dlgTitle').textContent = '编辑站点';
+  document.getElementById('f_name').value = l.name;
+  document.getElementById('f_url').value = l.url;
+  document.getElementById('f_desc').value = l.desc || '';
+  document.getElementById('f_newcat').value = '';
+  fillCatSelect(document.getElementById('f_cat'), state.cats);
+  document.getElementById('f_cat').value = l.cat;
+  dlg.showModal();
+}
+
+document.getElementById('form').addEventListener('submit', (e) => {
+  if (e.submitter && e.submitter.value === 'cancel') return;
+  e.preventDefault();
+  const name = document.getElementById('f_name').value.trim();
+  const url = document.getElementById('f_url').value.trim();
+  const desc = document.getElementById('f_desc').value.trim();
+  let cat = document.getElementById('f_cat').value;
+  const nc = document.getElementById('f_newcat').value.trim();
+  if (nc) { cat = nc; if (!state.cats.includes(nc)) state.cats.push(nc); }
+  if (!name || !url) return;
+  if (editingId) {
+    const l = state.links.find(x => x.id === editingId);
+    Object.assign(l, { name, url, desc, cat });
+  } else {
+    state.links.push({ id: String(Date.now()), name, url, desc, cat });
+  }
+  save(); dlg.close(); renderCats(); renderMain();
+});
+
+/* --- 分类管理 --- */
+const cdlg = document.getElementById('cdlg');
+document.getElementById('manage').onclick = () => {
+  const list = document.getElementById('clist');
+  list.innerHTML = '';
+  state.cats.forEach(c => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:14px';
+    const n = document.createElement('span'); n.textContent = c; n.style.flex = '1';
+    const rm = document.createElement('button');
+    rm.className = 'btn'; rm.type = 'button'; rm.textContent = '删除';
+    rm.onclick = () => {
+      state.cats = state.cats.filter(x => x !== c);
+      state.links = state.links.filter(l => l.cat !== c);
+      save(); renderCats(); renderMain();
+      document.getElementById('manage').click();
+    };
+    row.append(n, rm); list.appendChild(row);
+  });
+  cdlg.showModal();
+};
+document.getElementById('cform').addEventListener('submit', (e) => {
+  if (e.submitter && e.submitter.value === 'cancel') return;
+  e.preventDefault();
+  const v = document.getElementById('c_add').value.trim();
+  if (v && !state.cats.includes(v)) state.cats.push(v);
+  document.getElementById('c_add').value = '';
+  save(); renderCats(); renderMain();
+  document.getElementById('manage').click();
+});
+
+document.getElementById('add').onclick = openAdd;
+document.getElementById('q').addEventListener('input', (e) => {
+  keyword = e.target.value; renderMain();
+});
+
+/* ---------------- 效果展示（图片画廊） ---------------- */
+const gdlg = document.getElementById('gdlg');
+const gadddlg = document.getElementById('gadddlg');
+const lightbox = document.getElementById('lightbox');
+
+function renderGallery() {
+  const box = document.getElementById('gal');
+  box.innerHTML = '';
+  const items = state.gallery || [];
+  if (!items.length) {
+    const e = document.createElement('div');
+    e.className = 'gal-empty';
+    e.textContent = '还没有展示图片，点「+ 添加图片」上传或填写图片地址。';
+    box.appendChild(e);
+    return;
+  }
+  items.forEach(g => {
+    const wrap = document.createElement('div');
+    wrap.className = 'gal-item';
+    const img = document.createElement('img');
+    img.className = 'thumb'; img.src = g.img; img.alt = g.title || '';
+    img.loading = 'lazy';
+    img.onerror = () => { img.src = svgThumb('#f0f0f3', '#d5d5da', '×'); };
+    const cap = document.createElement('div');
+    cap.className = 'cap';
+    cap.innerHTML = '<span class="t"></span><small class="d"></small>';
+    cap.querySelector('.t').textContent = g.title || '';
+    cap.querySelector('.d').textContent = g.desc || '';
+    if (!g.desc) cap.querySelector('.d').style.display = 'none';
+    const rm = document.createElement('button');
+    rm.className = 'rm'; rm.type = 'button'; rm.textContent = '×'; rm.title = '删除';
+    rm.onclick = (e) => {
+      e.stopPropagation();
+      state.gallery = state.gallery.filter(x => x.id !== g.id);
+      save(); renderGallery();
+    };
+    wrap.append(img, cap, rm);
+    wrap.onclick = () => openLightbox(g);
+    box.appendChild(wrap);
+  });
+}
+
+function openLightbox(g) {
+  document.getElementById('lbimg').src = g.img;
+  document.getElementById('lbtitle').textContent = g.title || '';
+  document.getElementById('lbdesc').textContent = g.desc || '';
+  lightbox.classList.add('on');
+}
+document.getElementById('lbclose').onclick = () => lightbox.classList.remove('on');
+lightbox.onclick = (e) => { if (e.target === lightbox) lightbox.classList.remove('on'); };
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && lightbox.classList.contains('on')) lightbox.classList.remove('on');
+});
+
+document.getElementById('showcase').onclick = () => { renderGallery(); gdlg.showModal(); };
+document.getElementById('gclose').onclick = () => gdlg.close();
+document.getElementById('gadd').onclick = () => {
+  ['g_img', 'g_title', 'g_desc'].forEach(i => document.getElementById(i).value = '');
+  gadddlg.showModal();
+};
+document.getElementById('gaddform').addEventListener('submit', (e) => {
+  if (e.submitter && e.submitter.value === 'cancel') return;
+  e.preventDefault();
+  const img = document.getElementById('g_img').value.trim();
+  if (!img) return;
+  state.gallery.push({
+    id: String(Date.now()),
+    img,
+    title: document.getElementById('g_title').value.trim(),
+    desc: document.getElementById('g_desc').value.trim()
+  });
+  save(); gadddlg.close(); renderGallery();
+});
+
+/* ---------------- 意见建议 ---------------- */
+const fbdlg = document.getElementById('fbdlg');
+const fbmdlg = document.getElementById('fbmdlg');
+
+document.getElementById('feedback').onclick = () => {
+  document.getElementById('fb_content').value = '';
+  document.getElementById('fb_contact').value = '';
+  fbdlg.showModal();
+};
+document.getElementById('fbview').onclick = () => {
+  fbdlg.close();
+  renderFeedbackList();
+  fbmdlg.showModal();
+};
+document.getElementById('fbform').addEventListener('submit', (e) => {
+  if (e.submitter && e.submitter.value === 'cancel') return;
+  e.preventDefault();
+  const content = document.getElementById('fb_content').value.trim();
+  if (!content) return;
+  state.feedbacks.unshift({
+    id: String(Date.now()),
+    content,
+    contact: document.getElementById('fb_contact').value.trim(),
+    time: new Date().toLocaleString('zh-CN', { hour12: false })
+  });
+  save(); fbdlg.close(); renderFeedbackList();
+  fbmdlg.showModal();
+});
+
+function renderFeedbackList() {
+  const box = document.getElementById('fblist');
+  box.innerHTML = '';
+  const items = state.feedbacks || [];
+  if (!items.length) {
+    const e = document.createElement('div');
+    e.className = 'fb-empty';
+    e.textContent = '还没有提交过建议，欢迎把你的想法写在这里。';
+    box.appendChild(e);
+    return;
+  }
+  items.forEach(f => {
+    const d = document.createElement('div');
+    d.className = 'fb-item';
+    const c = document.createElement('div');
+    c.textContent = f.content;
+    const t = document.createElement('div');
+    t.className = 'fb-time';
+    const time = document.createElement('span');
+    time.textContent = f.time + (f.contact ? ' · ' + f.contact : '');
+    const sp = document.createElement('span');
+    sp.className = 'sp';
+    const rm = document.createElement('button');
+    rm.type = 'button'; rm.textContent = '删除';
+    rm.onclick = () => {
+      state.feedbacks = state.feedbacks.filter(x => x.id !== f.id);
+      save(); renderFeedbackList();
+    };
+    t.append(time, sp, rm);
+    d.append(c, t);
+    box.appendChild(d);
+  });
+}
+document.getElementById('fbclose').onclick = () => fbmdlg.close();
+document.getElementById('fbexport').onclick = () => {
+  const b = new Blob([JSON.stringify(state.feedbacks || [], null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(b);
+  a.download = 'xiaolu-feedback.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+
+renderCats();
+renderMain();
+renderBanner();
+restartTimer();
+</script>
+</body>
+</html>

@@ -14,6 +14,7 @@ use App\Model\Message;
 use App\Model\Notice;
 use App\Model\Showcase;
 use App\Service\CacheService;
+use App\Service\EntityRegistry;
 use App\Service\PingService;
 use App\Service\SettingService;
 use App\Service\UploadService;
@@ -68,109 +69,40 @@ final class ApiController
         $id = (int) ($body['id'] ?? 0);
 
         try {
-            switch ($action) {
-                case 'category':
-                    $data = $this->clean($body, ['name' => 'string', 'sort_order' => 'int', 'is_active' => 'bool']);
-                    $data['name'] = mb_substr(trim((string) $data['name']), 0, 30);
-                    if ($data['name'] === '') {
-                        return $this->json($response, false, '分类名称不能为空');
-                    }
-                    $id > 0 ? $this->category->update($id, $data) : $this->category->create($data['name'], (int) $data['sort_order'], (int) $data['is_active']);
-                    break;
-
-                case 'card':
-                    $data = $this->clean($body, ['category_id' => 'int', 'title' => 'string', 'image' => 'string', 'link' => 'string', 'detail' => 'string', 'card_type' => 'string', 'image_width' => 'int', 'image_height' => 'int', 'badge_text' => 'string', 'sort_order' => 'int', 'is_active' => 'bool']);
-                    $data['link'] = $this->safeUrl((string) $data['link']);
-                    if (trim((string) $data['title']) === '') {
-                        return $this->json($response, false, '卡片标题不能为空');
-                    }
-                    $id > 0 ? $this->card->update($id, $data) : $this->card->create($data);
-                    break;
-
-                case 'ad':
-                    $data = $this->clean($body, ['title' => 'string', 'image' => 'string', 'link' => 'string', 'sort_order' => 'int', 'is_active' => 'bool']);
-                    $data['link'] = $this->safeUrl((string) $data['link']);
-                    $id > 0 ? $this->ad->update($id, $data) : $this->ad->create($data);
-                    break;
-
-                case 'notice':
-                    $data = $this->clean($body, ['title' => 'string', 'content' => 'string', 'sort_order' => 'int', 'is_active' => 'bool']);
-                    if (trim((string) $data['title']) === '') {
-                        return $this->json($response, false, '公告标题不能为空');
-                    }
-                    $id > 0 ? $this->notice->update($id, $data) : $this->notice->create($data);
-                    break;
-
-                case 'article':
-                    $data = $this->clean($body, ['title' => 'string', 'slug' => 'string', 'summary' => 'string', 'content' => 'string', 'cover_image' => 'string', 'keywords' => 'string', 'is_active' => 'bool']);
-                    if (trim((string) $data['title']) === '') {
-                        return $this->json($response, false, '文章标题不能为空');
-                    }
-                    if (trim((string) $data['slug']) === '') {
-                        $data['slug'] = str_slug((string) $data['title']);
-                    }
-                    $data['slug'] = mb_substr($this->safeSlug((string) $data['slug']), 0, 50);
-                    if ($id > 0) {
-                        $this->article->update($id, $data);
-                    } else {
-                        $this->article->create($data);
-                    }
-                    break;
-
-                case 'showcase':
-                    $data = $this->clean($body, ['title' => 'string', 'image' => 'string', 'media_type' => 'string', 'video_url' => 'string', 'poster_url' => 'string', 'gallery_id' => 'int', 'sort_order' => 'int', 'is_active' => 'bool']);
-                    if (trim((string) $data['title']) === '') {
-                        return $this->json($response, false, '展示标题不能为空');
-                    }
-                    $data['media_type'] = in_array($data['media_type'], ['image', 'video'], true) ? $data['media_type'] : 'image';
-                    if ($data['media_type'] === 'video' && trim((string) $data['video_url']) === '') {
-                        return $this->json($response, false, '视频类型必须上传视频文件');
-                    }
-                    $id > 0 ? $this->showcase->update($id, $data) : $this->showcase->create($data);
-                    break;
-
-                case 'gallery':
-                    $data = $this->clean($body, ['title' => 'string', 'description' => 'string', 'cover_image' => 'string', 'sort_order' => 'int', 'is_active' => 'bool']);
-                    if (trim((string) $data['title']) === '') {
-                        return $this->json($response, false, '相册名称不能为空');
-                    }
-                    $id > 0 ? $this->gallery->update($id, $data) : $this->gallery->create($data);
-                    break;
-
-                case 'link':
-                    $data = $this->clean($body, ['title' => 'string', 'url' => 'string', 'icon' => 'string', 'sort_order' => 'int', 'is_active' => 'bool']);
-                    $data['url'] = $this->safeUrl((string) $data['url']);
-                    if (trim((string) $data['title']) === '' || $data['url'] === '') {
-                        return $this->json($response, false, '链接标题和地址不能为空');
-                    }
-                    $id > 0 ? $this->link->update($id, $data) : $this->link->create($data);
-                    break;
-
-                case 'message':
-                    // 审核/回复留言
-                    $act = (string) ($body['op'] ?? '');
-                    if ($act === 'reply') {
-                        $this->message->reply($id, trim((string) ($body['reply'] ?? '')));
-                    } elseif ($act === 'toggle') {
-                        $this->message->setActive($id, (int) ($body['is_active'] ?? 0));
-                    }
-                    break;
-
-                case 'config':
-                    if (!$this->isSuperAdmin()) {
-                        return $this->json($response, false, '仅超级管理员可修改站点配置');
-                    }
-                    $configs = [];
-                    foreach (self::CONFIG_KEYS as $key) {
-                        if (array_key_exists($key, $body)) {
-                            $configs[$key] = (string) $body[$key];
+            // 注册表驱动的通用实体保存
+            if (EntityRegistry::has($action)) {
+                $result = $this->saveEntity($action, $body, $id);
+                if ($result !== null) {
+                    return $this->json($response, false, $result);
+                }
+            } else {
+                switch ($action) {
+                    case 'message':
+                        // 审核/回复留言
+                        $act = (string) ($body['op'] ?? '');
+                        if ($act === 'reply') {
+                            $this->message->reply($id, trim((string) ($body['reply'] ?? '')));
+                        } elseif ($act === 'toggle') {
+                            $this->message->setActive($id, (int) ($body['is_active'] ?? 0));
                         }
-                    }
-                    $this->settings->setMany($configs);
-                    break;
+                        break;
 
-                default:
-                    return $this->json($response, false, '未知操作');
+                    case 'config':
+                        if (!$this->isSuperAdmin()) {
+                            return $this->json($response, false, '仅超级管理员可修改站点配置');
+                        }
+                        $configs = [];
+                        foreach (self::CONFIG_KEYS as $key) {
+                            if (array_key_exists($key, $body)) {
+                                $configs[$key] = (string) $body[$key];
+                            }
+                        }
+                        $this->settings->setMany($configs);
+                        break;
+
+                    default:
+                        return $this->json($response, false, '未知操作');
+                }
             }
         } catch (\Throwable $e) {
             error_log('[admin/api/save] ' . $action . ' failed, user=' . ($_SESSION['admin_username'] ?? '?') . ' msg=' . $e->getMessage());
@@ -182,6 +114,122 @@ final class ApiController
 
         $this->cache->clear();
         return $this->json($response, true, '保存成功');
+    }
+
+    /**
+     * 通用实体保存流程（注册表驱动）。
+     *
+     * @param array<string, mixed> $body 请求体
+     * @param int $id 0 表示新增
+     * @return string|null 错误信息；null 表示保存成功
+     */
+    private function saveEntity(string $entity, array $body, int $id): ?string
+    {
+        $def = EntityRegistry::definition($entity);
+        $data = $this->clean($body, $def['fields']);
+
+        // URL 字段伪协议过滤
+        foreach ($def['url'] ?? [] as $field) {
+            $data[$field] = $this->safeUrl((string) ($data[$field] ?? ''));
+        }
+
+        // 必填校验（trim 后判空）
+        foreach ($def['require'] ?? [] as $field) {
+            if (trim((string) ($data[$field] ?? '')) === '') {
+                return self::REQUIRE_MESSAGE[$entity] ?? '必填项不能为空';
+            }
+        }
+
+        // 字符串长度截断
+        foreach ($def['max'] ?? [] as $field => $max) {
+            $data[$field] = mb_substr(trim((string) ($data[$field] ?? '')), 0, $max);
+        }
+
+        // 实体特有处理
+        $error = $this->prepareEntityData($entity, $data);
+        if ($error !== null) {
+            return $error;
+        }
+
+        if ($id > 0) {
+            $this->entityModel($entity)->update($id, $data);
+        } else {
+            $this->createEntity($entity, $data);
+        }
+        return null;
+    }
+
+    /** 各实体的必填项错误提示。 */
+    private const REQUIRE_MESSAGE = [
+        'category' => '分类名称不能为空',
+        'card' => '卡片标题不能为空',
+        'notice' => '公告标题不能为空',
+        'article' => '文章标题不能为空',
+        'showcase' => '展示标题不能为空',
+        'gallery' => '相册名称不能为空',
+        'link' => '链接标题和地址不能为空',
+    ];
+
+    /**
+     * 实体特有数据处理（slug 生成、媒体类型校正等）。
+     *
+     * @param array<string, mixed> $data
+     * @return string|null 错误信息；null 表示通过
+     */
+    private function prepareEntityData(string $entity, array &$data): ?string
+    {
+        switch ($entity) {
+            case 'article':
+                if (trim((string) ($data['slug'] ?? '')) === '') {
+                    $data['slug'] = str_slug((string) ($data['title'] ?? ''));
+                }
+                $data['slug'] = mb_substr($this->safeSlug((string) $data['slug']), 0, 50);
+                break;
+
+            case 'showcase':
+                $data['media_type'] = in_array($data['media_type'] ?? '', ['image', 'video'], true)
+                    ? (string) $data['media_type']
+                    : 'image';
+                if ($data['media_type'] === 'video' && trim((string) ($data['video_url'] ?? '')) === '') {
+                    return '视频类型必须上传视频文件';
+                }
+                break;
+        }
+        return null;
+    }
+
+    /** 实体对应的 Model 实例。 */
+    private function entityModel(string $entity): object
+    {
+        return match ($entity) {
+            'category' => $this->category,
+            'card' => $this->card,
+            'ad' => $this->ad,
+            'notice' => $this->notice,
+            'article' => $this->article,
+            'showcase' => $this->showcase,
+            'gallery' => $this->gallery,
+            'link' => $this->link,
+            default => throw new \InvalidArgumentException('未知实体: ' . $entity),
+        };
+    }
+
+    /**
+     * 实体新增（Category 的 create 签名与其余不同，单独适配）。
+     *
+     * @param array<string, mixed> $data
+     */
+    private function createEntity(string $entity, array $data): void
+    {
+        if ($entity === 'category') {
+            $this->category->create(
+                (string) $data['name'],
+                (int) $data['sort_order'],
+                (int) $data['is_active']
+            );
+            return;
+        }
+        $this->entityModel($entity)->create($data);
     }
 
     /**
@@ -238,45 +286,15 @@ final class ApiController
 
         try {
             switch ($action) {
-                case 'category':
-                    $this->category->delete($id);
-                    break;
-                case 'card':
-                    $row = $this->card->imageOf($id);
-                    $this->card->delete($id);
-                    $this->deleteImage($row['image'] ?? null);
-                    break;
-                case 'ad':
-                    $row = $this->ad->imageOf($id);
-                    $this->ad->delete($id);
-                    $this->deleteImage($row['image'] ?? null);
-                    break;
-                case 'notice':
-                    $this->notice->delete($id);
-                    break;
-                case 'article':
-                    $row = $this->article->coverImageOf($id);
-                    $this->article->delete($id);
-                    $this->deleteImage($row['cover_image'] ?? null);
-                    break;
-                case 'showcase':
-                    $row = $this->showcase->imageOf($id);
-                    $this->showcase->delete($id);
-                    $this->deleteImage($row['image'] ?? null);
-                    $this->deleteImage($row['video_url'] ?? null);
-                    $this->deleteImage($row['poster_url'] ?? null);
-                    break;
-                case 'gallery':
-                    $this->gallery->delete($id);
-                    break;
-                case 'link':
-                    $this->link->delete($id);
-                    break;
                 case 'message':
                     $this->message->delete($id);
                     break;
+
                 default:
-                    return $this->json($response, false, '未知操作');
+                    if (!EntityRegistry::has($action)) {
+                        return $this->json($response, false, '未知操作');
+                    }
+                    $this->deleteEntity($action, $id);
             }
         } catch (\Throwable $e) {
             error_log('[admin/api/delete] ' . $action . ' failed, user=' . ($_SESSION['admin_username'] ?? '?') . ' msg=' . $e->getMessage());
@@ -285,6 +303,29 @@ final class ApiController
 
         $this->cache->clear();
         return $this->json($response, true, '删除成功');
+    }
+
+    /**
+     * 通用实体删除流程：删除记录并清理其关联的本地图片。
+     */
+    private function deleteEntity(string $entity, int $id): void
+    {
+        // 删除前取出图片路径（部分实体需同时清理多个图片字段）
+        $images = match ($entity) {
+            'card' => [$this->card->imageOf($id)['image'] ?? null],
+            'ad' => [$this->ad->imageOf($id)['image'] ?? null],
+            'article' => [$this->article->coverImageOf($id)['cover_image'] ?? null],
+            'showcase' => (static function (array $row): array {
+                return [$row['image'] ?? null, $row['video_url'] ?? null, $row['poster_url'] ?? null];
+            })($this->showcase->imageOf($id) ?? []),
+            default => [],
+        };
+
+        $this->entityModel($entity)->delete($id);
+
+        foreach ($images as $image) {
+            $this->deleteImage($image);
+        }
     }
 
     public function upload(Request $request, Response $response): Response

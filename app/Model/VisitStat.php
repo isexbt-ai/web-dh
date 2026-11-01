@@ -27,11 +27,6 @@ final class VisitStat extends BaseModel
         return $this->lastInsertId();
     }
 
-    public function countToday(): int
-    {
-        return (int) $this->fetchColumn("SELECT COUNT(*) FROM visit_stats WHERE visit_date = date('now')");
-    }
-
     public function countUniqueToday(): int
     {
         return (int) $this->fetchColumn("SELECT COUNT(DISTINCT ip) FROM visit_stats WHERE visit_date = date('now')");
