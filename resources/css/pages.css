@@ -568,8 +568,7 @@
     border-color: var(--border-strong);
 }
 
-.showcase-image-wrapper img,
-.showcase-item-title {
+
     padding: 12px 16px;
     font-size: 14px;
     font-weight: 500;
@@ -580,19 +579,6 @@
     text-overflow: ellipsis;
     background: var(--bg-elevated);
     border-top: 1px solid var(--border);
-}
-
-.showcase-badge.webpanimated {
-    background: linear-gradient(135deg, #7c4dff, #b388ff);
-}
-
-.showcase-badge.video {
-    background: linear-gradient(135deg, #00bcd4, #4dd0e1);
-}
-
-.showcase-modal.active {
-    opacity: 1;
-    visibility: visible;
 }
 
 .showcase-modal-content img,
@@ -668,14 +654,6 @@
 .showcase-tabs { display: flex; gap: 10px; justify-content: center; padding: 16px 0 4px; flex-wrap: wrap; }
 .showcase-tab { padding: 8px 20px; border-radius: 20px; font-size: 14px; background: var(--bg-muted); color: var(--text-tertiary); text-decoration: none; border: 1px solid var(--border); transition: all .3s; }
 .showcase-tab.active, .showcase-tab:hover { background: var(--brand-primary); color: var(--text-on-brand); border-color: var(--brand-primary); }
-.showcase-modal { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 9998; display: flex; align-items: center; justify-content: center; }
-.showcase-modal img, .showcase-modal video { max-width: 92vw; max-height: 78vh; border-radius: 8px; }
-.showcase-modal-close { position: absolute; top: 16px; right: 24px; font-size: 32px; color: #fff; cursor: pointer; z-index: 10; }
-.showcase-modal-counter { position: absolute; top: 20px; left: 24px; color: #fff; font-size: 14px; z-index: 10; }
-.showcase-modal-nav { position: absolute; top: 50%; transform: translateY(-50%); font-size: 40px; color: #fff; cursor: pointer; padding: 10px; z-index: 10; user-select: none; }
-.showcase-modal-nav.prev { left: 16px; }
-.showcase-modal-nav.next { right: 16px; }
-.showcase-modal-title { position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; color: #fff; font-size: 14px; }
 .article-date { font-size: 12px; color: #aaa; }
 .guestbook-container { padding-bottom: 20px; }
 .guestbook-section { padding: 10px 0; }
@@ -688,8 +666,6 @@
 .guestbook-form button { background: var(--brand-primary); color: var(--text-on-brand); border: none; padding: 8px 24px; border-radius: 20px; font-size: 14px; cursor: pointer; }
 .guestbook-form button:disabled { opacity: .6; cursor: not-allowed; }
 .guestbook-success { text-align: center; padding: 24px; color: var(--text-tertiary); }
-.guestbook-list-section { padding: 10px 0; }
-.guestbook-list-title { font-size: 16px; font-weight: 600; padding: 8px 4px; color: var(--text-primary); }
 
 /* ===== P4 分类页样式 ===== */
 .category-page { padding-bottom: 20px; }

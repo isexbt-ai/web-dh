@@ -210,17 +210,17 @@ body {
     border-bottom: none;
 }
 
-.rank-badge.top1 {
+
     background: linear-gradient(135deg, #ffd700, #ffaa00);
     color: #1a1a2e;
 }
 
-.rank-badge.top2 {
+
     background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
     color: #1a1a2e;
 }
 
-.rank-badge.top3 {
+
     background: linear-gradient(135deg, #cd7f32, #b87333);
     color: #fff;
 }
@@ -351,13 +351,13 @@ body {
     cursor: pointer;
 }
 
-.image-upload .upload-icon {
+
     font-size: 40px;
     margin-bottom: 8px;
     color: #cccccc;
 }
 
-.image-upload .upload-text {
+
     font-size: 14px;
     color: #999999;
 }
@@ -399,26 +399,32 @@ body {
 }
 
 /* ==================== 开关组件 ==================== */
+/* DOM 结构：label.toggle-switch > input + span.toggle-slider + span.toggle-text */
+/* 滑块为相对定位（不脱离文档流），文字标签紧随其后；input 视觉隐藏但保留可点区域。 */
 .toggle-switch {
     position: relative;
-    display: inline-block;
-    width: 44px;
-    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
 }
 
 .toggle-switch input {
+    position: absolute;
     opacity: 0;
-    width: 0;
-    height: 0;
+    width: 44px;
+    height: 24px;
+    margin: 0;
+    cursor: pointer;
 }
 
 .toggle-slider {
-    position: absolute;
+    position: relative;
+    flex-shrink: 0;
+    display: inline-block;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    width: 44px;
+    height: 24px;
     background: #e0e0e0;
     border-radius: 24px;
     transition: all 0.3s ease;
@@ -430,7 +436,7 @@ body {
     height: 18px;
     width: 18px;
     left: 3px;
-    bottom: 3px;
+    top: 3px;
     background: #ffffff;
     border-radius: 50%;
     transition: all 0.3s ease;
@@ -442,37 +448,6 @@ body {
 
 .toggle-switch input:checked + .toggle-slider::before {
     transform: translateX(20px);
-}
-
-/* ==================== 开关组件（配置页用） ==================== */
-.toggle-switch {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.toggle-switch input {
-    display: none;
-}
-
-.toggle-label .toggle-slider {
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 20px;
-    height: 20px;
-    background: #fff;
-    border-radius: 50%;
-    transition: transform 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.toggle-switch input:checked + .toggle-label {
-    background: #e94560;
-}
-
-.toggle-switch input:checked + .toggle-label .toggle-slider {
-    transform: translateX(22px);
 }
 
 .toggle-text {
