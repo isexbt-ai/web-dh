@@ -7,16 +7,26 @@ $raw = (string) ($raw ?? '');
 if ($raw === '') {
     return;
 }
+
+/** 图片 src 是否安全：拒绝 javascript:/data:/vbscript: 等伪协议与含协议的相对地址。 */
+$safeImageUrl = static function (string $url): bool {
+    if (preg_match('/^\s*(javascript|data|vbscript|about|chrome):/i', $url)) {
+        return false;
+    }
+    // 形如 "foo:bar" 的相对地址含协议分隔符 → 拒绝；纯相对路径（含 / 开头）放行
+    return (bool) preg_match('#^(https?://|/)#i', $url) || strpos($url, ':') === false;
+};
+
 $text = htmlspecialchars($raw, ENT_QUOTES, 'UTF-8');
-$text = preg_replace_callback('/!\[([^\]]*)\]\(([^\)]+)\)/', static function ($m) {
+
+// 1) ![alt](url) 标记 → 带懒加载的 <img>
+$text = preg_replace_callback('/!\[([^\]]*)\]\(([^\)]+)\)/', static function ($m) use ($safeImageUrl) {
     $alt = $m[1];
     $url = $m[2];
-    if (preg_match('/^\s*(javascript|data|vbscript|about|chrome):/i', $url)) {
-        return '';
-    }
-    if (!preg_match('/^(https?:\/\/|\/)/i', $url) && strpos($url, ':') !== false) {
+    if (!$safeImageUrl($url)) {
         return '';
     }
     return '<img src="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" alt="' . htmlspecialchars($alt, ENT_QUOTES, 'UTF-8') . '" class="detail-img" loading="lazy">';
 }, $text);
+
 echo nl2br($text);

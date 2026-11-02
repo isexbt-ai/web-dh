@@ -184,6 +184,7 @@ final class ApiController
                     $data['slug'] = str_slug((string) ($data['title'] ?? ''));
                 }
                 $data['slug'] = mb_substr($this->safeSlug((string) $data['slug']), 0, 50);
+                $data['content'] = self::sanitizeArticleBody((string) ($data['content'] ?? ''));
                 break;
 
             case 'showcase':
@@ -419,6 +420,30 @@ final class ApiController
     {
         $slug = preg_replace('/[^a-zA-Z0-9-]/', '', $slug) ?? '';
         return trim($slug, '-');
+    }
+
+    /**
+     * 文章正文净化：剥离脚本与伪协议，保留排版用 HTML 与正常交互。
+     *
+     * 正文在详情页按原始 HTML 输出（支持 h2/p/strong/img 等排版），
+     * 因此需在写入前阻断可执行内容：<script>、iframe 等嵌入标签、
+     * javascript:/data: 等伪协议。
+     *
+     * 注意：不剥离 onclick 等内联事件属性 —— 现网正文存在网盘付费下载
+     * 链接依赖 onclick 改写 href，剥离会破坏下载功能。
+     */
+    public static function sanitizeArticleBody(string $html): string
+    {
+        if ($html === '') {
+            return '';
+        }
+        // 移除 script 标签及其内容
+        $html = preg_replace('#<script\b[^>]*>.*?</script>#is', '', $html) ?? $html;
+        // 移除可嵌入文档的标签
+        $html = preg_replace('#</?(iframe|object|embed|base)\b[^>]*>#i', '', $html) ?? $html;
+        // 移除伪协议 URL（javascript:/data:/vbscript:）
+        $html = preg_replace('#(src|href)\s*=\s*(["\'])\s*(?:javascript|data|vbscript):[^"\']*\2#i', '$1=$2$2', $html) ?? $html;
+        return $html;
     }
 
     /** 安全删除图片（本地 uploads 路径或 R2 公开 URL）。 */

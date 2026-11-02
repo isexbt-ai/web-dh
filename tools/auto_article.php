@@ -134,7 +134,14 @@ function makeSlug(string $title): string
     return strtolower(mb_substr(trim($slug, '-'), 0, 50));
 }
 
-/** 复制图片到 uploads（本地 + 可选 R2），返回 [cover, map]。 */
+/**
+ * 复制图片到 uploads 并上传 R2，返回 [cover, map]。
+ *
+ * 规则：
+ * - 源文件不存在或复制失败 → 跳过该图（不插入正文，避免残留外站直链）
+ * - R2 上传成功 → 删本地副本（正文只用 R2 URL，本地不留孤儿文件）
+ * - R2 上传失败 → 保留本地副本并用本地相对路径
+ */
 function copyImagesToUploads(array $images, string $sourceDir, string $targetDir, R2Service $r2): array
 {
     $map = [];
@@ -144,6 +151,7 @@ function copyImagesToUploads(array $images, string $sourceDir, string $targetDir
     $filesDir = $filesDirs[0] ?? $sourceDir;
 
     foreach ($images as $originalSrc => $cleanPath) {
+        $sourcePath = null;
         $basename = basename($cleanPath);
         foreach ([$sourceDir . $cleanPath, $sourceDir . $basename, $filesDir . $basename] as $p) {
             $safe = safePath($p, $sourceDir);
@@ -152,7 +160,8 @@ function copyImagesToUploads(array $images, string $sourceDir, string $targetDir
                 break;
             }
         }
-        if (!isset($sourcePath)) {
+        if ($sourcePath === null) {
+            // 源图不存在 → 跳过，不插入外站直链
             continue;
         }
 
@@ -170,7 +179,14 @@ function copyImagesToUploads(array $images, string $sourceDir, string $targetDir
 
         $r2Key = 'articles/' . $newName;
         $url = $r2->upload($targetPath, $r2Key, mime_content_type($targetPath) ?: 'image/jpeg');
-        $webPath = $url ?? 'uploads/articles/' . $newName;
+        if ($url !== null && $url !== '') {
+            // R2 已有副本，删本地避免孤儿文件
+            @unlink($targetPath);
+            $webPath = $url;
+        } else {
+            // R2 不可用 → 保留本地副本
+            $webPath = 'uploads/articles/' . $newName;
+        }
 
         $map[$originalSrc] = $webPath;
         if ($cover === '') {
@@ -241,6 +257,24 @@ foreach ($htmlFiles as $htmlFile) {
     foreach ($imageMap as $originalSrc => $newPath) {
         $content = str_replace('src="' . $originalSrc . '"', 'src="' . $newPath . '"', $content);
         $content = str_replace("src='" . $originalSrc . "'", 'src="' . $newPath . '"', $content);
+    }
+
+    // 移除未成功下载的外链图（避免正文残留源站直链，源站图随时会失效）
+    $before = $content;
+    $content = preg_replace_callback('/<img\s+[^>]*src="([^"]+)"[^>]*>/i', static function (array $m) use ($imageMap): string {
+        $url = $m[1];
+        // 已映射到 R2 / 本地 → 保留
+        if (in_array($url, $imageMap, true)
+            || str_starts_with($url, 'uploads/')
+            || str_contains($url, 'article.91db.cc')) {
+            return $m[0];
+        }
+        // 其余为未下载的外链 → 移除
+        return '';
+    }, $content) ?? $content;
+    $removed = substr_count($before, '<img') - substr_count($content, '<img');
+    if ($removed > 0) {
+        echo "   移除未下载的外链图: {$removed} 张\n";
     }
 
     $summary = mb_substr((string) preg_replace('/\s+/', ' ', trim(strip_tags($content))), 0, 200);

@@ -33,7 +33,32 @@ $article = $article ?? [];
         <?php endif; ?>
 
         <div class="article-detail-body">
-            <?= $article['content'] ?? '' ?>
+            <?php
+            /**
+             * 正文为原始 HTML（后台可直接编辑标签），此处仅做两件事：
+             * 1. 给 <img> 补 loading="lazy"（正文图多且非首屏，避免阻塞详情页加载）
+             * 2. 移除指向 javascript:/data: 等伪协议的图片 src
+             * 不改动其它 HTML 结构。
+             */
+            $bodyHtml = (string) ($article['content'] ?? '');
+            if ($bodyHtml !== '') {
+                $bodyHtml = preg_replace_callback('/<img\s+([^>]*?)>/i', static function (array $m): string {
+                    $attrs = $m[1];
+                    if (!preg_match('/src="([^"]*)"/i', $attrs, $sm)) {
+                        return $m[0];
+                    }
+                    $src = html_entity_decode($sm[1], ENT_QUOTES, 'UTF-8');
+                    if (preg_match('/^\s*(javascript|data|vbscript|about|chrome):/i', $src)) {
+                        return '';
+                    }
+                    if (preg_match('/\bloading\s*=/i', $attrs)) {
+                        return $m[0];
+                    }
+                    return '<img ' . rtrim($attrs) . ' loading="lazy">';
+                }, $bodyHtml) ?? $bodyHtml;
+            }
+            echo $bodyHtml;
+            ?>
         </div>
 
         <?php if (!empty($article['keywords'])): ?>
