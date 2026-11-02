@@ -581,15 +581,6 @@
     border-top: 1px solid var(--border);
 }
 
-.showcase-modal-content img,
-.showcase-modal-nav.prev {
-    left: -60px;
-}
-
-.showcase-modal-nav.next {
-    right: -60px;
-}
-
 .showcase-empty {
     grid-column: 1 / -1;
     display: flex;
@@ -620,14 +611,6 @@
         grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 12px;
         padding: 12px;
-    }
-
-    .showcase-modal-nav.prev {
-        left: 10px;
-    }
-
-    .showcase-modal-nav.next {
-        right: 10px;
     }
 
 }
