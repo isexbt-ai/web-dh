@@ -64,10 +64,13 @@ final class Container
                 (int) config('app.login_lock_attempts', 5),
                 (int) config('app.login_lock_duration', 900)
             ),
-            UploadService::class => fn () => new UploadService(
+            UploadService::class => fn (ContainerInterface $c) => new UploadService(
                 (string) config('storage.upload_dir'),
                 (string) config('storage.upload_url_base'),
-                (int) config('app.upload_max_size', 50 * 1024 * 1024)
+                (int) config('app.upload_max_size', 50 * 1024 * 1024),
+                ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                ['mp4', 'webm', 'ogv', 'mov'],
+                $c->get(R2Service::class)
             ),
             R2Service::class => fn () => new R2Service((array) config('storage.r2', [])),
             PingService::class => fn (ContainerInterface $c) => new PingService(

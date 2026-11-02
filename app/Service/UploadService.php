@@ -6,7 +6,15 @@ namespace App\Service;
 
 /**
  * 媒体上传服务：白名单扩展名 + finfo MIME 校验 + 大小上限。
- * 返回 path 为含 uploads/ 前缀的相对路径（与生产数据库存储格式一致，零迁移）。
+ *
+ * 存储策略（按加载时机划分）：
+ * - 走 R2：仅「文章」目录。文章封面均为懒加载（loading="lazy"），
+ *   不阻塞首屏，适合放对象存储。
+ * - 走本地：卡片图、背景图、广告图、展示位图。这些都在首屏或需秒开，
+ *   同源加载更快，且不依赖外网 R2 域名。
+ *
+ * R2 不可用时自动回退到本地相对路径，功能不中断。
+ * 返回 path 为含 uploads/ 前缀的相对路径或 R2 完整 URL（与生产数据库存储格式一致，零迁移）。
  */
 final class UploadService
 {
@@ -25,6 +33,9 @@ final class UploadService
         'mov' => ['video/quicktime'],
     ];
 
+    /** 需要上传到 R2 的子目录（其余一律只存本地，保证首屏秒开） */
+    private const R2_SUBDIRS = ['articles'];
+
     /** @var string[] 允许的图片扩展名 */
     private array $allowedExtensions;
 
@@ -36,7 +47,8 @@ final class UploadService
         private string $uploadUrlBase,
         private int $maxSize,
         array $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-        array $allowedVideoExtensions = ['mp4', 'webm', 'ogv', 'mov']
+        array $allowedVideoExtensions = ['mp4', 'webm', 'ogv', 'mov'],
+        private ?R2Service $r2 = null
     ) {
         $this->allowedExtensions = $allowedExtensions;
         $this->allowedVideoExtensions = $allowedVideoExtensions;
@@ -163,12 +175,38 @@ final class UploadService
         }
 
         $sub = trim($subdir, '/');
+        $localPath = 'uploads/' . $sub . '/' . $filename;
+        $localUrl = $this->uploadUrlBase . '/' . $sub . '/' . $filename;
+
+        // 仅文章图片走 R2（懒加载，不影响首屏）；其余目录只存本地保证秒开
+        if ($this->shouldPushToR2($sub)) {
+            $r2Url = $this->r2?->upload($dest, $sub . '/' . $filename, $this->mimeOf($ext));
+            if ($r2Url !== null && $r2Url !== '') {
+                return ['ok' => true, 'path' => $r2Url, 'url' => $r2Url, 'message' => ''];
+            }
+        }
+
         return [
             'ok' => true,
-            'path' => 'uploads/' . $sub . '/' . $filename,
-            'url' => $this->uploadUrlBase . '/' . $sub . '/' . $filename,
+            'path' => $localPath,
+            'url' => $localUrl,
             'message' => '',
         ];
+    }
+
+    /** 该子目录是否需要同步到 R2（仅文章图）。 */
+    private function shouldPushToR2(string $subdir): bool
+    {
+        if ($this->r2 === null || !$this->r2->enabled()) {
+            return false;
+        }
+        return in_array($subdir, self::R2_SUBDIRS, true);
+    }
+
+    /** 扩展名 → MIME。 */
+    private function mimeOf(string $ext): string
+    {
+        return self::IMAGE_MIME_MAP[$ext] ?? self::VIDEO_MIME_MAP[$ext][0] ?? 'application/octet-stream';
     }
 
     /** 安全删除 uploads 内文件：realpath 校验目标在 upload 根目录内。 */
@@ -180,5 +218,29 @@ final class UploadService
             return false;
         }
         return @unlink($full);
+    }
+
+    /**
+     * 删除图片：按存储位置分派。
+     * - uploads/... 本地相对路径 → 删本地文件
+     * - R2 公开 URL → 删 R2 对象（并尝试删同名本地副本）
+     */
+    public function deleteImage(string $imagePath): void
+    {
+        if ($imagePath === '') {
+            return;
+        }
+        if (str_starts_with($imagePath, 'uploads/')) {
+            $this->delete(substr($imagePath, strlen('uploads/')));
+            return;
+        }
+        // R2 公开 URL → 反推 key 后删除
+        if ($this->r2 !== null && $this->r2->enabled()) {
+            $publicUrl = rtrim((string) config('storage.r2.public_url', ''), '/');
+            if ($publicUrl !== '' && str_starts_with($imagePath, $publicUrl . '/')) {
+                $key = substr($imagePath, strlen($publicUrl) + 1);
+                $this->r2->delete($key);
+            }
+        }
     }
 }

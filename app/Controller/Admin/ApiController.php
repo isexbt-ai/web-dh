@@ -421,16 +421,13 @@ final class ApiController
         return trim($slug, '-');
     }
 
-    /** 安全删除图片（仅限 uploads 内相对路径）。 */
+    /** 安全删除图片（本地 uploads 路径或 R2 公开 URL）。 */
     private function deleteImage(?string $imagePath): void
     {
         if ($imagePath === null || $imagePath === '') {
             return;
         }
-        // 仅删除本地上传路径（uploads/...），R2 外部 URL 不处理
-        if (str_starts_with($imagePath, 'uploads/')) {
-            $this->upload->delete(substr($imagePath, strlen('uploads/')));
-        }
+        $this->upload->deleteImage($imagePath);
     }
 
     private function json(Response $response, bool $success, string $message, array $data = []): Response

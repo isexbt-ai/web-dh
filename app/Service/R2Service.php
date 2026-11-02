@@ -23,10 +23,17 @@ final class R2Service
         return (bool) ($this->config['enabled'] ?? false);
     }
 
-    /** R2 公开访问 URL（拼接 public_url + key）。 */
+    /**
+     * R2 公开访问 URL（拼接 public_url + key）。
+     * public_url 未带协议时按 https 补全（否则生成的 URL 无法直接用于 img src）。
+     */
     public function url(string $key): string
     {
-        return rtrim((string) ($this->config['public_url'] ?? ''), '/') . '/' . ltrim($key, '/');
+        $base = rtrim((string) ($this->config['public_url'] ?? ''), '/');
+        if ($base !== '' && !preg_match('#^https?://#i', $base)) {
+            $base = 'https://' . $base;
+        }
+        return $base . '/' . ltrim($key, '/');
     }
 
     /** 上传本地文件到 R2，成功返回公开 URL，失败返回 null。 */
@@ -65,7 +72,8 @@ final class R2Service
         if (!$this->enabled()) {
             return false;
         }
-        $headers = $this->signedHeaders('DELETE', $key, '', '');
+        // DELETE 无 body：x-amz-content-sha256 用空内容的 SHA256（S3 签名规范要求）
+        $headers = $this->signedHeaders('DELETE', $key, hash('sha256', ''), '');
         $ch = curl_init($this->endpoint() . '/' . ltrim($key, '/'));
         curl_setopt_array($ch, [
             CURLOPT_CUSTOMREQUEST => 'DELETE',
