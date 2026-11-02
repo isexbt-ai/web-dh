@@ -1,12 +1,13 @@
 <?php
 /**
- * 广告管理（数据：items）
+ * 轮播管理（数据：items）
+ * 首页顶部轮播图；每个轮播条目自带跳转链接。
  */
 $items = $items ?? [];
 ?>
 <div class="page-header">
-    <div><h1>广告管理</h1><p>首页轮播图广告位</p></div>
-    <button type="button" class="btn btn-primary" id="btnAdd">新增广告</button>
+    <div><h1>轮播管理</h1><p>首页顶部轮播图</p></div>
+    <button type="button" class="btn btn-primary" id="btnAdd">新增轮播</button>
 </div>
 
 <div class="table-section">
@@ -14,7 +15,7 @@ $items = $items ?? [];
         <thead><tr><th>ID</th><th>标题</th><th>图片</th><th>排序</th><th>状态</th><th>操作</th></tr></thead>
         <tbody>
             <?php if ($items === []): ?>
-            <tr><td colspan="6" class="empty-state">暂无广告</td></tr>
+            <tr><td colspan="6" class="empty-state">暂无轮播</td></tr>
             <?php else: foreach ($items as $it): ?>
             <tr>
                 <td><?= (int) $it['id'] ?></td>
@@ -40,7 +41,7 @@ $items = $items ?? [];
 
 <div class="modal-overlay" id="editModal">
     <div class="modal-content">
-        <div class="modal-header"><h3 id="modalTitle">新增广告</h3><button type="button" class="modal-close">&times;</button></div>
+        <div class="modal-header"><h3 id="modalTitle">新增轮播</h3><button type="button" class="modal-close">&times;</button></div>
         <form id="editForm" data-action="ad">
             <div class="modal-body">
                 <input type="hidden" name="id">

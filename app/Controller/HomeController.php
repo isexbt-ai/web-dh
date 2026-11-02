@@ -44,7 +44,7 @@ final class HomeController
             $stats = $this->visitService->displayStats((int) config('app.visitor_display_days', 30));
             $cached = str_replace(
                 '<!--VISITOR_COUNT-->',
-                number_format((int) $stats['display_total']),
+                number_format((int) ($stats['total_visitors'] ?? 0)),
                 $cached
             );
             $response->getBody()->write($cached);
@@ -53,13 +53,12 @@ final class HomeController
 
         $siteTitle = $this->seo->siteTitle();
         $siteSubtitle = $this->settings->get('site_subtitle', (string) config('seo.site_description'));
-        $sortMethod = $this->settings->get('card_sort_method', 'default');
 
         $categories = $this->categoryModel->getAll(true);
 
         // 一次取全部启用卡片，按分类分组（消除循环查库）
         $cardsByCategory = [];
-        foreach ($this->cardModel->getAllActive($sortMethod) as $card) {
+        foreach ($this->cardModel->getAllActive() as $card) {
             $cardsByCategory[(int) $card['category_id']][] = $card;
         }
         $categoryCards = [];
@@ -95,8 +94,8 @@ final class HomeController
             'categoryCards' => $categoryCards,
             'ads' => $ads,
             'notices' => $this->noticeModel->getAll(true),
-            'visitorCount' => (int) $stats['display_total'],
-            'recentVisitors' => (int) $stats['display_recent'],
+            'visitorCount' => (int) ($stats['total_visitors'] ?? 0),
+            'recentVisitors' => (int) ($stats['recent_visitors'] ?? 0),
             'guestbookEnabled' => $this->settings->get('guestbook_enabled', '1') === '1',
             'wideLayout' => true,
         ]);

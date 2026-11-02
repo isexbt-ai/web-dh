@@ -12,8 +12,9 @@ use ReflectionMethod;
  * 上传存储策略测试：锁定「哪些目录走 R2、哪些只存本地」。
  *
  * 规则（按加载时机）：
- * - 文章封面懒加载，不阻塞首屏 → 走 R2
- * - 卡片图/背景图/广告图/展示位图需秒开 → 只存本地
+ * - 文章封面/正文图懒加载，不阻塞首屏 → 走 R2
+ * - 效果展示（独立页面，非首屏）→ 走 R2
+ * - 卡片图/背景图/广告图在首屏，需秒开 → 只存本地
  *
  * 该策略直接影响首屏加载速度与外网依赖，改动必须有测试兜底。
  */
@@ -34,9 +35,9 @@ final class UploadStoragePolicyTest extends TestCase
         return $const === false ? [] : (array) $const->getValue();
     }
 
-    public function testOnlyArticlesGoToR2(): void
+    public function testOnlyNonFirstScreenDirsGoToR2(): void
     {
-        self::assertSame(['articles'], $this->r2Subdirs());
+        self::assertSame(['articles', 'showcase'], $this->r2Subdirs());
     }
 
     /** 需要秒开的目录必须不在 R2 白名单里。 */
@@ -44,7 +45,7 @@ final class UploadStoragePolicyTest extends TestCase
     {
         $r2 = $this->r2Subdirs();
 
-        foreach (['cards', 'background', 'ads', 'showcase'] as $subdir) {
+        foreach (['cards', 'background', 'ads'] as $subdir) {
             self::assertNotContains($subdir, $r2, "{$subdir} 属首屏图片，应只存本地");
         }
     }

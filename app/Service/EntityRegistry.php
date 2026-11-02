@@ -33,8 +33,8 @@ final class EntityRegistry
         'card' => [
             'fields' => [
                 'category_id' => 'int', 'title' => 'string', 'image' => 'string', 'link' => 'string',
-                'detail' => 'string', 'card_type' => 'string', 'image_width' => 'int',
-                'image_height' => 'int', 'badge_text' => 'string', 'sort_order' => 'int', 'is_active' => 'bool',
+                'detail' => 'string', 'card_type' => 'string',
+                'badge_text' => 'string', 'sort_order' => 'int', 'is_active' => 'bool',
             ],
             'url' => ['link'],
             'require' => ['title'],
@@ -64,11 +64,6 @@ final class EntityRegistry
         'gallery' => [
             'fields' => ['title' => 'string', 'description' => 'string', 'cover_image' => 'string', 'sort_order' => 'int', 'is_active' => 'bool'],
             'require' => ['title'],
-        ],
-        'link' => [
-            'fields' => ['title' => 'string', 'url' => 'string', 'icon' => 'string', 'sort_order' => 'int', 'is_active' => 'bool'],
-            'url' => ['url'],
-            'require' => ['title', 'url'],
         ],
     ];
 

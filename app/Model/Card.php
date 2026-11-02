@@ -9,7 +9,7 @@ namespace App\Model;
  */
 final class Card extends BaseModel
 {
-    public function getByCategory(?int $categoryId, bool $activeOnly = true, string $sortMethod = 'default'): array
+    public function getByCategory(?int $categoryId, bool $activeOnly = true): array
     {
         $sql = 'SELECT c.*, cat.name AS category_name FROM cards c
                 LEFT JOIN categories cat ON c.category_id = cat.id';
@@ -27,22 +27,20 @@ final class Card extends BaseModel
             $sql .= ' WHERE ' . implode(' AND ', $where);
         }
 
-        $sql .= $sortMethod === 'click_count'
-            ? ' ORDER BY c.click_count DESC, c.id DESC'
-            : ' ORDER BY c.sort_order ASC, c.id DESC';
+        // 统一按 sort_order 升序（数字小的在前），同序按 id 升序
+        $sql .= ' ORDER BY c.sort_order ASC, c.id ASC';
 
         return $this->fetchAll($sql, $params);
     }
 
     /** 一次取全部启用卡片（首页按分类分组用，避免 N+1 循环查库）。 */
-    public function getAllActive(string $sortMethod = 'default'): array
+    public function getAllActive(): array
     {
         $sql = 'SELECT c.*, cat.name AS category_name FROM cards c
                 LEFT JOIN categories cat ON c.category_id = cat.id
                 WHERE c.is_active = 1';
-        $sql .= $sortMethod === 'click_count'
-            ? ' ORDER BY c.click_count DESC, c.id DESC'
-            : ' ORDER BY c.sort_order ASC, c.id DESC';
+        // 统一按 sort_order 升序（数字小的在前），同序按 id 升序
+        $sql .= ' ORDER BY c.sort_order ASC, c.id ASC';
         return $this->fetchAll($sql);
     }
 
@@ -69,7 +67,7 @@ final class Card extends BaseModel
 
     public function create(array $data): int
     {
-        $allowed = ['category_id', 'title', 'image', 'link', 'detail', 'card_type', 'image_width', 'image_height', 'badge_text', 'sort_order', 'is_active'];
+        $allowed = ['category_id', 'title', 'image', 'link', 'detail', 'card_type', 'badge_text', 'sort_order', 'is_active'];
         $fields = array_intersect_key($data, array_flip($allowed));
         $keys = array_keys($fields);
         $this->execute(
@@ -81,7 +79,7 @@ final class Card extends BaseModel
 
     public function update(int $id, array $data): bool
     {
-        $allowed = ['category_id', 'title', 'image', 'link', 'detail', 'card_type', 'image_width', 'image_height', 'badge_text', 'sort_order', 'is_active'];
+        $allowed = ['category_id', 'title', 'image', 'link', 'detail', 'card_type', 'badge_text', 'sort_order', 'is_active'];
         $fields = array_intersect_key($data, array_flip($allowed));
         if ($fields === []) {
             return false;

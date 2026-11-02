@@ -9,7 +9,6 @@ use App\Model\LoginAttempt;
 use App\Model\Setting;
 use App\Model\VisitStat;
 use App\Service\CacheService;
-use App\Service\PingService;
 use App\Service\RateLimitService;
 use App\Service\R2Service;
 use App\Service\SeoService;
@@ -73,10 +72,6 @@ final class Container
                 $c->get(R2Service::class)
             ),
             R2Service::class => fn () => new R2Service((array) config('storage.r2', [])),
-            PingService::class => fn (ContainerInterface $c) => new PingService(
-                $c->get(SettingService::class),
-                $c->get(SeoService::class),
-            ),
         ]);
 
         return $builder->build();

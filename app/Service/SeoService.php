@@ -70,7 +70,6 @@ final class SeoService
             'canonical' => $canonical,
             'og' => $og,
             'jsonld' => $jsonld,
-            'umami' => $this->trackingConfig(),
             'theme' => $this->activeTheme(),
             'bgImage' => $this->settings->get('site_bg_image', ''),
             'bgOverlay' => $this->settings->get('site_bg_overlay', '35'),
@@ -86,16 +85,6 @@ final class SeoService
         $theme = (string) $this->settings->get('site_theme', 'default');
         $allowed = ['default', 'dark', 'corporate', 'warm', 'mint', 'minimal'];
         return in_array($theme, $allowed, true) ? $theme : 'default';
-    }
-
-    /** umami 统计脚本配置（布局输出用）。 */
-    public function trackingConfig(): array
-    {
-        return [
-            'enabled' => $this->settings->get('umami_enabled', '1') === '1',
-            'script_url' => $this->settings->get('umami_script_url', ''),
-            'website_id' => $this->settings->get('umami_website_id', ''),
-        ];
     }
 
     /** 网站级 JSON-LD（WebSite schema，含 SearchAction）。 */

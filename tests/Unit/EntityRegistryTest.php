@@ -17,7 +17,7 @@ final class EntityRegistryTest extends TestCase
 {
     public function testAllEightEntitiesAreRegistered(): void
     {
-        $expected = ['category', 'card', 'ad', 'notice', 'article', 'showcase', 'gallery', 'link'];
+        $expected = ['category', 'card', 'ad', 'notice', 'article', 'showcase', 'gallery'];
         self::assertSame($expected, EntityRegistry::entities());
     }
 
@@ -35,7 +35,7 @@ final class EntityRegistryTest extends TestCase
             'category' => ['name', 'sort_order', 'is_active'],
             'card' => [
                 'category_id', 'title', 'image', 'link', 'detail', 'card_type',
-                'image_width', 'image_height', 'badge_text', 'sort_order', 'is_active',
+                'badge_text', 'sort_order', 'is_active',
             ],
             'ad' => ['title', 'image', 'link', 'sort_order', 'is_active'],
             'notice' => ['title', 'content', 'sort_order', 'is_active'],
@@ -45,7 +45,6 @@ final class EntityRegistryTest extends TestCase
                 'gallery_id', 'sort_order', 'is_active',
             ],
             'gallery' => ['title', 'description', 'cover_image', 'sort_order', 'is_active'],
-            'link' => ['title', 'url', 'icon', 'sort_order', 'is_active'],
         ];
 
         foreach ($expected as $entity => $fields) {
@@ -67,7 +66,6 @@ final class EntityRegistryTest extends TestCase
             'article' => ['title'],
             'showcase' => ['title'],
             'gallery' => ['title'],
-            'link' => ['title', 'url'],
             'ad' => [],
         ];
         foreach ($expected as $entity => $fields) {
@@ -85,7 +83,6 @@ final class EntityRegistryTest extends TestCase
         $expected = [
             'card' => ['link'],
             'ad' => ['link'],
-            'link' => ['url'],
             'category' => [],
             'notice' => [],
             'article' => [],

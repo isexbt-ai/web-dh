@@ -22,8 +22,7 @@ $link = $card['link'] ?? '#';
     <span class="card-type-badge <?= e($badgeClass) ?>"><?= e($badgeText) ?></span>
     <div class="card-image">
         <?php if ($imageSrc !== ''): ?>
-        <img src="<?= e($imageSrc) ?>" alt="<?= e($card['title']) ?>" loading="lazy"
-             width="<?= (int) ($card['image_width'] ?? 0) ?>" height="<?= (int) ($card['image_height'] ?? 0) ?>">
+        <img src="<?= e($imageSrc) ?>" alt="<?= e($card['title']) ?>" loading="lazy">
         <?php else: ?>
         <div class="card-placeholder">图片</div>
         <?php endif; ?>

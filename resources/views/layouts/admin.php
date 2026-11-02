@@ -25,12 +25,11 @@ $csrfToken = $csrfToken ?? (string) ($_SESSION['csrf_token'] ?? '');
             <nav class="sidebar-nav">
                 <a href="/admin" class="nav-item<?= $active === 'dashboard' ? ' active' : '' ?>">仪表盘</a>
                 <a href="/admin/config" class="nav-item<?= $active === 'config' ? ' active' : '' ?>">站点配置</a>
-                <a href="/admin/ads" class="nav-item<?= $active === 'ads' ? ' active' : '' ?>">广告管理</a>
+                <a href="/admin/ads" class="nav-item<?= $active === 'ads' ? ' active' : '' ?>">轮播管理</a>
                 <a href="/admin/notices" class="nav-item<?= $active === 'notices' ? ' active' : '' ?>">公告管理</a>
                 <a href="/admin/articles" class="nav-item<?= $active === 'articles' ? ' active' : '' ?>">文章管理</a>
                 <a href="/admin/categories" class="nav-item<?= $active === 'categories' ? ' active' : '' ?>">分类管理</a>
                 <a href="/admin/cards" class="nav-item<?= $active === 'cards' ? ' active' : '' ?>">卡片管理</a>
-                <a href="/admin/links" class="nav-item<?= $active === 'links' ? ' active' : '' ?>">链接管理</a>
                 <a href="/admin/showcase" class="nav-item<?= $active === 'showcase' ? ' active' : '' ?>">效果展示</a>
                 <a href="/admin/messages" class="nav-item<?= $active === 'messages' ? ' active' : '' ?>">留言管理</a>
                 <a href="/admin/password" class="nav-item<?= $active === 'password' ? ' active' : '' ?>">修改密码</a>

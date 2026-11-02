@@ -10,7 +10,6 @@ $pageDesc = $description ?? (string) config('seo.site_description');
 $canonical = $canonical ?? '';
 $og = $og ?? [];
 $jsonld = $jsonld ?? [];
-$umami = $umami ?? ['enabled' => false, 'script_url' => '', 'website_id' => ''];
 $activeTheme = $theme ?? 'default';
 $wideLayout = $wideLayout ?? false;
 $bgImage = $bgImage ?? '';
@@ -50,9 +49,6 @@ $themeColor = $themeColorMap[$activeTheme] ?? '#e94560';
     <?php foreach ($jsonld as $block): ?>
     <script type="application/ld+json"><?= json_encode($block, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
     <?php endforeach; ?>
-    <?php if (!empty($umami['enabled']) && $umami['script_url'] !== ''): ?>
-    <script defer src="<?= e($umami['script_url']) ?>" data-website-id="<?= e($umami['website_id']) ?>"></script>
-    <?php endif; ?>
 </head>
 <?php
 /** 背景图：仅当配置了合法地址时才启用 body 背景层。 */

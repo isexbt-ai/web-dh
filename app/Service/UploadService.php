@@ -33,8 +33,12 @@ final class UploadService
         'mov' => ['video/quicktime'],
     ];
 
-    /** 需要上传到 R2 的子目录（其余一律只存本地，保证首屏秒开） */
-    private const R2_SUBDIRS = ['articles'];
+    /**
+     * 需要上传到 R2 的子目录（其余一律只存本地，保证首屏秒开）。
+     * - articles：文章封面与正文图（懒加载，不阻塞首屏）
+     * - showcase：效果展示的图片/视频/封面（独立页面，非首屏）
+     */
+    private const R2_SUBDIRS = ['articles', 'showcase'];
 
     /** @var string[] 允许的图片扩展名 */
     private array $allowedExtensions;

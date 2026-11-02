@@ -42,8 +42,7 @@ $currentGalleryId = (int) ($currentGalleryId ?? 0);
                     data-title="<?= e($item['title']) ?>"
                     data-media-type="<?= $isVideo ? 'video' : 'image' ?>"
                     data-src="<?= e($isVideo ? $videoSrc : (string) ($item['image_url'] ?? '')) ?>"
-                    data-poster="<?= e($thumb) ?>"
-                    data-width="<?= (int) ($item['image_width'] ?? 0) ?>">
+                    data-poster="<?= e($thumb) ?>">
                 <div class="showcase-thumb">
                     <?php if ($isVideo): ?>
                     <video src="<?= e($videoSrc) ?>"

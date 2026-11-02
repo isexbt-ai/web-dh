@@ -30,9 +30,7 @@ final class ApiController
         $categoryId = isset($params['category_id']) && $params['category_id'] !== ''
             ? (int) $params['category_id']
             : null;
-        $sortMethod = $this->settings->get('card_sort_method', 'default');
-
-        $cards = $this->cardModel->getByCategory($categoryId, true, $sortMethod);
+        $cards = $this->cardModel->getByCategory($categoryId, true);
         $data = array_map(static fn (array $c): array => [
             'id' => (int) $c['id'],
             'title' => (string) $c['title'],
@@ -41,8 +39,6 @@ final class ApiController
             'detail' => (string) ($c['detail'] ?? ''),
             'card_type' => (string) ($c['card_type'] ?? 'link'),
             'badge_text' => (string) ($c['badge_text'] ?? ''),
-            'image_width' => (int) ($c['image_width'] ?? 0),
-            'image_height' => (int) ($c['image_height'] ?? 0),
         ], $cards);
 
         return $this->json($response, ['ok' => true, 'cards' => $data]);

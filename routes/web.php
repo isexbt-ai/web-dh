@@ -9,7 +9,6 @@ use App\Controller\Admin\AuthController;
 use App\Controller\Admin\CardController as AdminCardController;
 use App\Controller\Admin\CategoryController as AdminCategoryController;
 use App\Controller\Admin\DashboardController;
-use App\Controller\Admin\LinkController as AdminLinkController;
 use App\Controller\Admin\MessageController as AdminMessageController;
 use App\Controller\Admin\NoticeController as AdminNoticeController;
 use App\Controller\Admin\SettingController;
@@ -89,7 +88,6 @@ return function (App $app): void {
         $app->get('/articles', [AdminArticleController::class, 'index']);
         $app->get('/categories', [AdminCategoryController::class, 'index']);
         $app->get('/cards', [AdminCardController::class, 'index']);
-        $app->get('/links', [AdminLinkController::class, 'index']);
         $app->get('/showcase', [AdminShowcaseController::class, 'index']);
         $app->get('/messages', [AdminMessageController::class, 'index']);
         $app->get('/password', [AuthController::class, 'passwordForm']);

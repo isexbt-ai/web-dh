@@ -35,8 +35,7 @@ final class CategoryController
             throw new HttpNotFoundException($request, '分类不存在');
         }
 
-        $sortMethod = $this->settings->get('card_sort_method', 'default');
-        $cards = $this->cardModel->getByCategory($id, true, $sortMethod);
+        $cards = $this->cardModel->getByCategory($id, true);
         $canonical = $this->seo->canonical('/category/' . $id . '.html');
         $jsonld = [
             $this->seo->collectionSchema((string) $category['name'], $canonical),

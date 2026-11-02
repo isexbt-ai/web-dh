@@ -65,7 +65,7 @@ final class RouteSmokeTest extends TestCase
     /** 后台页面：未登录 302 跳登录页。 */
     public function testAdminPagesRedirectWhenNotLoggedIn(): void
     {
-        $paths = ['', '/config', '/ads', '/notices', '/articles', '/categories', '/cards', '/links', '/showcase', '/messages', '/password'];
+        $paths = ['', '/config', '/ads', '/notices', '/articles', '/categories', '/cards', '/showcase', '/messages', '/password'];
         foreach ($paths as $path) {
             $response = $this->request('GET', '/admin' . $path);
             self::assertSame(302, $response->getStatusCode(), "/admin{$path} 未登录应 302");
