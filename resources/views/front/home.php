@@ -1,7 +1,7 @@
 <?php
 /**
  * 首页内容模板（顶部导航布局）。
- * 数据：siteTitle/siteSubtitle/ads/categoryCards/notices/visitorCount/guestbookEnabled
+ * 数据：siteTitle/siteSubtitle/ads/categoryCards/notices/guestbookEnabled
  */
 $siteTitle = $siteTitle ?? (string) config('seo.site_title');
 $siteSubtitle = $siteSubtitle ?? '';
@@ -126,10 +126,6 @@ foreach ($categoryCards as $c) {
         </div>
     </div>
 </div>
-<?php endif; ?>
-
-<?php if (!empty($visitorCount)): ?>
-<p class="visitor-count">您是本站的第 <!--VISITOR_COUNT--> 位访客，欢迎光临本站。</p>
 <?php endif; ?>
 
 <button class="back-to-top" id="backToTop" type="button" title="返回顶部" aria-label="返回顶部">

@@ -10,10 +10,10 @@ $pageDesc = $description ?? (string) config('seo.site_description');
 $canonical = $canonical ?? '';
 $og = $og ?? [];
 $jsonld = $jsonld ?? [];
-$activeTheme = $theme ?? 'default';
 $wideLayout = $wideLayout ?? false;
 $bgImage = $bgImage ?? '';
 $bgOverlay = $bgOverlay ?? '35';
+$themeColor = '#0b0c10';
 ?>
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -21,26 +21,13 @@ $bgOverlay = $bgOverlay ?? '35';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle) ?></title>
-    <?php
-/** 浏览器地址栏颜色：按主题选用品牌主色，深色主题用页面底色。 */
-$themeColorMap = [
-    'dark' => '#0f1419',
-    'corporate' => '#0066cc',
-    'warm' => '#ff6b35',
-    'mint' => '#14b8a6',
-];
-$themeColor = $themeColorMap[$activeTheme] ?? '#e94560';
-?>
-<meta name="description" content="<?= e($pageDesc) ?>">
+    <meta name="description" content="<?= e($pageDesc) ?>">
     <meta name="theme-color" content="<?= e($themeColor) ?>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <?php if ($canonical !== ''): ?>
     <link rel="canonical" href="<?= e($canonical) ?>">
     <?php endif; ?>
     <link rel="stylesheet" href="<?= e(asset('style.css')) ?>">
-    <?php if ($activeTheme !== 'default'): ?>
-    <link rel="stylesheet" href="<?= e(asset('theme-' . $activeTheme)) ?>">
-    <?php endif; ?>
     <link rel="stylesheet" href="<?= e(asset('pages.css')) ?>">
     <link rel="manifest" href="/manifest.json">
     <?php foreach ($og as $key => $value): ?>
@@ -63,7 +50,7 @@ if ($bgCss !== '') {
     $bodyStyle = '--site-bg-image:' . $bgCss . ';--site-bg-overlay:' . (max(0, min(100, (int) $bgOverlay)) / 100);
 }
 ?>
-<body<?= $activeTheme !== 'default' ? ' data-theme="' . e($activeTheme) . '"' : '' ?><?= $bodyClasses !== [] ? ' class="' . e(implode(' ', $bodyClasses)) . '"' : '' ?><?= $bodyStyle !== '' ? ' style="' . e($bodyStyle) . '"' : '' ?>>
+<body<?= $bodyClasses !== [] ? ' class="' . e(implode(' ', $bodyClasses)) . '"' : '' ?><?= $bodyStyle !== '' ? ' style="' . e($bodyStyle) . '"' : '' ?>>
     <?php if (empty($wideLayout)): ?>
     <!-- 子页面顶栏：站点名 + 全站搜索 + 导航（首页使用自带的 home-header） -->
     <header class="site-bar">

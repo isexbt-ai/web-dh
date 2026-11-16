@@ -10,25 +10,43 @@
     padding: 0 24px;
 }
 
-/* ---------- 顶部展示区（广告轮播） ---------- */
+/* ---------- 顶部展示区（广告轮播）：沉浸式通栏 ---------- */
+/* 突破容器内边距铺满整宽，底部由遮罩溶入页面背景 */
 .home-banner {
-    padding: 20px 0 0;
+    padding: 0;
+    margin: 0 -24px;
 }
 
 .home-banner .slide-carousel {
     height: var(--home-banner-height);
     aspect-ratio: auto;
-    border-radius: 16px;
+    border-radius: 0;
+    background: #05060a;
+}
+
+/* 沉浸遮罩：顶部压暗让文字可读，底部溶入页面底色消除硬边 */
+.home-banner .slide-carousel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background:
+        linear-gradient(180deg, rgba(11, 12, 16, 0.42) 0%, rgba(11, 12, 16, 0) 30%),
+        linear-gradient(0deg, var(--bg-page) 0%, rgba(11, 12, 16, 0.78) 22%, rgba(11, 12, 16, 0.12) 58%, rgba(11, 12, 16, 0) 78%);
 }
 
 .home-banner .slide-item img {
-    border-radius: 16px;
+    border-radius: 0;
+    filter: saturate(1.06) contrast(1.02);
 }
 
 .home-banner .slide-dots {
     left: auto;
-    right: 16px;
+    right: 24px;
+    bottom: 22px;
     transform: none;
+    z-index: 3;
 }
 
 /* ---------- 子页面顶栏（首页之外的页面） ---------- */
@@ -36,7 +54,9 @@
     position: sticky;
     top: 0;
     z-index: 20;
-    background: var(--bg-card);
+    background: rgba(11, 12, 16, 0.72);
+    backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
     border-bottom: 1px solid var(--border);
 }
 
@@ -63,7 +83,9 @@
     position: sticky;
     top: 0;
     z-index: 20;
-    background: var(--bg-card);
+    background: rgba(11, 12, 16, 0.72);
+    backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
     border-bottom: 1px solid var(--border);
 }
 
@@ -110,19 +132,20 @@
     min-width: 120px;
     max-width: 320px;
     padding: 7px 14px;
-    border: 1px solid var(--border-strong);
-    border-radius: 10px;
-    background: var(--bg-muted);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
     color: var(--text-muted);
     font-size: 14px;
     font-family: inherit;
     cursor: pointer;
-    transition: border-color 0.2s ease, color 0.2s ease;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
 }
 
 .home-search-btn:hover {
-    border-color: var(--brand-primary);
-    color: var(--brand-primary);
+    border-color: rgba(255, 255, 255, 0.26);
+    background: rgba(255, 255, 255, 0.09);
+    color: var(--text-secondary);
 }
 
 .home-search-btn svg {
@@ -138,14 +161,14 @@
     margin-left: auto;
 }
 
-/* 入口按钮：描边 + 主色文字，hover 反白填充 */
+/* 入口按钮：玻璃描边，hover 主色高亮 */
 .home-nav-btn {
     display: inline-flex;
     align-items: center;
     padding: 6px 14px;
-    border: 1px solid var(--border-strong);
-    border-radius: 8px;
-    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
     color: var(--text-secondary);
     font-size: 13.5px;
     font-weight: 500;
@@ -155,20 +178,20 @@
 
 .home-nav-btn:hover {
     border-color: var(--brand-primary);
-    color: var(--brand-primary);
+    color: var(--brand-primary-light);
     background: var(--brand-bg-lighter);
 }
 
 /* 主入口（留言板）：实心主色，最显眼 */
 .home-nav-btn-primary {
-    border-color: var(--brand-primary);
-    background: var(--brand-primary);
+    border-color: transparent;
+    background: var(--brand-gradient);
     color: var(--text-on-brand);
 }
 
 .home-nav-btn-primary:hover {
     background: var(--brand-primary-dark);
-    border-color: var(--brand-primary-dark);
+    border-color: transparent;
     color: var(--text-on-brand);
 }
 
@@ -179,29 +202,31 @@
     gap: 8px;
     max-width: var(--home-layout-width);
     margin: 0 auto;
-    padding: 0 24px 10px;
+    padding: 14px 24px 12px;
 }
 
 .home-cats button {
-    padding: 6px 12px;
-    border: 0;
-    border-radius: 8px;
+    padding: 6px 14px;
+    border: 1px solid transparent;
+    border-radius: 999px;
     background: transparent;
     color: var(--text-tertiary);
     font-size: 14px;
     font-family: inherit;
     cursor: pointer;
-    transition: background 0.2s ease, color 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .home-cats button:hover {
-    background: var(--bg-muted);
+    background: rgba(255, 255, 255, 0.07);
+    border-color: var(--border);
     color: var(--text-primary);
 }
 
 .home-cats button.active {
-    background: var(--brand-primary);
-    color: var(--text-on-brand);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.16);
+    color: var(--text-primary);
     font-weight: 600;
 }
 
@@ -213,7 +238,7 @@
 
 /* ---------- 主内容区 ---------- */
 .home-main {
-    padding: 18px 0 60px;
+    padding: 26px 0 60px;
 }
 
 /* 分类切换：默认全部显示，选中单个时只显示对应区块 */

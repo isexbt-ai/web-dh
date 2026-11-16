@@ -4,6 +4,8 @@
     border-radius: var(--section-radius);
     border: var(--section-border);
     box-shadow: var(--section-shadow);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
     margin-bottom: var(--section-spacing);
     overflow: hidden;
     transition: all 0.3s ease;
@@ -17,9 +19,9 @@
 /* ==================== 轮播图区 ==================== */
 .slide-carousel {
     position: relative;
-    border-radius: 12px;
+    border-radius: 0;
     overflow: hidden;
-    background: var(--bg-muted);
+    background: #05060a;
     width: 100%;
     aspect-ratio: 16/9;
 }
@@ -52,7 +54,7 @@
     height: 100%;
     object-fit: cover;
     display: block;
-    border-radius: 12px;
+    border-radius: 0;
 }
 
 .slide-placeholder {
@@ -65,7 +67,7 @@
     font-size: 24px;
     font-weight: bold;
     color: var(--text-on-brand);
-    border-radius: 12px;
+    border-radius: 0;
 }
 
 .slide-dots {
@@ -80,17 +82,17 @@
 
 .slide-dot {
     width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.32);
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .slide-dot.active {
     background: var(--brand-primary);
-    width: 24px;
-    border-radius: 4px;
+    width: 26px;
+    border-radius: 2px;
 }
 
 /* ==================== 公告弹窗 ==================== */
@@ -113,18 +115,23 @@
 .notice-modal-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.62);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     z-index: 0;
 }
 .notice-modal-content {
     position: relative;
-    background: var(--bg-card);
-    border-radius: 16px;
+    background: rgba(22, 23, 29, 0.92);
+    border: 1px solid var(--border-strong);
+    border-radius: 18px;
     width: 90%;
     max-width: 380px;
     max-height: 80vh;
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
     z-index: 1;
 }
 .notice-modal.show .notice-modal-content {
@@ -225,16 +232,19 @@
     justify-content: center;
 }
 
+/* 卡片 = 玻璃容器：内嵌图片 + 透明标题条 */
 .card-item {
     background: var(--bg-card);
     border-radius: var(--card-radius);
-    overflow: hidden;
     border: var(--card-border);
     box-shadow: var(--card-shadow);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease,
+                background 0.3s ease, border-color 0.3s ease;
     cursor: pointer;
     position: relative;
-    aspect-ratio: var(--card-aspect);
+    padding: 9px;
     min-height: var(--card-min-height);
     display: flex;
     flex-direction: column;
@@ -244,18 +254,21 @@
     transform: var(--card-transform-hover);
     box-shadow: var(--card-shadow-hover);
     border-color: var(--border-strong);
+    background: rgba(255, 255, 255, 0.10);
 }
 
 .card-item:active {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    box-shadow: var(--shadow-medium);
 }
 
 .card-image {
-    flex: 1;
     width: 100%;
+    aspect-ratio: var(--card-aspect);
+    border-radius: 12px;
     overflow: hidden;
     position: relative;
+    background: rgba(255, 255, 255, 0.04);
 }
 
 .card-image img {
@@ -263,7 +276,7 @@
     height: 100%;
     object-fit: var(--card-image-fit);
     display: block;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .card-item:hover .card-image img {
@@ -293,43 +306,42 @@
     background: var(--card-title-bg);
     border-top: var(--card-title-border);
     font-weight: var(--card-title-weight);
-    transition: all 0.3s ease;
+    transition: color 0.3s ease;
     line-height: 1.3;
     flex-shrink: 0;
 }
 
 .card-item:hover .card-title {
-    background: var(--card-title-bg-hover);
     color: var(--card-title-color-hover);
 }
 
 /* 卡片类型标签 */
 .card-type-badge {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 14px;
+    right: 14px;
     padding: 2px 8px;
     border-radius: var(--badge-radius);
     font-size: var(--badge-font-size);
     font-weight: 600;
     z-index: 5;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .card-type-badge.link {
-    background: rgba(78, 204, 163, 0.9);
+    background: rgba(78, 204, 163, 0.75);
     color: #fff;
 }
 
 .card-type-badge.detail {
-    background: var(--brand-shadow-medium), var(--brand-primary);
-    background: var(--brand-primary);
-    opacity: 0.9;
-    color: var(--text-on-brand);
+    background: rgba(255, 77, 106, 0.78);
+    color: #fff;
 }
 
 .card-type-badge.custom {
-    background: linear-gradient(135deg, #f9a825, #ff9800);
-    color: var(--text-on-brand);
+    background: rgba(249, 168, 37, 0.78);
+    color: #fff;
 }
 
 /* ==================== 加载动画 ==================== */
@@ -346,24 +358,6 @@
     background: var(--footer-bg);
     border-top: 1px solid var(--border);
     margin-top: 4px;
-}
-
-.site-footer .visitor-count {
-    margin-top: 8px;
-    font-size: 18px;
-    font-weight: 700;
-    background: var(--brand-glow);
-    background-size: 300% 300%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: gradientShift 4s ease infinite;
-}
-
-@keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
 }
 
 /* ==================== 响应式设计 - PC端 ==================== */
@@ -427,10 +421,17 @@
 
     .home-banner {
         padding-top: 12px;
+        margin: 0 -12px;
     }
 
+    /* 移动端沉浸展示区：缩短高度但保持通栏与溶入背景的遮罩 */
     .home-banner .slide-carousel {
-        height: 140px;
+        height: 200px;
+    }
+
+    .home-banner .slide-dots {
+        right: 16px;
+        bottom: 16px;
     }
 
     .home-search-btn {
@@ -719,21 +720,6 @@
     line-height: 1.4;
     letter-spacing: 0.5px;
     display: inline-block;
-}
-
-/* ===== 首页/页面 visitor-count 炫彩居中 ===== */
-.visitor-count {
-    text-align: center;
-    padding: 16px 0;
-    background: var(--brand-glow);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: visitor-glow 8s linear infinite;
-}
-@keyframes visitor-glow {
-    to { background-position: 200% center; }
 }
 
 /* ===== 屏幕阅读器隐藏（h1 标题视觉隐藏） ===== */

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 /**
  * 前端构建脚本：minify 压缩 resources 资源到 public/assets，生成 manifest.json（内容 hash 版本号）。
- * 自动扫描 themes/*.css；非默认主题会生成独立 manifest 项供前台按需加载。
  * 用法: composer build（或 php build.php）；产物随 git 入库，服务器零构建。
  */
 
@@ -28,18 +27,6 @@ $assets = [
     'main.js' => [__DIR__ . '/resources/js/main.js', __DIR__ . '/public/assets/js/main.min.js', 'js'],
     'admin.js' => [__DIR__ . '/resources/js/admin.js', __DIR__ . '/public/assets/js/admin.min.js', 'js'],
 ];
-
-// 自动扫描 themes/*.css（默认主题用 :root，不需要文件）
-$themesDir = __DIR__ . '/resources/css/themes';
-$themesOutDir = __DIR__ . '/public/assets/css/themes';
-if (is_dir($themesDir)) {
-    foreach (glob($themesDir . '/*.css') ?: [] as $themeSrc) {
-        $name = pathinfo($themeSrc, PATHINFO_FILENAME);
-        $themeKey = 'theme-' . $name;
-        $themeDst = $themesOutDir . '/' . $name . '.min.css';
-        $assets[$themeKey] = [$themeSrc, $themeDst, 'css'];
-    }
-}
 
 $manifest = [];
 $failed = false;

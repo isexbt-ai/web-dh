@@ -6,10 +6,12 @@
 }
 
 .detail-card {
-    background: var(--bg-card);
-    border-radius: 16px;
+    background: rgba(20, 21, 27, 0.72);
+    border-radius: 18px;
     border: 1px solid var(--border);
     box-shadow: var(--shadow-card);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
     overflow: hidden;
 }
 
@@ -221,10 +223,12 @@
 .article-item {
     display: flex;
     gap: 20px;
-    background: var(--bg-card);
-    border-radius: 16px;
+    background: rgba(20, 21, 27, 0.72);
+    border-radius: 18px;
     border: 1px solid var(--border);
     box-shadow: var(--shadow-card);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
     overflow: hidden;
     transition: all 0.3s ease;
     text-decoration: none;
@@ -317,10 +321,12 @@
 }
 
 .article-detail-card {
-    background: var(--bg-card);
-    border-radius: 16px;
+    background: rgba(20, 21, 27, 0.72);
+    border-radius: 18px;
     border: 1px solid var(--border);
     box-shadow: var(--shadow-card);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
     overflow: hidden;
 }
 
@@ -528,7 +534,9 @@
     align-items: center;
     justify-content: space-between;
     padding: 16px 20px;
-    background: var(--bg-card);
+    background: rgba(11, 12, 16, 0.78);
+    backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
     border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
@@ -552,11 +560,13 @@
 }
 
 .showcase-item {
-    background: var(--bg-card);
-    border-radius: 16px;
+    background: rgba(20, 21, 27, 0.72);
+    border-radius: 18px;
     overflow: hidden;
     border: 1px solid var(--border);
     box-shadow: var(--shadow-card);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     position: relative;
@@ -637,12 +647,12 @@
 .showcase-tabs { display: flex; gap: 10px; justify-content: center; padding: 16px 0 4px; flex-wrap: wrap; }
 .showcase-tab { padding: 8px 20px; border-radius: 20px; font-size: 14px; background: var(--bg-muted); color: var(--text-tertiary); text-decoration: none; border: 1px solid var(--border); transition: all .3s; }
 .showcase-tab.active, .showcase-tab:hover { background: var(--brand-primary); color: var(--text-on-brand); border-color: var(--brand-primary); }
-.article-date { font-size: 12px; color: #aaa; }
+.article-date { font-size: 12px; color: var(--text-muted); }
 .guestbook-container { padding-bottom: 20px; }
 .guestbook-section { padding: 10px 0; }
 .guestbook-form-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary); }
 .guestbook-form { display: flex; flex-direction: column; gap: 12px; }
-.guestbook-form input, .guestbook-form textarea { width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; box-sizing: border-box; background: var(--bg-card); color: var(--text-primary); }
+.guestbook-form input, .guestbook-form textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border-strong); border-radius: 10px; font-size: 14px; box-sizing: border-box; background: var(--bg-input); color: var(--text-primary); }
 .guestbook-form textarea { resize: vertical; }
 .guestbook-form-actions { display: flex; justify-content: space-between; align-items: center; }
 .guestbook-char-count { font-size: 12px; color: var(--text-muted); }
@@ -677,11 +687,13 @@
 
 .showcase-item {
     margin: 0;
-    background: var(--bg-card);
-    border-radius: var(--card-radius, 12px);
+    background: rgba(20, 21, 27, 0.72);
+    border-radius: var(--card-radius, 18px);
     overflow: hidden;
     border: 1px solid var(--border);
     box-shadow: var(--shadow-card);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
     cursor: zoom-in;
     position: relative;
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;

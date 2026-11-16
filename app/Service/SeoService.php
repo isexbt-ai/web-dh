@@ -70,21 +70,9 @@ final class SeoService
             'canonical' => $canonical,
             'og' => $og,
             'jsonld' => $jsonld,
-            'theme' => $this->activeTheme(),
             'bgImage' => $this->settings->get('site_bg_image', ''),
             'bgOverlay' => $this->settings->get('site_bg_overlay', '35'),
         ];
-    }
-
-    /**
-     * 当前激活主题：默认 default（使用 :root 变量），其它主题需加载对应 CSS。
-     * 校验非法值回退 default。
-     */
-    public function activeTheme(): string
-    {
-        $theme = (string) $this->settings->get('site_theme', 'default');
-        $allowed = ['default', 'dark', 'corporate', 'warm', 'mint', 'minimal'];
-        return in_array($theme, $allowed, true) ? $theme : 'default';
     }
 
     /** 网站级 JSON-LD（WebSite schema，含 SearchAction）。 */

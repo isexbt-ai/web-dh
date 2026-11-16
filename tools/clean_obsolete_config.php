@@ -6,7 +6,9 @@ declare(strict_types=1);
  * 清理已废弃的站点配置项。
  *
  * 背景：站点配置页已移除 umami 统计、虚拟人气加成、搜索引擎主动推送、
- *      卡片排序方式（改为卡片管理内按分类维护 sort_order）。
+ *      卡片排序方式（改为卡片管理内按分类维护 sort_order）；
+ *      前台改版为唯一暗色玻璃样式后，主题切换与卡片列数配置随之废弃
+ *      （列数改由 CSS 断点变量控制）。
  *      代码不再读取这些键，残留属于垃圾数据。
  *
  * 用法：php tools/clean_obsolete_config.php [--dry-run]
@@ -24,6 +26,8 @@ $obsolete = [
     'umami_enabled', 'umami_script_url', 'umami_website_id',
     'visitor_base_offset', 'visitor_daily_increment',
     'baidu_push_token', 'indexnow_key',
+    'site_theme',
+    'cards_per_row_desktop', 'cards_per_row_tablet', 'cards_per_row_mobile',
 ];
 
 $pdo = new PDO('sqlite:' . (string) config('database.path'));

@@ -8,7 +8,6 @@ use App\Model\Message;
 use App\Service\SeoService;
 use App\Service\SettingService;
 use App\Service\View;
-use App\Service\VisitService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Exception\HttpNotFoundException;
@@ -22,8 +21,7 @@ final class GuestbookController
         private View $view,
         private Message $messageModel,
         private SeoService $seo,
-        private SettingService $settings,
-        private VisitService $visitService
+        private SettingService $settings
     ) {
     }
 

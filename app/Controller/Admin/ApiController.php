@@ -29,11 +29,9 @@ final class ApiController
     /** 后台可保存的配置键白名单（与 SettingController 一致） */
     private const CONFIG_KEYS = [
         'site_title', 'site_subtitle', 'site_description', 'site_keywords',
-        'site_theme',
         'site_bg_image', 'site_bg_overlay',
         'guestbook_enabled',
         'guestbook_title', 'guestbook_subtitle', 'guestbook_image', 'guestbook_notice',
-        'cards_per_row_desktop', 'cards_per_row_tablet', 'cards_per_row_mobile',
     ];
 
     /** 允许的上传子目录白名单（防止 type 参数穿越到 uploads 之外） */

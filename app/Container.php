@@ -55,8 +55,6 @@ final class Container
             SettingService::class => fn (ContainerInterface $c) => new SettingService($c->get(Setting::class)),
             VisitService::class => fn (ContainerInterface $c) => new VisitService(
                 $c->get(VisitStat::class),
-                $c->get(SettingService::class),
-                $c->get(CacheService::class),
             ),
             RateLimitService::class => fn (ContainerInterface $c) => new RateLimitService(
                 $c->get(LoginAttempt::class),

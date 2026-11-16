@@ -12,12 +12,11 @@ use App\Service\CacheService;
 use App\Service\SeoService;
 use App\Service\SettingService;
 use App\Service\View;
-use App\Service\VisitService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
- * 首页控制器：轮播 + 分类卡片（一次查询分组，无 N+1）+ 公告 + 访客统计。
+ * 首页控制器：轮播 + 分类卡片（一次查询分组，无 N+1）+ 公告。
  * 整页文件缓存 5 分钟，后台写操作时失效。
  */
 final class HomeController
@@ -30,7 +29,6 @@ final class HomeController
         private Category $categoryModel,
         private Card $cardModel,
         private Notice $noticeModel,
-        private VisitService $visitService,
         private CacheService $cache
     ) {
     }
@@ -40,13 +38,6 @@ final class HomeController
         $cacheKey = 'page_home';
         $cached = $this->cache->get($cacheKey);
         if (is_string($cached) && $cached !== '') {
-            // 缓存命中：访客数仍每次实时计算并替换占位符（避免被 5 分钟缓存冻结）
-            $stats = $this->visitService->displayStats((int) config('app.visitor_display_days', 30));
-            $cached = str_replace(
-                '<!--VISITOR_COUNT-->',
-                number_format((int) ($stats['total_visitors'] ?? 0)),
-                $cached
-            );
             $response->getBody()->write($cached);
             return $response;
         }
@@ -82,8 +73,6 @@ final class HomeController
             $jsonld[] = $this->seo->itemListSchema($cardItems, '精选导航');
         }
 
-        $stats = $this->visitService->displayStats((int) config('app.visitor_display_days', 30));
-
         $ads = $this->adModel->getAll(true);
 
         $seo = $this->seo->page($siteTitle, $siteSubtitle, '/', [], $jsonld);
@@ -94,8 +83,6 @@ final class HomeController
             'categoryCards' => $categoryCards,
             'ads' => $ads,
             'notices' => $this->noticeModel->getAll(true),
-            'visitorCount' => (int) ($stats['total_visitors'] ?? 0),
-            'recentVisitors' => (int) ($stats['recent_visitors'] ?? 0),
             'guestbookEnabled' => $this->settings->get('guestbook_enabled', '1') === '1',
             'wideLayout' => true,
         ]);

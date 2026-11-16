@@ -146,17 +146,6 @@
 
     // ==================== 初始化 ====================
     document.addEventListener('DOMContentLoaded', function () {
-        // 主题选择器：change 事件即时切换 .active 视觉（不依赖保存）
-        document.querySelectorAll('.theme-picker input[type="radio"]').forEach(function (radio) {
-            radio.addEventListener('change', function () {
-                var picker = radio.closest('.theme-picker');
-                if (!picker) return;
-                picker.querySelectorAll('.theme-option').forEach(function (opt) { opt.classList.remove('active'); });
-                var opt = radio.closest('.theme-option');
-                if (opt) opt.classList.add('active');
-            });
-        });
-
         // 登录
         var loginForm = document.getElementById('loginForm');
         if (loginForm) {
